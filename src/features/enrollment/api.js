@@ -43,3 +43,34 @@ export async function createEnrollmentCall({ studentId, groupId }) {
     };
   }
 }
+
+/**
+ * Call cancelEnrollment Cloud Function
+ * @param {Object} params
+ * @param {string} params.enrollmentId
+ * @returns {Promise<{ success: boolean }>}
+ */
+export async function cancelEnrollmentCall({ enrollmentId }) {
+  try {
+    const callable = httpsCallable(functions, 'cancelEnrollment');
+    const result = await callable({ enrollmentId });
+    return result.data;
+  } catch (error) {
+    if (
+      error.code === 'failed-precondition' ||
+      error.code === 'functions/failed-precondition' ||
+      error.code === 'permission-denied' ||
+      error.code === 'functions/permission-denied' ||
+      error.code === 'not-found' ||
+      error.code === 'functions/not-found'
+    ) {
+      throw error;
+    }
+
+    console.warn(
+      'cancelEnrollment Cloud Function unavailable, using dev simulation:',
+      error.message
+    );
+    return { success: true, isDevMock: true };
+  }
+}
