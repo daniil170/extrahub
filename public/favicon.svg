@@ -1,6 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="8" fill="#2563EB"/>
-  <path d="M16 6L26 12L16 18L6 12L16 6Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M9 14.5V20.5C9 20.5 11.5 24 16 24C20.5 24 23 20.5 23 20.5V14.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M26 12V18" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 196 196" fill="none">
+  <!-- Rounded squircle background matching brand blue -->
+  <rect width="196" height="196" rx="44" fill="#245892" />
+  
+  <!-- Top-Right Coral Block -->
+  <rect x="138" y="44" width="28" height="28" rx="8" fill="#F06543" />
+  
+  <!-- Bottom-Right Mint Green Block -->
+  <rect x="138" y="128" width="28" height="28" rx="8" fill="#82C9A4" />
+
+  <!-- Middle Pillar Compartments -->
+  <rect x="114" y="74" width="20" height="22" fill="#F06543" />
+  <rect x="114" y="146" width="20" height="16" rx="4" fill="#F06543" />
+
+  <!-- The "E" Outer & Inner Path (White) -->
+  <path 
+    d="M102 44 H52 C41 44 34 51 34 62 V134 C34 145 41 152 52 152 H102 C106 152 108 149 108 145 V133 C108 129 106 126 102 126 H64 C58 126 54 122 54 116 V108 C54 104 57 101 61 101 H88 C93 101 96 98 96 93 C96 88 93 85 88 85 H61 C57 85 54 82 54 78 V70 C54 64 58 60 64 60 H102 C106 60 108 57 108 53 V47 C108 44 106 44 102 44 Z" 
+    stroke="#FFFFFF" 
+    stroke-width="9" 
+    stroke-linejoin="round"
+    stroke-linecap="round"
+    fill="none"
+  />
+
+  <!-- Arrow passing through middle (White) -->
+  <path 
+    d="M84 93 H162 M148 81 L164 93 L148 105" 
+    stroke="#FFFFFF" 
+    stroke-width="9" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+
+  <!-- Vertical Ladder / Column Frame (White) -->
+  <path 
+    d="M110 44 H142 V152 H110 Z" 
+    stroke="#FFFFFF" 
+    stroke-width="9" 
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+  <!-- Ladder rungs -->
+  <line x1="110" y1="74" x2="142" y2="74" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" />
+  <line x1="110" y1="126" x2="142" y2="126" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" />
 </svg>
