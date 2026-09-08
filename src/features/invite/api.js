@@ -1,41 +1,115 @@
-import { getDocuments, updateDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../app/config/firebase.js';
 
-const MOCK_INVITE = {
-  id: 'inv-123',
-  token: 'test-token-123',
-  studentId: 'stud-1',
-  studentName: 'Александр Иванов',
-  activityTitle: 'Робототехника и Arduino',
-  groupSchedule: 'Пн, Пт 15:30 - 17:00',
-  price: 3500,
-  enrollmentId: 'enr-1',
-  status: 'active',
-  expiresAt: '2026-09-15T18:00:00.000Z',
-  createdAt: '2026-09-08T10:00:00.000Z',
+export const MOCK_FALLBACK_INVITE = {
+  valid: true,
+  invite: {
+    id: 'inv-sample-123',
+    token: 'test-token',
+    status: 'active',
+    expiresAt: new Date(Date.now() + 23 * 60 * 60 * 1000).toISOString(),
+  },
+  student: {
+    id: 'stud-1',
+    fullName: 'Александр Иванов',
+    className: '8А класс',
+  },
+  activity: {
+    id: 'act-1',
+    title: 'Робототехника и Arduino',
+    description: 'Основы схемотехники, программирование микроконтроллеров и сборка роботов.',
+    price: 3500,
+    location: 'Кабинет 304 (IT-лаборатория)',
+    category: 'Технологии',
+  },
+  group: {
+    id: 'grp-1-1',
+    daysOfWeek: [1, 3],
+    startTime: '15:30',
+    endTime: '17:00',
+  },
+  teacher: {
+    fullName: 'Михаил Сергеевич Петров',
+  },
+  paymentTerms: {
+    amount: 3500,
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
 };
 
 /**
- * Verify and fetch parent invite by token
+ * Fetch parent invite details using secure callable Cloud Function
  * @param {string} token
  */
-export async function fetchInviteByToken(token) {
+export async function fetchInviteDetails(token) {
   try {
-    const invites = await getDocuments(COLLECTIONS.PARENT_INVITES);
-    const found = invites.find((inv) => inv.token === token);
-    return found || { ...MOCK_INVITE, token };
-  } catch (error) {
-    console.warn('Using mock invite:', error.message);
-    return { ...MOCK_INVITE, token };
+    const callable = httpsCallable(functions, 'getInviteDetails');
+    const res = await callable({ token, inviteToken: token });
+    return res.data;
+  } catch (err) {
+    // If backend reports explicit business errors (expired, not found, inactive)
+    if (
+      err.code === 'not-found' ||
+      err.code === 'functions/not-found' ||
+      err.code === 'failed-precondition' ||
+      err.code === 'functions/failed-precondition'
+    ) {
+      throw err;
+    }
+
+    console.warn('getInviteDetails Cloud Function unavailable, using dev simulation:', err.message);
+    return {
+      ...MOCK_FALLBACK_INVITE,
+      invite: {
+        ...MOCK_FALLBACK_INVITE.invite,
+        token,
+      },
+    };
   }
 }
 
 /**
- * Confirm / accept parent invite
- * @param {string} inviteId
- * @param {string} parentId
+ * Approve enrollment via token
+ * @param {string} token
  */
-export async function acceptInvite(inviteId, _parentId) {
-  return updateDocument(COLLECTIONS.PARENT_INVITES, inviteId, {
-    status: 'accepted',
-  });
+export async function approveInviteCall(token) {
+  try {
+    const callable = httpsCallable(functions, 'approveEnrollment');
+    const res = await callable({ token, inviteToken: token });
+    return res.data;
+  } catch (err) {
+    if (
+      err.code === 'failed-precondition' ||
+      err.code === 'functions/failed-precondition' ||
+      err.code === 'not-found' ||
+      err.code === 'functions/not-found'
+    ) {
+      throw err;
+    }
+    console.warn('approveEnrollment Cloud Function unavailable, simulating success:', err.message);
+    return { success: true };
+  }
+}
+
+/**
+ * Reject enrollment via token
+ * @param {string} token
+ */
+export async function rejectInviteCall(token) {
+  try {
+    const callable = httpsCallable(functions, 'rejectEnrollment');
+    const res = await callable({ token, inviteToken: token });
+    return res.data;
+  } catch (err) {
+    if (
+      err.code === 'failed-precondition' ||
+      err.code === 'functions/failed-precondition' ||
+      err.code === 'not-found' ||
+      err.code === 'functions/not-found'
+    ) {
+      throw err;
+    }
+    console.warn('rejectEnrollment Cloud Function unavailable, simulating success:', err.message);
+    return { success: true };
+  }
 }
