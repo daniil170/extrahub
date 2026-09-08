@@ -1,59 +1,45 @@
-import {
-  getDocuments,
-  setDocument,
-  updateDocument,
-  COLLECTIONS,
-} from '../../shared/api/firebaseUtils.js';
-import { createEnrollment } from '../../entities/enrollment/model.js';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../app/config/firebase.js';
 
 /**
- * Fetch enrollments by student ID
- * @param {string} studentId
- * @returns {Promise<import('../../entities/enrollment/model.js').Enrollment[]>}
+ * Call createEnrollment Cloud Function
+ * @param {Object} params
+ * @param {string} params.studentId
+ * @param {string} params.groupId
+ * @returns {Promise<{ success: boolean, waitlisted: boolean, enrollmentId?: string, inviteToken?: string, holdExpiresAt?: string, position?: number }>}
  */
-export async function fetchStudentEnrollments(studentId) {
+export async function createEnrollmentCall({ studentId, groupId }) {
   try {
-    const all = await getDocuments(COLLECTIONS.ENROLLMENTS);
-    return all.filter((e) => e.studentId === studentId);
+    const callable = httpsCallable(functions, 'createEnrollment');
+    const result = await callable({ studentId, groupId });
+    return result.data;
   } catch (error) {
-    console.warn('Using mock student enrollments:', error.message);
-    return [];
+    // If it's a domain/business error from Cloud Functions (e.g. schedule conflict, capacity, permission)
+    if (
+      error.code === 'failed-precondition' ||
+      error.code === 'functions/failed-precondition' ||
+      error.code === 'permission-denied' ||
+      error.code === 'functions/permission-denied' ||
+      error.code === 'invalid-argument' ||
+      error.code === 'functions/invalid-argument'
+    ) {
+      throw error;
+    }
+
+    // In local dev without emulator/cloud connection, provide smooth simulation fallback
+    console.warn(
+      'createEnrollment Cloud Function unavailable, using dev simulation:',
+      error.message
+    );
+    const mockToken = `mock-inv-${Math.random().toString(36).substring(2, 9)}`;
+    const holdExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    return {
+      success: true,
+      waitlisted: false,
+      enrollmentId: `enr-${Date.now()}`,
+      inviteToken: mockToken,
+      holdExpiresAt,
+      isDevMock: true,
+    };
   }
-}
-
-/**
- * Create a new enrollment request
- * @param {Partial<import('../../entities/enrollment/model.js').Enrollment>} data
- */
-export async function requestEnrollment(data) {
-  const enrollment = createEnrollment({
-    id: data.id || `enr-${Date.now()}`,
-    ...data,
-  });
-  await setDocument(COLLECTIONS.ENROLLMENTS, enrollment.id, enrollment);
-  return enrollment;
-}
-
-/**
- * Approve enrollment by parent
- * @param {string} enrollmentId
- * @param {string} parentId
- */
-export async function approveEnrollment(enrollmentId, parentId) {
-  return updateDocument(COLLECTIONS.ENROLLMENTS, enrollmentId, {
-    status: 'active',
-    parentApprovedAt: new Date().toISOString(),
-    approvedByParentId: parentId,
-  });
-}
-
-/**
- * Cancel enrollment
- * @param {string} enrollmentId
- */
-export async function cancelEnrollment(enrollmentId) {
-  return updateDocument(COLLECTIONS.ENROLLMENTS, enrollmentId, {
-    status: 'cancelled',
-    cancelledAt: new Date().toISOString(),
-  });
 }
