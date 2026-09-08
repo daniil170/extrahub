@@ -1,0 +1,49 @@
+:root {
+  /* Typography */
+  --font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Brand Palette (Educator & Scholar Theme) */
+  --primary: #1e3a5f;
+  --primary-hover: #152943;
+  --primary-light: #f0f4f8;
+  --primary-border: #cbd5e1;
+  --primary-glow: rgba(30, 58, 95, 0.16);
+
+  /* Brand Accents (derived from ExtraHub mark) */
+  --accent-coral: #e76f51;
+  --accent-coral-hover: #d25b3e;
+  --accent-coral-light: #fff2ed;
+
+  --accent-mint: #2a9d8f;
+  --accent-mint-hover: #228377;
+  --accent-mint-light: #ecf8f6;
+
+  /* Status Colors */
+  --success: #2a9d8f;
+  --success-light: #ecf8f6;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --danger: #e63946;
+  --danger-light: #fdf2f2;
+  --info: #1e3a5f;
+  --info-light: #f0f4f8;
+
+  /* Neutrals & Surfaces */
+  --bg-primary: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
+
+  /* Radius & Shadows */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+}
