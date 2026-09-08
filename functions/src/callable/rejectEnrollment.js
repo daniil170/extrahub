@@ -7,10 +7,10 @@ import { promoteFromWaitlist } from '../shared/waitlist.js';
  * Callable Cloud Function to reject enrollment via parent invite token
  */
 export const rejectEnrollment = onCall(async (request) => {
-  const { inviteToken } = request.data || {};
+  const inviteToken = request.data?.inviteToken || request.data?.token;
 
   if (!inviteToken || typeof inviteToken !== 'string') {
-    throw new HttpsError('invalid-argument', 'Параметр inviteToken обязателен');
+    throw new HttpsError('invalid-argument', 'Параметр inviteToken или token обязателен');
   }
 
   const inviteQuery = await db

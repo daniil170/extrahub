@@ -6,10 +6,10 @@ import { db } from '../config/firebase.js';
  * Does not require parent authentication, but validates token and prevents leaking extraneous data.
  */
 export const getInviteDetails = onCall(async (request) => {
-  const { inviteToken } = request.data || {};
+  const inviteToken = request.data?.inviteToken || request.data?.token;
 
   if (!inviteToken || typeof inviteToken !== 'string') {
-    throw new HttpsError('invalid-argument', 'Параметр inviteToken обязателен');
+    throw new HttpsError('invalid-argument', 'Параметр inviteToken или token обязателен');
   }
 
   const inviteQuery = await db
@@ -26,7 +26,10 @@ export const getInviteDetails = onCall(async (request) => {
   const invite = inviteDoc.data();
 
   if (invite.status !== 'active') {
-    throw new HttpsError('failed-precondition', `Приглашение не активно (статус: ${invite.status})`);
+    throw new HttpsError(
+      'failed-precondition',
+      `Приглашение не активно (статус: ${invite.status})`
+    );
   }
 
   const now = new Date();
