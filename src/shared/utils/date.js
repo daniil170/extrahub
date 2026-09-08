@@ -33,11 +33,11 @@ export function formatDaysOfWeek(days = []) {
 }
 
 /**
- * Format currency amount
+ * Format currency amount in Kazakhstani Tenge (₸) by default
  * @param {number} amount
- * @param {string} [currency='₽']
+ * @param {string} [currency='₸']
  * @returns {string}
  */
-export function formatCurrency(amount = 0, currency = '₽') {
+export function formatCurrency(amount = 0, currency = '₸') {
   return `${amount.toLocaleString('ru-RU')} ${currency}`;
 }
