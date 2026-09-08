@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   subscribeCoordinatorPayments,
   createPaymentRecord,
+  createGroupInvoicesRecord,
   markPaymentAsPaid,
   cancelPaymentRecord,
 } from './api.js';
@@ -10,11 +11,14 @@ export function useCoordinatorPayments() {
   const [payments, setPayments] = useState([]);
   const [students, setStudents] = useState([]);
   const [activities, setActivities] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Filters & Search
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterGroupId, setFilterGroupId] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Processing & Feedback state
@@ -23,10 +27,12 @@ export function useCoordinatorPayments() {
 
   // Create Invoice Modal State
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createModalMode, setCreateModalMode] = useState('group'); // 'group' | 'single'
+  const [preselectedGroupId, setPreselectedGroupId] = useState(null);
 
   useEffect(() => {
     if (!actionSuccess) return;
-    const timer = setTimeout(() => setActionSuccess(null), 2500);
+    const timer = setTimeout(() => setActionSuccess(null), 3000);
     return () => clearTimeout(timer);
   }, [actionSuccess]);
 
@@ -37,6 +43,8 @@ export function useCoordinatorPayments() {
         setPayments(data.payments);
         setStudents(data.students);
         setActivities(data.activities);
+        setGroups(data.groups || []);
+        setEnrollments(data.enrollments || []);
         setLoading(false);
       },
       (err) => {
@@ -50,22 +58,26 @@ export function useCoordinatorPayments() {
     };
   }, []);
 
-  // Filtered payments by search and status
+  // Filtered payments by search, status, and group
   const filteredPayments = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return payments.filter((p) => {
       if (filterStatus !== 'all' && p.status !== filterStatus) {
         return false;
       }
+      if (filterGroupId !== 'all' && p.groupId !== filterGroupId) {
+        return false;
+      }
       if (q) {
         const studentMatch = (p.studentName || '').toLowerCase().includes(q);
         const classMatch = (p.className || '').toLowerCase().includes(q);
         const actMatch = (p.activityTitle || '').toLowerCase().includes(q);
-        if (!studentMatch && !classMatch && !actMatch) return false;
+        const grpMatch = (p.groupName || '').toLowerCase().includes(q);
+        if (!studentMatch && !classMatch && !actMatch && !grpMatch) return false;
       }
       return true;
     });
-  }, [payments, filterStatus, searchQuery]);
+  }, [payments, filterStatus, filterGroupId, searchQuery]);
 
   // Financial statistics
   const stats = useMemo(() => {
@@ -98,25 +110,28 @@ export function useCoordinatorPayments() {
     };
   }, [payments]);
 
-  const openCreateModal = useCallback(() => {
+  const openCreateModal = useCallback((mode = 'group', groupId = null) => {
+    setCreateModalMode(mode);
+    setPreselectedGroupId(groupId);
     setCreateModalOpen(true);
   }, []);
 
   const closeCreateModal = useCallback(() => {
     if (isProcessing) return;
     setCreateModalOpen(false);
+    setPreselectedGroupId(null);
   }, [isProcessing]);
 
   // Create single invoice
   const createSingleInvoice = useCallback(
-    async ({ studentId, activityId, amount, dueDate }) => {
+    async ({ studentId, activityId, amount, dueDate, periodTitle }) => {
       setIsProcessing(true);
       setError(null);
       try {
         const student = students.find((s) => s.id === studentId);
         const activity = activities.find((a) => a.id === activityId);
 
-        await createPaymentRecord({
+        const res = await createPaymentRecord({
           studentId,
           studentName: student?.fullName || '',
           className: student?.className || '',
@@ -124,7 +139,25 @@ export function useCoordinatorPayments() {
           activityTitle: activity?.title || '',
           amount: Number(amount),
           dueDate,
+          periodTitle: periodTitle || 'Оплата за кружок',
         });
+
+        // Optimistically add to local payments
+        const newRecord = {
+          id: res.id,
+          studentId,
+          studentName: student?.fullName || `Ученик (${studentId})`,
+          className: student?.className || '',
+          activityId,
+          activityTitle: activity?.title || 'Кружок',
+          amount: Number(amount),
+          dueDate,
+          periodTitle: periodTitle || 'Оплата за кружок',
+          status: 'pending',
+          paidAt: null,
+          createdAt: new Date().toISOString(),
+        };
+        setPayments((prev) => [newRecord, ...prev]);
 
         setActionSuccess('Счёт успешно выставлен!');
         setCreateModalOpen(false);
@@ -136,6 +169,40 @@ export function useCoordinatorPayments() {
       }
     },
     [students, activities]
+  );
+
+  // Create group invoices batch
+  const createGroupInvoices = useCallback(
+    async ({ groupId, activityId, amount, dueDate, periodTitle }) => {
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const res = await createGroupInvoicesRecord({
+          groupId,
+          activityId,
+          amount: Number(amount),
+          dueDate,
+          periodTitle,
+          activeEnrollments: enrollments,
+        });
+
+        if (res.invoices && res.invoices.length > 0) {
+          setPayments((prev) => [...res.invoices, ...prev]);
+        }
+
+        const formattedTotal = Number(res.totalAmount).toLocaleString('ru-RU');
+        setActionSuccess(
+          `Успешно сформировано ${res.count} счетов для группы на сумму ${formattedTotal} ₸!`
+        );
+        setCreateModalOpen(false);
+      } catch (err) {
+        console.error('Failed to create group invoices:', err);
+        setError(err.message || 'Ошибка формирования счетов группы');
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [enrollments]
   );
 
   // Mark invoice as paid offline
@@ -179,6 +246,8 @@ export function useCoordinatorPayments() {
     filteredPayments,
     students,
     activities,
+    groups,
+    enrollments,
     stats,
     loading,
     error,
@@ -187,13 +256,18 @@ export function useCoordinatorPayments() {
     // Filters
     filterStatus,
     setFilterStatus,
+    filterGroupId,
+    setFilterGroupId,
     searchQuery,
     setSearchQuery,
     // Modal & Actions
     createModalOpen,
+    createModalMode,
+    preselectedGroupId,
     openCreateModal,
     closeCreateModal,
     createSingleInvoice,
+    createGroupInvoices,
     markAsPaid,
     cancelInvoice,
   };

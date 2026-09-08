@@ -54,6 +54,159 @@ export const MOCK_STUDENTS_CATALOG = [
   },
 ];
 
+export const MOCK_COORDINATOR_ENROLLMENTS = [
+  // Robotics Group A (grp-1-1)
+  {
+    id: 'enr-c1',
+    studentId: 'student-1',
+    studentName: 'Александр Иванов',
+    className: '7-Б класс',
+    groupId: 'grp-1-1',
+    activityId: 'act-1',
+    status: 'active',
+  },
+  {
+    id: 'enr-c2',
+    studentId: 'student-2',
+    studentName: 'София Иванова',
+    className: '5-Б класс',
+    groupId: 'grp-1-1',
+    activityId: 'act-1',
+    status: 'active',
+  },
+  {
+    id: 'enr-c3',
+    studentId: 'student-3',
+    studentName: 'Дарья Смирнова',
+    className: '7-А класс',
+    groupId: 'grp-1-1',
+    activityId: 'act-1',
+    status: 'active',
+  },
+  {
+    id: 'enr-c4',
+    studentId: 'student-4',
+    studentName: 'Илья Кузнецов',
+    className: '8-В класс',
+    groupId: 'grp-1-1',
+    activityId: 'act-1',
+    status: 'active',
+  },
+  {
+    id: 'enr-c5',
+    studentId: 'student-5',
+    studentName: 'Максим Смирнов',
+    className: '7-Б класс',
+    groupId: 'grp-1-1',
+    activityId: 'act-1',
+    status: 'active',
+  },
+  {
+    id: 'enr-c6',
+    studentId: 'student-6',
+    studentName: 'Екатерина Попова',
+    className: '8-А класс',
+    groupId: 'grp-1-1',
+    activityId: 'act-1',
+    status: 'active',
+  },
+  // Theater Main Troupe (grp-2-1)
+  {
+    id: 'enr-c7',
+    studentId: 'student-1',
+    studentName: 'Александр Иванов',
+    className: '7-Б класс',
+    groupId: 'grp-2-1',
+    activityId: 'act-2',
+    status: 'active',
+  },
+  {
+    id: 'enr-c8',
+    studentId: 'student-3',
+    studentName: 'Дарья Смирнова',
+    className: '7-А класс',
+    groupId: 'grp-2-1',
+    activityId: 'act-2',
+    status: 'active',
+  },
+  {
+    id: 'enr-c9',
+    studentId: 'student-5',
+    studentName: 'Максим Смирнов',
+    className: '7-Б класс',
+    groupId: 'grp-2-1',
+    activityId: 'act-2',
+    status: 'active',
+  },
+  // Chess (grp-3-1)
+  {
+    id: 'enr-c10',
+    studentId: 'student-2',
+    studentName: 'София Иванова',
+    className: '5-Б класс',
+    groupId: 'grp-3-1',
+    activityId: 'act-3',
+    status: 'active',
+  },
+  {
+    id: 'enr-c11',
+    studentId: 'student-6',
+    studentName: 'Екатерина Попова',
+    className: '8-А класс',
+    groupId: 'grp-3-1',
+    activityId: 'act-3',
+    status: 'active',
+  },
+  // Volleyball (grp-4-1)
+  {
+    id: 'enr-c12',
+    studentId: 'student-4',
+    studentName: 'Илья Кузнецов',
+    className: '8-В класс',
+    groupId: 'grp-4-1',
+    activityId: 'act-4',
+    status: 'active',
+  },
+  // English Debates (grp-5-1)
+  {
+    id: 'enr-c13',
+    studentId: 'student-2',
+    studentName: 'София Иванова',
+    className: '5-Б класс',
+    groupId: 'grp-5-1',
+    activityId: 'act-5',
+    status: 'active',
+  },
+  {
+    id: 'enr-c14',
+    studentId: 'student-5',
+    studentName: 'Максим Смирнов',
+    className: '7-Б класс',
+    groupId: 'grp-5-1',
+    activityId: 'act-5',
+    status: 'active',
+  },
+  // Math Olympiad (grp-6-1)
+  {
+    id: 'enr-c15',
+    studentId: 'student-1',
+    studentName: 'Александр Иванов',
+    className: '7-Б класс',
+    groupId: 'grp-6-1',
+    activityId: 'act-6',
+    status: 'active',
+  },
+  {
+    id: 'enr-c16',
+    studentId: 'student-4',
+    studentName: 'Илья Кузнецов',
+    className: '8-В класс',
+    groupId: 'grp-6-1',
+    activityId: 'act-6',
+    status: 'active',
+  },
+];
+
 export const MOCK_COORDINATOR_PAYMENTS = [
   {
     id: 'pay-101',
@@ -63,7 +216,7 @@ export const MOCK_COORDINATOR_PAYMENTS = [
     className: '7-Б класс',
     activityId: 'act-1',
     activityTitle: 'Робототехника и Arduino',
-    amount: 3500,
+    amount: 25000,
     status: 'paid',
     dueDate: '2026-09-15',
     paidAt: '2026-09-03T14:20:00.000Z',
@@ -77,7 +230,7 @@ export const MOCK_COORDINATOR_PAYMENTS = [
     className: '5-Б класс',
     activityId: 'act-5',
     activityTitle: 'Разговорный английский Debate Club',
-    amount: 3200,
+    amount: 22000,
     status: 'pending',
     dueDate: '2026-09-25',
     paidAt: null,
@@ -91,7 +244,7 @@ export const MOCK_COORDINATOR_PAYMENTS = [
     className: '7-А класс',
     activityId: 'act-1',
     activityTitle: 'Робототехника и Arduino',
-    amount: 3500,
+    amount: 25000,
     status: 'overdue',
     dueDate: '2026-09-05',
     paidAt: null,
@@ -105,7 +258,7 @@ export const MOCK_COORDINATOR_PAYMENTS = [
     className: '8-В класс',
     activityId: 'act-4',
     activityTitle: 'Школьный волейбол',
-    amount: 1800,
+    amount: 15000,
     status: 'pending',
     dueDate: '2026-09-20',
     paidAt: null,
@@ -347,11 +500,15 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
   let paymentsList = null;
   let studentsList = null;
   let actsList = null;
+  let grpsList = null;
+  let enrsList = null;
 
   function emit() {
     const pays = paymentsList && paymentsList.length > 0 ? paymentsList : devPaymentsStore;
     const stds = studentsList && studentsList.length > 0 ? studentsList : MOCK_STUDENTS_CATALOG;
     const acts = actsList && actsList.length > 0 ? actsList : MOCK_ACTIVITIES;
+    const grps = grpsList && grpsList.length > 0 ? grpsList : devGroupsStore;
+    const enrs = enrsList && enrsList.length > 0 ? enrsList : MOCK_COORDINATOR_ENROLLMENTS;
 
     const stdMap = {};
     stds.forEach((s) => {
@@ -363,15 +520,22 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
       actMap[a.id] = a;
     });
 
+    const grpMap = {};
+    grps.forEach((g) => {
+      grpMap[g.id] = g;
+    });
+
     const enrichedPayments = pays.map((p) => {
       const student = stdMap[p.studentId] || {};
       const activity = actMap[p.activityId] || {};
+      const group = grpMap[p.groupId] || {};
 
       return {
         ...p,
         studentName: p.studentName || student.fullName || `Ученик (${p.studentId})`,
         className: p.className || student.className || '',
         activityTitle: p.activityTitle || activity.title || 'Кружок',
+        groupName: p.groupName || group.name || '',
       };
     });
 
@@ -379,6 +543,8 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
       payments: enrichedPayments,
       students: stds,
       activities: acts,
+      groups: grps,
+      enrollments: enrs,
     });
   }
 
@@ -415,12 +581,105 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
     );
     unsubs.push(unsubActs);
 
+    const unsubGrps = onSnapshot(
+      collection(db, COLLECTIONS.ACTIVITY_GROUPS),
+      (snap) => {
+        grpsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        emit();
+      },
+      () => emit()
+    );
+    unsubs.push(unsubGrps);
+
+    const unsubEnrs = onSnapshot(
+      collection(db, COLLECTIONS.ENROLLMENTS),
+      (snap) => {
+        enrsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        emit();
+      },
+      () => emit()
+    );
+    unsubs.push(unsubEnrs);
+
     return () => unsubs.forEach((fn) => fn && fn());
   } catch (err) {
     console.warn('subscribeCoordinatorPayments fallback to mock:', err.message);
     emit();
     if (onError) onError(err);
     return () => {};
+  }
+}
+
+/**
+ * Batch create payment invoices for all active students in an activity group
+ */
+export async function createGroupInvoicesRecord({
+  groupId,
+  activityId,
+  amount,
+  dueDate,
+  periodTitle = 'Оплата за кружок',
+  activeEnrollments = [],
+}) {
+  const sourceEnrollments =
+    activeEnrollments && activeEnrollments.length > 0
+      ? activeEnrollments
+      : MOCK_COORDINATOR_ENROLLMENTS;
+
+  const matching = sourceEnrollments.filter((e) => e.groupId === groupId && e.status === 'active');
+
+  if (matching.length === 0) {
+    throw new Error('В выбранной группе нет активных зачисленных учеников для выставления счетов');
+  }
+
+  const act = MOCK_ACTIVITIES.find((a) => a.id === activityId) || {};
+  const grp = devGroupsStore.find((g) => g.id === groupId) || {};
+  const groupName = grp.name || 'Основная группа';
+
+  const newInvoices = matching.map((enr, i) => ({
+    id: `pay-grp-${Date.now()}-${i}-${enr.studentId}`,
+    groupId,
+    groupName,
+    enrollmentId: enr.id,
+    studentId: enr.studentId,
+    studentName: enr.studentName || `Ученик (${enr.studentId})`,
+    className: enr.className || '',
+    activityId: activityId || enr.activityId,
+    activityTitle: act.title || enr.activityTitle || 'Кружок',
+    amount: Number(amount) || 0,
+    periodTitle,
+    dueDate: dueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    status: 'pending',
+    paidAt: null,
+    createdAt: new Date().toISOString(),
+  }));
+
+  try {
+    const promises = newInvoices.map((inv) => {
+      const docRef = doc(db, COLLECTIONS.PAYMENTS, inv.id);
+      return setDoc(docRef, inv);
+    });
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Firestore timeout')), 1000)
+    );
+    await Promise.race([Promise.all(promises), timeoutPromise]);
+    devPaymentsStore = [...newInvoices, ...devPaymentsStore];
+    return {
+      success: true,
+      count: newInvoices.length,
+      totalAmount: newInvoices.length * (Number(amount) || 0),
+      invoices: newInvoices,
+    };
+  } catch (err) {
+    console.warn('createGroupInvoicesRecord fallback to mock store:', err.message);
+    devPaymentsStore = [...newInvoices, ...devPaymentsStore];
+    return {
+      success: true,
+      count: newInvoices.length,
+      totalAmount: newInvoices.length * (Number(amount) || 0),
+      invoices: newInvoices,
+      isDevMock: true,
+    };
   }
 }
 
