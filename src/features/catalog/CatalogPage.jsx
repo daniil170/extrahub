@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useCatalog } from './useCatalog.js';
 import { useEnrollment } from '../enrollment/useEnrollment.js';
 import { EnrollmentModal } from '../enrollment/EnrollmentModal.jsx';
+import { ActivityDetailsModal } from './ActivityDetailsModal.jsx';
 import { Card, Badge, Button, Spinner, PageHeader } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 
@@ -40,6 +42,24 @@ export function CatalogPage() {
     submitEnrollment,
     userRole,
   } = useEnrollment();
+
+  const [detailsActivity, setDetailsActivity] = useState(null);
+
+  const handleOpenDetails = (activity) => {
+    setDetailsActivity(activity);
+  };
+
+  const handleCloseDetails = () => {
+    setDetailsActivity(null);
+  };
+
+  const handleEnrollFromDetails = (preferredGroup) => {
+    if (detailsActivity) {
+      const act = detailsActivity;
+      setDetailsActivity(null);
+      openEnrollment(act, preferredGroup?.id);
+    }
+  };
 
   const daysOptions = [
     { value: 'all', label: 'Все дни' },
@@ -282,13 +302,25 @@ export function CatalogPage() {
             return (
               <Card
                 key={act.id}
+                role="button"
+                tabIndex={0}
+                aria-label={`Подробнее о программе кружка ${act.title}`}
+                onClick={() => handleOpenDetails(act)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleOpenDetails(act);
+                  }
+                }}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   height: '100%',
                   borderRadius: 'var(--radius-lg)',
-                  transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+                  transition: 'box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease',
+                  cursor: 'pointer',
+                  position: 'relative',
                 }}
               >
                 <div>
@@ -345,7 +377,7 @@ export function CatalogPage() {
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '6px',
-                      marginBottom: '16px',
+                      marginBottom: '12px',
                       padding: '10px 12px',
                       backgroundColor: 'var(--bg-subtle)',
                       borderRadius: 'var(--radius-sm)',
@@ -371,6 +403,22 @@ export function CatalogPage() {
                       📊 Занято: <strong>{totalEnrolled}</strong> из{' '}
                       <strong>{totalCapacity}</strong> мест
                     </div>
+                  </div>
+
+                  {/* Clickable prompt for curriculum / content */}
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '13px',
+                      color: 'var(--primary)',
+                      fontWeight: 600,
+                      marginBottom: '14px',
+                    }}
+                  >
+                    <span>📖 Содержание и программа курса</span>
+                    <span>→</span>
                   </div>
                 </div>
 
@@ -404,7 +452,10 @@ export function CatalogPage() {
                   <Button
                     size="sm"
                     variant={isFull ? 'secondary' : 'primary'}
-                    onClick={() => openEnrollment(act)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEnrollment(act);
+                    }}
                   >
                     {isFull ? 'Встать в лист ожидания' : 'Записаться'}
                   </Button>
@@ -414,6 +465,14 @@ export function CatalogPage() {
           })}
         </div>
       )}
+
+      {/* Activity Program & Syllabus Details Modal */}
+      <ActivityDetailsModal
+        isOpen={Boolean(detailsActivity)}
+        onClose={handleCloseDetails}
+        activity={detailsActivity}
+        onEnroll={handleEnrollFromDetails}
+      />
 
       {/* Interactive Enrollment Modal */}
       <EnrollmentModal
