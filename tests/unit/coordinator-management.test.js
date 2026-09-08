@@ -3,12 +3,22 @@ import {
   calculateCapacityMetrics,
   enrichGroupsWithActivity,
   generateGroupInvoices,
+  createGroupInvoicesRecord,
   markPaymentAsPaid,
   updateGroupCapacity,
   MOCK_COORDINATOR_PAYMENTS,
 } from '../../src/features/coordinator/api.js';
+import { formatCurrency } from '../../src/shared/utils/index.js';
 
 describe('Coordinator Management & Billing Logic', () => {
+  describe('formatCurrency', () => {
+    it('formats amounts in Kazakhstani Tenge (₸) by default', () => {
+      expect(formatCurrency(25000)).toBe('25\u00A0000 ₸');
+      expect(formatCurrency(0)).toBe('0 ₸');
+      expect(formatCurrency(150000)).toBe('150\u00A0000 ₸');
+    });
+  });
+
   describe('calculateCapacityMetrics', () => {
     it('calculates total capacity, enrolled count, occupancy rate and full groups correctly', () => {
       const testGroups = [
@@ -173,6 +183,67 @@ describe('Coordinator Management & Billing Logic', () => {
 
       const res = await markPaymentAsPaid('pay-102');
       expect(res.success).toBe(true);
+    });
+  });
+
+  describe('createGroupInvoicesRecord', () => {
+    it('creates batch invoices for all active students in a group and calculates total amount in Tenge', async () => {
+      const activeEnrollments = [
+        {
+          id: 'e1',
+          groupId: 'grp-test',
+          studentId: 's1',
+          studentName: 'Александр',
+          className: '7-Б',
+          status: 'active',
+        },
+        {
+          id: 'e2',
+          groupId: 'grp-test',
+          studentId: 's2',
+          studentName: 'София',
+          className: '5-Б',
+          status: 'active',
+        },
+        {
+          id: 'e3',
+          groupId: 'grp-test',
+          studentId: 's3',
+          studentName: 'Дарья',
+          className: '7-А',
+          status: 'cancelled',
+        },
+      ];
+
+      const res = await createGroupInvoicesRecord({
+        groupId: 'grp-test',
+        activityId: 'act-1',
+        amount: 25000,
+        dueDate: '2026-10-15',
+        periodTitle: 'Октябрь 2026',
+        activeEnrollments,
+      });
+
+      expect(res.success).toBe(true);
+      expect(res.count).toBe(2);
+      expect(res.totalAmount).toBe(50000); // 2 * 25 000 ₸
+      expect(res.invoices).toHaveLength(2);
+      expect(res.invoices[0].amount).toBe(25000);
+      expect(res.invoices[0].periodTitle).toBe('Октябрь 2026');
+      expect(res.invoices[0].status).toBe('pending');
+    });
+
+    it('rejects group invoicing if there are no active students in the group', async () => {
+      await expect(
+        createGroupInvoicesRecord({
+          groupId: 'grp-empty',
+          activityId: 'act-1',
+          amount: 25000,
+          activeEnrollments: [],
+        })
+      ).rejects.toThrow(
+        'В выбранной группе нет активных зачисленных учеников для выставления счетов'
+      );
     });
   });
 });
