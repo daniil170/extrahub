@@ -63,4 +63,22 @@ describe('Catalog & Capacity Logic', () => {
     expect(result[0].groups).toEqual([]);
     expect(result[0].teacherName).toBe('Михаил Сергеевич Петров');
   });
+
+  it('contains comprehensive curriculum syllabus and learning outcomes for all catalog activities', () => {
+    MOCK_ACTIVITIES.forEach((activity) => {
+      expect(activity.syllabus).toBeDefined();
+      expect(Array.isArray(activity.syllabus)).toBe(true);
+      expect(activity.syllabus.length).toBeGreaterThanOrEqual(3);
+
+      activity.syllabus.forEach((mod) => {
+        expect(mod.module).toBeDefined();
+        expect(mod.title).toBeTruthy();
+        expect(mod.description).toBeTruthy();
+      });
+
+      expect(activity.learningOutcomes).toBeDefined();
+      expect(Array.isArray(activity.learningOutcomes)).toBe(true);
+      expect(activity.learningOutcomes.length).toBeGreaterThanOrEqual(3);
+    });
+  });
 });
