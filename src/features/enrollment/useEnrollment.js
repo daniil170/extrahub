@@ -25,18 +25,22 @@ export function useEnrollment() {
    * Open the enrollment modal for a selected activity
    */
   const openEnrollment = useCallback(
-    (activity) => {
+    (activity, preferredGroupId = null) => {
       setActiveActivity(activity);
       setConflictError(null);
       setGeneralError(null);
       setEnrollmentResult(null);
 
-      // Pick default group (prefer one with available spots)
+      // Pick preferred group or default group (prefer one with available spots)
       const groups = activity.groups || [];
-      const availableGroup = groups.find(
-        (g) => (Number(g.enrolledCount) || 0) < (Number(g.capacity) || 0)
-      );
-      setSelectedGroupId(availableGroup?.id || groups[0]?.id || '');
+      if (preferredGroupId) {
+        setSelectedGroupId(preferredGroupId);
+      } else {
+        const availableGroup = groups.find(
+          (g) => (Number(g.enrolledCount) || 0) < (Number(g.capacity) || 0)
+        );
+        setSelectedGroupId(availableGroup?.id || groups[0]?.id || '');
+      }
 
       // Pick default student based on current user role
       if (user?.role === 'student') {
