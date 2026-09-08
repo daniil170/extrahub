@@ -12,6 +12,7 @@ import {
   TeacherDashboard,
   CoordinatorDashboard,
 } from '../../features/dashboard/index.js';
+import { DashboardRedirect } from './DashboardRedirect.jsx';
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: 'catalog',
         element: <CatalogPage />,
+      },
+      {
+        path: 'dashboard',
+        element: <DashboardRedirect />,
       },
       {
         path: 'login',
