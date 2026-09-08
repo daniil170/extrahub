@@ -1,0 +1,244 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // HELPER FUNCTIONS
+    // ==========================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function getUserRole() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? getUserDoc().role
+        : null;
+    }
+
+    function isStudent() {
+      return isAuthenticated() && getUserRole() == 'student';
+    }
+
+    function isParent() {
+      return isAuthenticated() && getUserRole() == 'parent';
+    }
+
+    function isTeacher() {
+      return isAuthenticated() && getUserRole() == 'teacher';
+    }
+
+    function isCoordinator() {
+      return isAuthenticated() && (getUserRole() == 'coordinator' || getUserRole() == 'admin');
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+
+    function isParentOfStudent(studentId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/students/$(studentId)) &&
+        request.auth.uid in get(/databases/$(database)/documents/students/$(studentId)).data.parentIds;
+    }
+
+    function isTeacherOfGroup(groupId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/activityGroups/$(groupId)) &&
+        get(/databases/$(database)/documents/activityGroups/$(groupId)).data.teacherId == request.auth.uid;
+    }
+
+    // ==========================================
+    // USERS COLLECTION
+    // ==========================================
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == userId ||
+        isTeacher() ||
+        isCoordinator()
+      );
+      
+      // Users can only create their own user document with non-elevated roles
+      allow create: if isAuthenticated() && (
+        (request.auth.uid == userId && !(request.resource.data.role in ['coordinator', 'admin'])) ||
+        isAdmin()
+      );
+
+      // Users cannot change their own role or status
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'status'])) ||
+        isCoordinator()
+      );
+
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // STUDENTS COLLECTION
+    // ==========================================
+    match /students/{studentId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == studentId ||
+        isParentOfStudent(studentId) ||
+        isTeacher() ||
+        isCoordinator()
+      );
+
+      allow create, update, delete: if isCoordinator();
+    }
+
+    // ==========================================
+    // ACTIVITIES COLLECTION
+    // ==========================================
+    match /activities/{activityId} {
+      // Public catalog
+      allow read: if true;
+      allow create, update, delete: if isCoordinator();
+    }
+
+    // ==========================================
+    // ACTIVITY GROUPS COLLECTION
+    // ==========================================
+    match /activityGroups/{groupId} {
+      // Public group schedule
+      allow read: if true;
+      allow create, delete: if isCoordinator();
+      
+      // CRITICAL: Direct client mutation of enrolledCount is strictly forbidden!
+      // EnrolledCount must only be changed via Admin SDK / Cloud Functions.
+      allow update: if isCoordinator() && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['enrolledCount']) ||
+        isAdmin()
+      );
+    }
+
+    // ==========================================
+    // ENROLLMENTS COLLECTION
+    // ==========================================
+    match /enrollments/{enrollmentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.studentId == request.auth.uid ||
+        isParentOfStudent(resource.data.studentId) ||
+        isTeacher() ||
+        isCoordinator()
+      );
+
+      // Student can only create pending approval enrollment for themselves
+      allow create: if isAuthenticated() && (
+        (
+          isStudent() &&
+          request.resource.data.studentId == request.auth.uid &&
+          request.resource.data.status == 'pending_parent_approval'
+        ) ||
+        isCoordinator()
+      );
+
+      // Parent can approve child enrollment, Student can cancel their own, Coordinator has full access
+      allow update: if isAuthenticated() && (
+        (
+          isParentOfStudent(resource.data.studentId) &&
+          request.resource.data.status in ['active', 'cancelled'] &&
+          request.resource.data.approvedByParentId == request.auth.uid &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['studentId', 'groupId', 'activityId', 'enrolledAt'])
+        ) ||
+        (
+          isStudent() &&
+          resource.data.studentId == request.auth.uid &&
+          request.resource.data.status == 'cancelled' &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['studentId', 'groupId', 'activityId', 'enrolledAt'])
+        ) ||
+        isCoordinator()
+      );
+
+      allow delete: if isCoordinator();
+    }
+
+    // ==========================================
+    // WAITLIST COLLECTION
+    // ==========================================
+    match /waitlist/{waitlistId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && (
+        (isStudent() && request.resource.data.studentId == request.auth.uid) ||
+        isCoordinator()
+      );
+      allow update, delete: if isCoordinator();
+    }
+
+    // ==========================================
+    // ATTENDANCE COLLECTION
+    // ==========================================
+    match /attendance/{attendanceId} {
+      allow read: if isAuthenticated() && (
+        resource.data.studentId == request.auth.uid ||
+        isParentOfStudent(resource.data.studentId) ||
+        isTeacherOfGroup(resource.data.groupId) ||
+        isCoordinator()
+      );
+
+      // Teacher can only mark attendance for their assigned group
+      allow create: if isAuthenticated() && (
+        (isTeacher() && isTeacherOfGroup(request.resource.data.groupId) && request.resource.data.markedBy == request.auth.uid) ||
+        isCoordinator()
+      );
+
+      allow update: if isAuthenticated() && (
+        (isTeacher() && isTeacherOfGroup(resource.data.groupId) && isTeacherOfGroup(request.resource.data.groupId)) ||
+        isCoordinator()
+      );
+
+      allow delete: if isCoordinator();
+    }
+
+    // ==========================================
+    // PAYMENTS COLLECTION
+    // ==========================================
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.studentId == request.auth.uid ||
+        isParentOfStudent(resource.data.studentId) ||
+        isCoordinator()
+      );
+
+      allow create, update, delete: if isCoordinator();
+    }
+
+    // ==========================================
+    // PARENT INVITES COLLECTION
+    // ==========================================
+    match /parentInvites/{inviteId} {
+      // Landing page token check can read invite
+      allow read: if true;
+      // Creation and updates are managed exclusively by Cloud Functions / Admin SDK / Coordinator
+      allow create, update, delete: if isCoordinator();
+    }
+
+    // ==========================================
+    // ACHIEVEMENTS COLLECTION
+    // ==========================================
+    match /achievements/{achievementId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isTeacher() || isCoordinator();
+      allow delete: if isCoordinator();
+    }
+
+    // ==========================================
+    // NOTIFICATIONS COLLECTION
+    // ==========================================
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // User can only update isRead flag on their own notification
+      allow update: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']);
+
+      allow create, delete: if isCoordinator();
+    }
+  }
+}
