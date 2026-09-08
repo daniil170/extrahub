@@ -86,12 +86,16 @@ const devAttendanceStore = {
  */
 export async function fetchTeacherGroups(teacherId) {
   try {
-    // 1. Find activities for teacher
+    // 1. Find activities for teacher with quick timeout
     const actsQ = query(
       collection(db, COLLECTIONS.ACTIVITIES),
       where('teacherId', '==', teacherId)
     );
-    const actsSnap = await getDocs(actsQ);
+    const getDocsPromise = getDocs(actsQ);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Firestore timeout')), 800)
+    );
+    const actsSnap = await Promise.race([getDocsPromise, timeoutPromise]);
 
     if (actsSnap.empty) {
       return MOCK_TEACHER_GROUPS;
@@ -104,7 +108,8 @@ export async function fetchTeacherGroups(teacherId) {
     });
 
     // 2. Find groups for these activities
-    const grpsSnap = await getDocs(collection(db, COLLECTIONS.ACTIVITY_GROUPS));
+    const grpsSnapPromise = getDocs(collection(db, COLLECTIONS.ACTIVITY_GROUPS));
+    const grpsSnap = await Promise.race([grpsSnapPromise, timeoutPromise]);
     const teacherGroups = grpsSnap.docs
       .map((d) => ({ id: d.id, ...d.data() }))
       .filter((g) => activityIds.includes(g.activityId))
@@ -132,14 +137,19 @@ export async function fetchGroupStudents(groupId) {
       where('groupId', '==', groupId),
       where('status', '==', 'active')
     );
-    const enrSnap = await getDocs(enrQ);
+    const getDocsPromise = getDocs(enrQ);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Firestore timeout')), 800)
+    );
+    const enrSnap = await Promise.race([getDocsPromise, timeoutPromise]);
 
     if (enrSnap.empty) {
       return MOCK_GROUP_STUDENTS[groupId] || MOCK_GROUP_STUDENTS['grp-1-1'];
     }
 
     const studentIds = enrSnap.docs.map((d) => d.data().studentId);
-    const studentsSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+    const studentsSnapPromise = getDocs(collection(db, COLLECTIONS.STUDENTS));
+    const studentsSnap = await Promise.race([studentsSnapPromise, timeoutPromise]);
     const studentsMap = {};
     studentsSnap.docs.forEach((d) => {
       studentsMap[d.id] = d.data();

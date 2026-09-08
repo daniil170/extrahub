@@ -264,37 +264,64 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
               </div>
 
               <div>
-                <label
-                  htmlFor="mobile-role-select"
+                <div
                   style={{
-                    display: 'block',
-                    fontSize: '11.5px',
+                    fontSize: '12px',
+                    fontWeight: 600,
                     color: 'var(--text-secondary)',
-                    marginBottom: '4px',
+                    marginBottom: '8px',
                   }}
                 >
-                  Сменить демонстрационную роль:
-                </label>
-                <select
-                  id="mobile-role-select"
-                  value={currentUser.role}
-                  onChange={(e) => handleRoleChange(e.target.value)}
+                  Переключить демонстрационную роль:
+                </div>
+                <div
                   style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-color)',
-                    fontSize: '13px',
-                    backgroundColor: 'var(--bg-surface)',
-                    color: 'var(--text-primary)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: '8px',
                   }}
                 >
-                  <option value="student">Студент</option>
-                  <option value="parent">Родитель</option>
-                  <option value="teacher">Преподаватель</option>
-                  <option value="coordinator">Координатор</option>
-                  <option value="admin">Администратор</option>
-                </select>
+                  {[
+                    { role: 'student', label: 'Ученик', icon: '🎓' },
+                    { role: 'parent', label: 'Родитель', icon: '👨‍👩‍👦' },
+                    { role: 'teacher', label: 'Преподаватель', icon: '👨‍🏫' },
+                    { role: 'coordinator', label: 'Координатор', icon: '📋' },
+                    { role: 'admin', label: 'Администратор', icon: '⚙️' },
+                  ].map((r) => {
+                    const isSelected = currentUser.role === r.role;
+                    return (
+                      <button
+                        key={r.role}
+                        type="button"
+                        onClick={() => handleRoleChange(r.role)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '10px 10px',
+                          borderRadius: 'var(--radius-md)',
+                          border: isSelected
+                            ? '2px solid var(--primary)'
+                            : '1px solid var(--border-color)',
+                          backgroundColor: isSelected ? 'var(--primary)' : '#ffffff',
+                          color: isSelected ? '#ffffff' : '#0f172a',
+                          fontWeight: isSelected ? 700 : 600,
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          boxShadow: isSelected ? '0 2px 4px rgba(30, 58, 95, 0.2)' : 'none',
+                          transition: 'all 0.15s ease',
+                          textAlign: 'left',
+                        }}
+                      >
+                        <span style={{ fontSize: '15px' }}>{r.icon}</span>
+                        <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {r.label}
+                        </span>
+                        {isSelected && <span style={{ fontSize: '12px', fontWeight: 800 }}>✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}

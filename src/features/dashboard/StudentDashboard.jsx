@@ -88,7 +88,7 @@ export function StudentDashboard() {
       )}
 
       {!loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.9fr 1.1fr', gap: '24px' }}>
+        <div className="dashboard-grid">
           {/* Left Column: My Enrollments */}
           <div>
             <div

@@ -118,7 +118,7 @@ export function AttendanceJournal() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
             gap: '16px',
             alignItems: 'center',
           }}
@@ -355,7 +355,7 @@ export function AttendanceJournal() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <Button size="sm" variant="outline" onClick={() => markAll('present')}>
               👍 Отметить всех присутствующими
             </Button>
@@ -422,15 +422,9 @@ export function AttendanceJournal() {
 
                   {/* Status Segmented Control / Radio Chips */}
                   <div
+                    className="attendance-status-group"
                     role="radiogroup"
                     aria-label={`Статус посещаемости для ${student.fullName}`}
-                    style={{
-                      display: 'flex',
-                      gap: '4px',
-                      backgroundColor: 'var(--bg-subtle)',
-                      padding: '4px',
-                      borderRadius: 'var(--radius-md)',
-                    }}
                   >
                     {STATUS_OPTIONS.map((opt) => {
                       const isSelected = currentStatus === opt.value;
