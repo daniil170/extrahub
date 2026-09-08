@@ -1,24 +1,66 @@
-import { useState, useEffect } from 'react';
-import { Modal, Button } from '../../shared/ui/index.js';
+import { useState, useEffect, useMemo } from 'react';
+import { Modal, Button, Badge } from '../../shared/ui/index.js';
+import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 
 export function CreatePaymentModal({
   isOpen,
   onClose,
   activities = [],
+  groups = [],
   students = [],
+  enrollments = [],
+  initialMode = 'group',
+  preselectedGroupId = null,
   onSubmitSingle,
+  onSubmitGroup,
   isProcessing,
 }) {
-  const [mode, setMode] = useState('single'); // 'single' | 'group'
-  const [selectedActivityId, setSelectedActivityId] = useState(activities[0]?.id || '');
-  const [selectedStudentId, setSelectedStudentId] = useState(students[0]?.id || '');
-  const [amount, setAmount] = useState(3500);
+  const [mode, setMode] = useState(initialMode); // 'group' | 'single'
+  const [selectedActivityId, setSelectedActivityId] = useState('');
+  const [selectedGroupId, setSelectedGroupId] = useState('');
+  const [selectedStudentId, setSelectedStudentId] = useState('');
+  const [periodTitle, setPeriodTitle] = useState('Оплата за кружок (Октябрь 2026)');
+  const [amount, setAmount] = useState(25000);
   const [dueDate, setDueDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() + 7);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   });
   const [validationError, setValidationError] = useState('');
+
+  // Sync mode and preselected group when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode || 'group');
+      setValidationError('');
+      if (preselectedGroupId) {
+        setSelectedGroupId(preselectedGroupId);
+        const grp = groups.find((g) => g.id === preselectedGroupId);
+        if (grp?.activityId) {
+          setSelectedActivityId(grp.activityId);
+        }
+      } else if (activities.length > 0 && !selectedActivityId) {
+        setSelectedActivityId(activities[0].id);
+      }
+    }
+  }, [isOpen, initialMode, preselectedGroupId, activities, groups, selectedActivityId]);
+
+  // Available groups for selected activity
+  const availableGroups = useMemo(() => {
+    if (!selectedActivityId) return [];
+    return groups.filter((g) => g.activityId === selectedActivityId);
+  }, [groups, selectedActivityId]);
+
+  // Keep selectedGroupId valid when activity changes
+  useEffect(() => {
+    if (availableGroups.length > 0) {
+      if (!availableGroups.some((g) => g.id === selectedGroupId)) {
+        setSelectedGroupId(availableGroups[0].id);
+      }
+    } else {
+      setSelectedGroupId('');
+    }
+  }, [availableGroups, selectedGroupId]);
 
   // Update default amount when activity changes
   useEffect(() => {
@@ -28,14 +70,33 @@ export function CreatePaymentModal({
     }
   }, [selectedActivityId, activities]);
 
+  // Initial student selection
   useEffect(() => {
-    if (activities.length > 0 && !selectedActivityId) {
-      setSelectedActivityId(activities[0].id);
-    }
     if (students.length > 0 && !selectedStudentId) {
       setSelectedStudentId(students[0].id);
     }
-  }, [activities, students, selectedActivityId, selectedStudentId]);
+  }, [students, selectedStudentId]);
+
+  // Students enrolled in selected group
+  const groupStudents = useMemo(() => {
+    if (!selectedGroupId) return [];
+    const activeGroupEnrolls = enrollments.filter(
+      (e) => e.groupId === selectedGroupId && e.status === 'active'
+    );
+    const studentMap = {};
+    students.forEach((s) => {
+      studentMap[s.id] = s;
+    });
+
+    return activeGroupEnrolls.map((e) => {
+      const s = studentMap[e.studentId] || {};
+      return {
+        id: e.studentId,
+        fullName: e.studentName || s.fullName || `Ученик (${e.studentId})`,
+        className: e.className || s.className || '',
+      };
+    });
+  }, [enrollments, selectedGroupId, students]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,89 +104,121 @@ export function CreatePaymentModal({
       setValidationError('Пожалуйста, выберите кружок');
       return;
     }
+
+    if (mode === 'group') {
+      if (!selectedGroupId) {
+        setValidationError('Пожалуйста, выберите группу для выставления счетов');
+        return;
+      }
+      if (groupStudents.length === 0) {
+        setValidationError(
+          'В выбранной группе нет зачисленных учеников со статусом "active". Выставление невозможно.'
+        );
+        return;
+      }
+    }
+
     if (mode === 'single' && !selectedStudentId) {
       setValidationError('Пожалуйста, выберите ученика');
       return;
     }
+
     if (Number(amount) < 0) {
       setValidationError('Сумма не может быть отрицательной');
       return;
     }
+
     if (!dueDate) {
-      setValidationError('Укажите срок оплаты');
+      setValidationError('Укажите крайний срок оплаты');
       return;
     }
 
     setValidationError('');
 
-    if (mode === 'single') {
+    if (mode === 'group') {
+      onSubmitGroup({
+        groupId: selectedGroupId,
+        activityId: selectedActivityId,
+        amount: Number(amount),
+        dueDate,
+        periodTitle: periodTitle.trim() || 'Оплата за кружок',
+      });
+    } else {
       onSubmitSingle({
         activityId: selectedActivityId,
         studentId: selectedStudentId,
         amount: Number(amount),
         dueDate,
-      });
-    } else {
-      // In group mode, issue to all active students
-      students.forEach((st) => {
-        onSubmitSingle({
-          activityId: selectedActivityId,
-          studentId: st.id,
-          amount: Number(amount),
-          dueDate,
-        });
+        periodTitle: periodTitle.trim() || 'Оплата за кружок',
       });
     }
   };
 
+  const totalGroupAmount = (Number(amount) || 0) * groupStudents.length;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Выставить счёт на оплату" maxWidth="500px">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        mode === 'group' ? '👥 Выставление счетов группе кружка' : '👤 Индивидуальный счёт ученику'
+      }
+      maxWidth="560px"
+    >
       <form onSubmit={handleSubmit}>
-        {/* Mode Selector */}
+        {/* Mode Selector Tabs */}
         <div
           style={{
             display: 'flex',
             backgroundColor: 'var(--bg-subtle)',
             padding: '4px',
             borderRadius: 'var(--radius-md)',
-            marginBottom: '18px',
+            marginBottom: '20px',
           }}
         >
-          <button
-            type="button"
-            onClick={() => setMode('single')}
-            style={{
-              flex: 1,
-              padding: '8px 12px',
-              borderRadius: 'var(--radius-sm)',
-              border: 'none',
-              backgroundColor: mode === 'single' ? 'var(--primary)' : 'transparent',
-              color: mode === 'single' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: mode === 'single' ? 700 : 500,
-              fontSize: '13px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            👤 Одному ученику
-          </button>
           <button
             type="button"
             onClick={() => setMode('group')}
             style={{
               flex: 1,
-              padding: '8px 12px',
+              padding: '9px 12px',
               borderRadius: 'var(--radius-sm)',
               border: 'none',
               backgroundColor: mode === 'group' ? 'var(--primary)' : 'transparent',
               color: mode === 'group' ? '#ffffff' : 'var(--text-secondary)',
               fontWeight: mode === 'group' ? 700 : 500,
-              fontSize: '13px',
+              fontSize: '13.5px',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
             }}
           >
-            👥 Всей группе кружка
+            <span>👥 Всей группе (Рекомендуется)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('single')}
+            style={{
+              flex: 1,
+              padding: '9px 12px',
+              borderRadius: 'var(--radius-sm)',
+              border: 'none',
+              backgroundColor: mode === 'single' ? 'var(--primary)' : 'transparent',
+              color: mode === 'single' ? '#ffffff' : 'var(--text-secondary)',
+              fontWeight: mode === 'single' ? 700 : 500,
+              fontSize: '13.5px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+            }}
+          >
+            <span>👤 Одному ученику</span>
           </button>
         </div>
 
@@ -133,20 +226,21 @@ export function CreatePaymentModal({
           <div
             role="alert"
             style={{
-              padding: '10px 12px',
+              padding: '10px 14px',
               backgroundColor: 'var(--danger-light)',
               color: 'var(--danger)',
               borderRadius: 'var(--radius-sm)',
               fontSize: '13px',
               marginBottom: '16px',
+              border: '1px solid var(--danger)',
             }}
           >
-            {validationError}
+            ⚠️ {validationError}
           </div>
         )}
 
         {/* Activity Selection */}
-        <div style={{ marginBottom: '14px' }}>
+        <div style={{ marginBottom: '16px' }}>
           <label
             style={{
               display: 'block',
@@ -156,7 +250,7 @@ export function CreatePaymentModal({
               marginBottom: '6px',
             }}
           >
-            Кружок / Направление:
+            1. Выберите кружок / секцию:
           </label>
           <select
             value={selectedActivityId}
@@ -174,15 +268,15 @@ export function CreatePaymentModal({
           >
             {activities.map((a) => (
               <option key={a.id} value={a.id}>
-                {a.title} ({a.price === 0 ? 'Бесплатно' : `${a.price} ₽`})
+                {a.title} ({a.price === 0 ? 'Бесплатно' : formatCurrency(a.price)})
               </option>
             ))}
           </select>
         </div>
 
-        {/* Student Selection (if single mode) */}
-        {mode === 'single' ? (
-          <div style={{ marginBottom: '14px' }}>
+        {/* Group Selection (Group Mode) */}
+        {mode === 'group' ? (
+          <div style={{ marginBottom: '16px' }}>
             <label
               style={{
                 display: 'block',
@@ -192,7 +286,112 @@ export function CreatePaymentModal({
                 marginBottom: '6px',
               }}
             >
-              Ученик:
+              2. Выберите группу кружка:
+            </label>
+            {availableGroups.length > 0 ? (
+              <select
+                value={selectedGroupId}
+                onChange={(e) => setSelectedGroupId(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: 'var(--radius-md)',
+                  border: '1px solid var(--border-color)',
+                  fontSize: '14px',
+                  backgroundColor: 'var(--bg-primary)',
+                  color: 'var(--text-primary)',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {availableGroups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name || 'Группа'} — {formatDaysOfWeek(g.daysOfWeek)} {g.startTime}–
+                    {g.endTime}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                У выбранного кружка пока нет открытых групп
+              </div>
+            )}
+
+            {/* List of Enrolled Students Preview */}
+            <div
+              style={{
+                marginTop: '12px',
+                padding: '12px 14px',
+                backgroundColor: 'var(--bg-subtle)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '8px',
+                }}
+              >
+                <span
+                  style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text-secondary)' }}
+                >
+                  Ученики группы к начислению:
+                </span>
+                <Badge variant={groupStudents.length > 0 ? 'success' : 'default'}>
+                  {groupStudents.length} зачислено
+                </Badge>
+              </div>
+
+              {groupStudents.length > 0 ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '6px',
+                    maxHeight: '120px',
+                    overflowY: 'auto',
+                  }}
+                >
+                  {groupStudents.map((st) => (
+                    <span
+                      key={st.id}
+                      style={{
+                        fontSize: '12px',
+                        padding: '3px 8px',
+                        backgroundColor: 'var(--bg-surface)',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--border-color)',
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      👤 {st.fullName} {st.className ? `(${st.className})` : ''}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  style={{ fontSize: '12.5px', color: 'var(--text-muted)', fontStyle: 'italic' }}
+                >
+                  В этой группе пока нет активных зачисленных учеников
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Student Selection (Single Mode) */
+          <div style={{ marginBottom: '16px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                marginBottom: '6px',
+              }}
+            >
+              2. Выберите ученика:
             </label>
             <select
               value={selectedStudentId}
@@ -215,21 +414,38 @@ export function CreatePaymentModal({
               ))}
             </select>
           </div>
-        ) : (
-          <div
+        )}
+
+        {/* Period / Purpose of Payment */}
+        <div style={{ marginBottom: '16px' }}>
+          <label
             style={{
-              padding: '10px 12px',
-              backgroundColor: 'var(--primary-light)',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '12.5px',
-              color: 'var(--primary)',
-              marginBottom: '14px',
+              display: 'block',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--text-secondary)',
+              marginBottom: '6px',
             }}
           >
-            ℹ️ Счета будут сформированы автоматически для всех активных учеников выбранного кружка (
-            {students.length} учеников).
-          </div>
-        )}
+            3. Назначение счёта / Период:
+          </label>
+          <input
+            type="text"
+            value={periodTitle}
+            onChange={(e) => setPeriodTitle(e.target.value)}
+            placeholder="Например: Оплата за кружок (Октябрь 2026)"
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-color)',
+              fontSize: '14px',
+              backgroundColor: 'var(--bg-primary)',
+              color: 'var(--text-primary)',
+              boxSizing: 'border-box',
+            }}
+          />
+        </div>
 
         {/* Amount & Due Date */}
         <div
@@ -250,12 +466,12 @@ export function CreatePaymentModal({
                 marginBottom: '6px',
               }}
             >
-              Сумма к оплате (₽):
+              {mode === 'group' ? 'Сумма на 1 ученика (₸):' : 'Сумма к оплате (₸):'}
             </label>
             <input
               type="number"
               min="0"
-              step="100"
+              step="500"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               style={{
@@ -263,8 +479,7 @@ export function CreatePaymentModal({
                 padding: '10px 12px',
                 borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--border-color)',
-                fontSize: '15px',
-                fontWeight: 700,
+                fontSize: '14px',
                 backgroundColor: 'var(--bg-primary)',
                 color: 'var(--text-primary)',
                 boxSizing: 'border-box',
@@ -302,16 +517,71 @@ export function CreatePaymentModal({
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-          <Button variant="outline" type="button" onClick={onClose} disabled={isProcessing}>
+        {/* Summary Card for Group Mode */}
+        {mode === 'group' && (
+          <div
+            style={{
+              padding: '14px 16px',
+              backgroundColor: 'var(--primary-subtle)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--primary)',
+              marginBottom: '20px',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '6px',
+                fontSize: '13px',
+              }}
+            >
+              <span style={{ color: 'var(--text-secondary)' }}>Зачислено в группу:</span>
+              <strong>{groupStudents.length} учеников</strong>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginBottom: '6px',
+                fontSize: '13px',
+              }}
+            >
+              <span style={{ color: 'var(--text-secondary)' }}>Тариф на человека:</span>
+              <strong>{formatCurrency(amount)}</strong>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                paddingTop: '8px',
+                borderTop: '1px dashed var(--border-color)',
+                fontSize: '15px',
+                fontWeight: 700,
+                color: 'var(--primary)',
+              }}
+            >
+              <span>Итого к начислению по группе:</span>
+              <span>{formatCurrency(totalGroupAmount)}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          <Button variant="outline" onClick={onClose} disabled={isProcessing}>
             Отмена
           </Button>
-          <Button variant="primary" type="submit" disabled={isProcessing}>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={isProcessing || (mode === 'group' && groupStudents.length === 0)}
+          >
             {isProcessing
               ? 'Формирование...'
-              : mode === 'single'
-                ? 'Выставить счёт'
-                : 'Выставить всей группе'}
+              : mode === 'group'
+                ? `Сформировать ${groupStudents.length} счетов (${formatCurrency(totalGroupAmount)})`
+                : `Выставить счёт (${formatCurrency(amount)})`}
           </Button>
         </div>
       </form>

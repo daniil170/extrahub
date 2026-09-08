@@ -9,6 +9,8 @@ export function PaymentManagement() {
     filteredPayments,
     students,
     activities,
+    groups,
+    enrollments,
     stats,
     loading,
     error,
@@ -16,12 +18,17 @@ export function PaymentManagement() {
     actionSuccess,
     filterStatus,
     setFilterStatus,
+    filterGroupId,
+    setFilterGroupId,
     searchQuery,
     setSearchQuery,
     createModalOpen,
+    createModalMode,
+    preselectedGroupId,
     openCreateModal,
     closeCreateModal,
     createSingleInvoice,
+    createGroupInvoices,
     markAsPaid,
     cancelInvoice,
   } = useCoordinatorPayments();
@@ -211,7 +218,32 @@ export function PaymentManagement() {
             })}
           </div>
 
-          {/* Search & Invoicing action */}
+          {/* Group Filter Dropdown */}
+          <div>
+            <select
+              value={filterGroupId}
+              onChange={(e) => setFilterGroupId(e.target.value)}
+              aria-label="Фильтр по группе"
+              style={{
+                padding: '7px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+                fontSize: '13px',
+                backgroundColor: 'var(--bg-primary)',
+                color: 'var(--text-primary)',
+                height: '36px',
+              }}
+            >
+              <option value="all">Все группы школы</option>
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name || 'Группа'}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Search & Invoicing actions */}
           <div
             style={{
               display: 'flex',
@@ -219,28 +251,45 @@ export function PaymentManagement() {
               alignItems: 'center',
               flex: 1,
               justifyContent: 'flex-end',
-              minWidth: '300px',
+              minWidth: '320px',
+              flexWrap: 'wrap',
             }}
           >
             <input
               type="text"
-              placeholder="🔍 Поиск по ФИО или кружку..."
+              placeholder="🔍 Поиск по ФИО, классу или кружку..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
-                padding: '9px 12px',
+                padding: '8px 12px',
                 borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--border-color)',
                 fontSize: '13.5px',
                 backgroundColor: 'var(--bg-primary)',
                 color: 'var(--text-primary)',
-                minWidth: '220px',
+                minWidth: '180px',
                 flex: 1,
+                height: '36px',
+                boxSizing: 'border-box',
               }}
             />
 
-            <Button variant="primary" size="sm" onClick={openCreateModal}>
-              + Выставить счёт
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => openCreateModal('group')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <span>+ 👥 Выставить счета группе</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openCreateModal('single')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <span>+ 👤 Индивидуально</span>
             </Button>
           </div>
         </div>
@@ -292,7 +341,8 @@ export function PaymentManagement() {
                   }}
                 >
                   <th style={{ padding: '10px 12px' }}>Ученик</th>
-                  <th style={{ padding: '10px 12px' }}>Кружок</th>
+                  <th style={{ padding: '10px 12px' }}>Кружок и группа</th>
+                  <th style={{ padding: '10px 12px' }}>Назначение платежа</th>
                   <th style={{ padding: '10px 12px' }}>Сумма</th>
                   <th style={{ padding: '10px 12px' }}>Срок оплаты</th>
                   <th style={{ padding: '10px 12px' }}>Статус</th>
@@ -329,12 +379,30 @@ export function PaymentManagement() {
                         )}
                       </td>
 
-                      {/* Activity */}
+                      {/* Activity & Group */}
                       <td style={{ padding: '12px' }}>
-                        <div style={{ fontWeight: 500 }}>{p.activityTitle}</div>
+                        <div style={{ fontWeight: 600 }}>{p.activityTitle}</div>
+                        {p.groupName && (
+                          <div style={{ marginTop: '3px' }}>
+                            <Badge variant="info" style={{ fontSize: '11px', padding: '1px 6px' }}>
+                              👥 {p.groupName}
+                            </Badge>
+                          </div>
+                        )}
                       </td>
 
-                      {/* Amount */}
+                      {/* Purpose / Period */}
+                      <td
+                        style={{
+                          padding: '12px',
+                          color: 'var(--text-secondary)',
+                          fontSize: '13px',
+                        }}
+                      >
+                        {p.periodTitle || 'Оплата за кружок'}
+                      </td>
+
+                      {/* Amount in Tenge */}
                       <td
                         style={{ padding: '12px', fontWeight: 700, color: 'var(--text-primary)' }}
                       >
@@ -397,8 +465,13 @@ export function PaymentManagement() {
         isOpen={createModalOpen}
         onClose={closeCreateModal}
         activities={activities}
+        groups={groups}
         students={students}
+        enrollments={enrollments}
+        initialMode={createModalMode}
+        preselectedGroupId={preselectedGroupId}
         onSubmitSingle={createSingleInvoice}
+        onSubmitGroup={createGroupInvoices}
         isProcessing={isProcessing}
       />
 
