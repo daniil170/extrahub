@@ -1,12 +1,10 @@
-import React from 'react';
-
 /**
  * @param {Object} props
- * @param {React.ReactNode} props.children
+ * @param {import('react').ReactNode} props.children
  * @param {string} [props.title]
- * @param {React.ReactNode} [props.action]
+ * @param {import('react').ReactNode} [props.action]
  * @param {string} [props.className='']
- * @param {React.CSSProperties} [props.style]
+ * @param {import('react').CSSProperties} [props.style]
  */
 export function Card({ children, title, action, className = '', style = {}, ...rest }) {
   const cardStyle = {

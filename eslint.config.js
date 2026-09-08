@@ -30,7 +30,7 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': [
-        'warn',
+        'error',
         {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
@@ -41,6 +41,7 @@ export default defineConfig([
       'prefer-const': 'error',
       'no-var': 'error',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
 ]);

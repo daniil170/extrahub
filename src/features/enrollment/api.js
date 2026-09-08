@@ -1,5 +1,4 @@
 import {
-  getDocument,
   getDocuments,
   setDocument,
   updateDocument,

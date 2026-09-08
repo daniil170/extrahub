@@ -1,8 +1,4 @@
-import {
-  getDocuments,
-  updateDocument,
-  COLLECTIONS,
-} from '../../shared/api/firebaseUtils.js';
+import { getDocuments, updateDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 
 const MOCK_NOTIFICATIONS = [
   {

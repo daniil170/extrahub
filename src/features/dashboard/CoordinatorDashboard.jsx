@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { Card, Badge, Button, PageHeader } from '../../shared/ui/index.js';
 

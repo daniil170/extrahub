@@ -1,8 +1,4 @@
-import {
-  getDocuments,
-  setDocument,
-  COLLECTIONS,
-} from '../../shared/api/firebaseUtils.js';
+import { getDocuments, setDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { createAttendance } from '../../entities/attendance/model.js';
 
 const MOCK_ATTENDANCE = [

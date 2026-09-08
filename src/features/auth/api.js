@@ -1,9 +1,5 @@
 import { auth } from '../../app/config/firebase.js';
-import {
-  signInWithEmailAndPassword,
-  signOut,
-  createUserWithEmailAndPassword,
-} from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 import { getDocument, setDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { createUser } from '../../entities/user/model.js';
 

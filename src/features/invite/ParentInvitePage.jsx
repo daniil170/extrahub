@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useParentInvite } from './useParentInvite.js';
 import { Card, Badge, Button, Spinner, PageHeader } from '../../shared/ui/index.js';
@@ -31,10 +30,7 @@ export function ParentInvitePage() {
 
   return (
     <div style={{ maxWidth: '600px', margin: '40px auto' }}>
-      <PageHeader
-        title="Подтверждение записи ребенка"
-        subtitle="Школьная платформа ExtraHub"
-      />
+      <PageHeader title="Подтверждение записи ребенка" subtitle="Школьная платформа ExtraHub" />
 
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
@@ -44,7 +40,9 @@ export function ParentInvitePage() {
           </Badge>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+        <div
+          style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}
+        >
           <div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Ученик</div>
             <div style={{ fontSize: '16px', fontWeight: 600 }}>{invite.studentName}</div>
@@ -56,7 +54,9 @@ export function ParentInvitePage() {
           </div>
 
           <div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Расписание занятий</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+              Расписание занятий
+            </div>
             <div style={{ fontSize: '14px' }}>{invite.groupSchedule}</div>
           </div>
 

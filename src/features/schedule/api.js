@@ -32,9 +32,9 @@ const MOCK_SCHEDULE = [
 
 /**
  * Fetch schedule for student
- * @param {string} studentId
+ * @param {string} _studentId
  */
-export async function fetchStudentSchedule(studentId) {
+export async function fetchStudentSchedule(_studentId) {
   try {
     const groups = await getDocuments(COLLECTIONS.ACTIVITY_GROUPS);
     return groups.length > 0 ? groups : MOCK_SCHEDULE;

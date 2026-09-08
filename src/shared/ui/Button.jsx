@@ -1,8 +1,6 @@
-import React from 'react';
-
 /**
  * @param {Object} props
- * @param {React.ReactNode} props.children
+ * @param {import('react').ReactNode} props.children
  * @param {'primary' | 'secondary' | 'outline' | 'danger'} [props.variant='primary']
  * @param {'sm' | 'md' | 'lg'} [props.size='md']
  * @param {boolean} [props.disabled=false]

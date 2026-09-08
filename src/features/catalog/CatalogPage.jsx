@@ -1,4 +1,3 @@
-import React from 'react';
 import { useCatalog } from './useCatalog.js';
 import { Card, Badge, Button, Spinner, PageHeader } from '../../shared/ui/index.js';
 import { formatCurrency } from '../../shared/utils/index.js';
@@ -61,7 +60,9 @@ export function CatalogPage() {
                 }}
               >
                 <div>
-                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block' }}>
+                  <span
+                    style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block' }}
+                  >
                     Стоимость
                   </span>
                   <strong style={{ fontSize: '16px' }}>

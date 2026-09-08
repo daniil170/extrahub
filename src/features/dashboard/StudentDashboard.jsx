@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { useSchedule } from '../schedule/useSchedule.js';
 import { Card, Badge, PageHeader, Spinner } from '../../shared/ui/index.js';
@@ -9,7 +8,12 @@ export function StudentDashboard() {
   const { schedule, loading } = useSchedule(user?.id);
 
   const mockAchievements = [
-    { id: 'ach-1', title: 'Первый робот', desc: 'Собрана первая рабочая модель робота', icon: '🤖' },
+    {
+      id: 'ach-1',
+      title: 'Первый робот',
+      desc: 'Собрана первая рабочая модель робота',
+      icon: '🤖',
+    },
     { id: 'ach-2', title: 'Шахматный дебют', desc: 'Победа в первом школьном турнире', icon: '♟️' },
   ];
 
@@ -67,7 +71,9 @@ export function StudentDashboard() {
               >
                 <div>
                   <strong>Робототехника и Arduino</strong>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Группа 1 (Пн, Пт)</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                    Группа 1 (Пн, Пт)
+                  </div>
                 </div>
                 <Badge variant="success">Активен</Badge>
               </div>
@@ -81,7 +87,9 @@ export function StudentDashboard() {
               >
                 <div>
                   <strong>Шахматный клуб</strong>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Группа 2 (Ср)</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                    Группа 2 (Ср)
+                  </div>
                 </div>
                 <Badge variant="warning">Ожидает подтверждения родителем</Badge>
               </div>

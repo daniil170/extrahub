@@ -1,4 +1,3 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { Spinner, Card } from '../../shared/ui/index.js';
@@ -6,7 +5,7 @@ import { Spinner, Card } from '../../shared/ui/index.js';
 /**
  * Route guard for authenticated users and specific roles
  * @param {Object} props
- * @param {React.ReactNode} props.children
+ * @param {import('react').ReactNode} props.children
  * @param {string[]} [props.allowedRoles]
  */
 export function ProtectedRoute({ children, allowedRoles }) {

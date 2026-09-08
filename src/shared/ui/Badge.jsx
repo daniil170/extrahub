@@ -1,8 +1,6 @@
-import React from 'react';
-
 /**
  * @param {Object} props
- * @param {React.ReactNode} props.children
+ * @param {import('react').ReactNode} props.children
  * @param {'default' | 'success' | 'warning' | 'danger' | 'info'} [props.variant='default']
  * @param {string} [props.className='']
  */

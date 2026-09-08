@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * @param {Object} props
  * @param {'sm' | 'md' | 'lg'} [props.size='md']

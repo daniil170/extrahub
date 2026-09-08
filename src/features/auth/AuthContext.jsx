@@ -1,10 +1,9 @@
-import React, { createContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../app/config/firebase.js';
 import { getDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { createUser } from '../../entities/user/model.js';
-
-export const AuthContext = createContext(null);
+import { AuthContext } from './context.js';
 
 const DEV_DEFAULT_USER = createUser({
   id: 'dev-user-1',

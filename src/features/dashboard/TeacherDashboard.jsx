@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { Card, Badge, Button, PageHeader } from '../../shared/ui/index.js';
 
@@ -96,16 +96,10 @@ export function TeacherDashboard() {
                   </div>
 
                   <div style={{ display: 'flex', gap: '6px' }}>
-                    <Button
-                      size="sm"
-                      variant={st.status === 'present' ? 'primary' : 'outline'}
-                    >
+                    <Button size="sm" variant={st.status === 'present' ? 'primary' : 'outline'}>
                       Присутствует
                     </Button>
-                    <Button
-                      size="sm"
-                      variant={st.status === 'absent' ? 'danger' : 'outline'}
-                    >
+                    <Button size="sm" variant={st.status === 'absent' ? 'danger' : 'outline'}>
                       Отсутствует
                     </Button>
                   </div>
