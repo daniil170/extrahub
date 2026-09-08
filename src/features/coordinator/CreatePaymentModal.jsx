@@ -568,7 +568,7 @@ export function CreatePaymentModal({
         )}
 
         {/* Actions */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap' }}>
           <Button variant="outline" onClick={onClose} disabled={isProcessing}>
             Отмена
           </Button>

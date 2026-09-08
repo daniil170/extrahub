@@ -548,7 +548,13 @@ export function EnrollmentModal({
         )}
 
         <div
-          style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '24px' }}
+          style={{
+            display: 'flex',
+            gap: '10px',
+            justifyContent: 'flex-end',
+            marginTop: '24px',
+            flexWrap: 'wrap',
+          }}
         >
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             Отмена

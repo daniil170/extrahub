@@ -46,3 +46,63 @@ textarea {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* Mobile & Touch responsiveness */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.nav-desktop-links {
+  display: flex;
+  align-items: center;
+}
+
+.nav-desktop-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-mobile-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    padding: 16px 14px !important;
+  }
+
+  .nav-desktop-links {
+    display: none !important;
+  }
+
+  .nav-desktop-user {
+    display: none !important;
+  }
+
+  .nav-mobile-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 20px;
+    transition: background-color 0.15s ease;
+  }
+}
+

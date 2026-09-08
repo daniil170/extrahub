@@ -67,6 +67,8 @@ export function ParentDashboard() {
             backgroundColor: 'var(--bg-subtle)',
             borderRadius: 'var(--radius-lg)',
             width: 'fit-content',
+            maxWidth: '100%',
+            flexWrap: 'wrap',
             border: '1px solid var(--border-color)',
           }}
         >

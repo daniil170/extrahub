@@ -514,6 +514,8 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
             paddingTop: '16px',
             borderTop: '1px solid var(--border-color)',
             marginTop: '8px',
+            flexWrap: 'wrap',
+            gap: '12px',
           }}
         >
           <div>

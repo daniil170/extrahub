@@ -8,15 +8,7 @@ export function Layout() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar currentUser={user} onSwitchRole={switchDevRole} onLogout={logout} />
-      <main
-        style={{
-          flex: 1,
-          maxWidth: '1200px',
-          width: '100%',
-          margin: '0 auto',
-          padding: '32px 24px',
-        }}
-      >
+      <main className="app-main">
         <Outlet />
       </main>
       <footer
