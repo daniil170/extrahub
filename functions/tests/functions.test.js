@@ -5,6 +5,7 @@ import {
   approveEnrollment,
   rejectEnrollment,
   cancelEnrollment,
+  getInviteDetails,
   processExpiredHolds,
 } from '../src/index.js';
 
@@ -453,6 +454,44 @@ describe('Cloud Functions: Enrollment & Waitlist Logic', () => {
           auth: { uid: 'student-2' }, // student-2 is unrelated
         })
       ).rejects.toThrow(/Недостаточно прав/);
+    });
+
+    it('getInviteDetails safely returns student, group, activity and payment terms for valid token', async () => {
+      const creation = await createEnrollment.run({
+        data: { studentId: 'student-1', groupId: 'group-robotics-open' },
+        auth: { uid: 'student-1' },
+      });
+
+      const details = await getInviteDetails.run({
+        data: { inviteToken: creation.inviteToken },
+      });
+
+      expect(details.valid).toBe(true);
+      expect(details.student.fullName).toBe('Александр Иванов');
+      expect(details.student.className).toBe('7-Б');
+      expect(details.activity.title).toBe('Робототехника');
+      expect(details.activity.price).toBe(3500);
+      expect(details.group.startTime).toBe('15:30');
+      expect(details.paymentTerms.amount).toBe(3500);
+      expect(details.paymentTerms.dueDate).toBeDefined();
+    });
+
+    it('getInviteDetails rejects expired tokens', async () => {
+      const expiredDate = new Date(Date.now() - 3600000).toISOString();
+      await db.collection('parentInvites').doc('inv-test-expired').set({
+        id: 'inv-test-expired',
+        studentId: 'student-1',
+        enrollmentId: 'enr-123',
+        token: 'token-expired-details',
+        status: 'active',
+        expiresAt: expiredDate,
+      });
+
+      await expect(
+        getInviteDetails.run({
+          data: { inviteToken: 'token-expired-details' },
+        })
+      ).rejects.toThrow(/Срок действия приглашения истёк/);
     });
   });
 });
