@@ -827,7 +827,8 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
                       ? '1.5px solid var(--danger)'
                       : '1px solid var(--border-color)',
                     fontSize: '13px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: 'var(--bg-surface)',
+                    color: 'var(--text-primary)',
                     boxSizing: 'border-box',
                   }}
                 />
@@ -859,7 +860,8 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
                       ? '1.5px solid var(--danger)'
                       : '1px solid var(--border-color)',
                     fontSize: '13px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: 'var(--bg-surface)',
+                    color: 'var(--text-primary)',
                     boxSizing: 'border-box',
                   }}
                 />
@@ -892,7 +894,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
                           border: isSelected
                             ? '2px solid var(--primary)'
                             : '1px solid var(--border-color)',
-                          backgroundColor: isSelected ? 'var(--primary)' : '#ffffff',
+                          backgroundColor: isSelected ? 'var(--primary)' : 'var(--bg-surface)',
                           color: isSelected ? '#ffffff' : 'var(--text-primary)',
                           fontWeight: isSelected ? 700 : 500,
                           cursor: 'pointer',
@@ -929,7 +931,8 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
                       borderRadius: 'var(--radius-sm)',
                       border: '1px solid var(--border-color)',
                       fontSize: '13px',
-                      backgroundColor: '#ffffff',
+                      backgroundColor: 'var(--bg-surface)',
+                      color: 'var(--text-primary)',
                       boxSizing: 'border-box',
                     }}
                   />
@@ -955,7 +958,8 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
                       borderRadius: 'var(--radius-sm)',
                       border: '1px solid var(--border-color)',
                       fontSize: '13px',
-                      backgroundColor: '#ffffff',
+                      backgroundColor: 'var(--bg-surface)',
+                      color: 'var(--text-primary)',
                       boxSizing: 'border-box',
                     }}
                   />

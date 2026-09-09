@@ -302,16 +302,16 @@ export function NotificationCenter({ currentUser }) {
                       alignItems: 'flex-start',
                       gap: '12px',
                       borderBottom: '1px solid var(--border-color)',
-                      backgroundColor: item.isRead ? '#ffffff' : 'rgba(30, 58, 95, 0.04)',
+                      backgroundColor: item.isRead ? 'var(--bg-surface)' : 'var(--primary-light)',
                       cursor: item.isRead ? 'default' : 'pointer',
                       transition: 'background-color 0.15s ease',
                       position: 'relative',
                     }}
                     onMouseEnter={(e) => {
-                      if (!item.isRead) e.currentTarget.style.backgroundColor = 'rgba(30, 58, 95, 0.08)';
+                      if (!item.isRead) e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
                     }}
                     onMouseLeave={(e) => {
-                      if (!item.isRead) e.currentTarget.style.backgroundColor = 'rgba(30, 58, 95, 0.04)';
+                      if (!item.isRead) e.currentTarget.style.backgroundColor = 'var(--primary-light)';
                     }}
                   >
                     {/* Icon Badge */}

@@ -278,7 +278,7 @@ export function CapacityOverview() {
                     key={act.id}
                     style={{
                       padding: '12px',
-                      backgroundColor: '#ffffff',
+                      backgroundColor: 'var(--bg-surface)',
                       borderRadius: 'var(--radius-md)',
                       border: '1px solid var(--border-color)',
                       display: 'flex',

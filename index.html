@@ -10,6 +10,17 @@
       name="description"
       content="ExtraHub — Платформа для управления внеучебной деятельностью школы (кружки, секции, запись, расписание, посещаемость)."
     />
+    <script>
+      (function () {
+        try {
+          var savedTheme = localStorage.getItem('extrahub_theme');
+          var systemDark =
+            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = savedTheme ? savedTheme : systemDark ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
     <title>ExtraHub — Управление внеучебной деятельностью</title>
   </head>
   <body>

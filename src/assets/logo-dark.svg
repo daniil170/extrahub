@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Top-Right Coral Block -->
+  <rect x="156" y="24" width="34" height="34" rx="10" fill="#F06543" />
+  
+  <!-- Bottom-Right Mint Green Block -->
+  <rect x="156" y="142" width="34" height="34" rx="10" fill="#82C9A4" />
+
+  <!-- Middle Vertical Column Background Fills -->
+  <!-- Upper compartment (coral) -->
+  <rect x="119" y="60" width="28" height="28" fill="#F06543" />
+  <!-- Lower compartment (coral) -->
+  <rect x="119" y="148" width="28" height="28" rx="6" fill="#F06543" />
+
+  <!-- The "E" Outer & Inner Path with light stroke for dark mode -->
+  <path 
+    d="M102 24 H40 C28 24 20 32 20 44 V156 C20 168 28 176 40 176 H102 C106 176 108 173 108 168 V150 C108 145 106 142 102 142 H56 C50 142 46 138 46 132 V118 C46 114 49 110 53 110 H88 C94 110 98 106 98 100 C98 94 94 90 88 90 H53 C49 90 46 86 46 82 V68 C46 62 50 58 56 58 H102 C106 58 108 55 108 50 V32 C108 27 106 24 102 24 Z" 
+    stroke="#F8FAFC" 
+    stroke-width="12" 
+    stroke-linejoin="round"
+    stroke-linecap="round"
+    fill="#16223D"
+  />
+
+  <!-- Arrow passing through middle -->
+  <path 
+    d="M84 100 H180 M164 86 L184 100 L164 114" 
+    stroke="#F8FAFC" 
+    stroke-width="12" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+  />
+
+  <!-- Vertical Ladder / Column Frame -->
+  <path 
+    d="M114 24 H152 V176 H114 Z" 
+    stroke="#F8FAFC" 
+    stroke-width="12" 
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+  <!-- Ladder rungs -->
+  <line x1="114" y1="60" x2="152" y2="60" stroke="#F8FAFC" stroke-width="12" stroke-linecap="round" />
+  <line x1="114" y1="144" x2="152" y2="144" stroke="#F8FAFC" stroke-width="12" stroke-linecap="round" />
+</svg>
