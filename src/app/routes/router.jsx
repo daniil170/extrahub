@@ -6,6 +6,7 @@ import { NotFoundPage } from './NotFoundPage.jsx';
 import { CatalogPage } from '../../features/catalog/CatalogPage.jsx';
 import { LoginPage } from '../../features/auth/LoginPage.jsx';
 import { ParentInvitePage } from '../../features/invite/ParentInvitePage.jsx';
+import { AboutPage } from '../../features/about/AboutPage.jsx';
 import {
   StudentDashboard,
   ParentDashboard,
@@ -26,6 +27,10 @@ export const router = createBrowserRouter([
       {
         path: 'catalog',
         element: <CatalogPage />,
+      },
+      {
+        path: 'about',
+        element: <AboutPage />,
       },
       {
         path: 'dashboard',

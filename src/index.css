@@ -263,5 +263,17 @@ html, body {
   box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
 }
 
+/* Footer Link Enhancements */
+.footer-link {
+  transition: color 0.15s ease, transform 0.15s ease;
+  display: inline-block;
+}
+
+.footer-link:hover {
+  color: var(--primary) !important;
+  transform: translateX(2px);
+}
+
+
 
 

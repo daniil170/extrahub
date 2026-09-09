@@ -197,6 +197,10 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                 {userCabinet.label}
               </NavLink>
             )}
+
+            <NavLink to="/about" style={navLinkStyle}>
+              О платформе
+            </NavLink>
           </nav>
         </div>
 
@@ -423,6 +427,10 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                 🏛️ {userCabinet.label}
               </NavLink>
             )}
+
+            <NavLink to="/about" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
+              ℹ️ О платформе и команде
+            </NavLink>
           </nav>
 
           {/* Bottom Action (Login / Logout) */}

@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar.jsx';
+import { Footer } from './Footer.jsx';
 import { useAuth } from '../hooks/useAuth.js';
 
 export function Layout() {
@@ -11,18 +12,7 @@ export function Layout() {
       <main className="app-main">
         <Outlet />
       </main>
-      <footer
-        style={{
-          borderTop: '1px solid var(--border-color)',
-          backgroundColor: 'var(--bg-surface)',
-          padding: '16px 24px',
-          textAlign: 'center',
-          fontSize: '13px',
-          color: 'var(--text-secondary)',
-        }}
-      >
-        ExtraHub — Платформа управления внеучебной деятельностью школы
-      </footer>
+      <Footer />
     </div>
   );
 }
