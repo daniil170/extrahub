@@ -12,6 +12,7 @@
     "test": "firebase emulators:exec --only firestore \"vitest run\"",
     "test:unit": "vitest run",
     "test:watch": "vitest",
+    "seed": "node scripts/seed-demo-data.js",
     "preview": "vite preview"
   },
   "dependencies": {

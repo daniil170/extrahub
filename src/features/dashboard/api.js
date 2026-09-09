@@ -3,94 +3,15 @@ import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { MOCK_ACTIVITIES, MOCK_ACTIVITY_GROUPS, MOCK_TEACHERS } from '../catalog/api.js';
 
-export const MOCK_CHILDREN = [
-  {
-    id: 'student-1',
-    fullName: 'Александр Иванов',
-    className: '7-Б класс',
-    parentIds: ['dev-user-1', 'parent-1'],
-    schoolId: 'school-1',
-  },
-  {
-    id: 'student-2',
-    fullName: 'София Иванова',
-    className: '5-Б класс',
-    parentIds: ['dev-user-1', 'parent-1'],
-    schoolId: 'school-1',
-  },
-];
+import {
+  DEMO_STUDENTS,
+  DEMO_ENROLLMENTS,
+  DEMO_PAYMENTS,
+} from '../../shared/data/demoData.js';
 
-export const MOCK_ENROLLMENTS = [
-  {
-    id: 'enr-1',
-    studentId: 'student-1',
-    groupId: 'grp-1-1',
-    activityId: 'act-1',
-    status: 'active',
-    holdExpiresAt: null,
-    enrolledAt: '2026-09-01T10:00:00.000Z',
-  },
-  {
-    id: 'enr-2',
-    studentId: 'student-1',
-    groupId: 'grp-3-1',
-    activityId: 'act-3',
-    status: 'pending_parent_approval',
-    holdExpiresAt: new Date(Date.now() + 18 * 60 * 60 * 1000).toISOString(),
-    enrolledAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'enr-3',
-    studentId: 'student-2',
-    groupId: 'grp-5-1',
-    activityId: 'act-5',
-    status: 'active',
-    holdExpiresAt: null,
-    enrolledAt: '2026-09-02T11:00:00.000Z',
-  },
-  {
-    id: 'enr-4',
-    studentId: 'student-2',
-    groupId: 'grp-2-1',
-    activityId: 'act-2',
-    status: 'cancelled',
-    cancelledAt: '2026-09-04T12:00:00.000Z',
-    enrolledAt: '2026-09-03T09:00:00.000Z',
-  },
-];
-
-export const MOCK_PAYMENTS = [
-  {
-    id: 'pay-1',
-    enrollmentId: 'enr-1',
-    studentId: 'student-1',
-    activityId: 'act-1',
-    amount: 25000,
-    status: 'paid',
-    dueDate: '2026-09-15',
-    paidAt: '2026-09-03T14:20:00.000Z',
-  },
-  {
-    id: 'pay-2',
-    enrollmentId: 'enr-2',
-    studentId: 'student-1',
-    activityId: 'act-3',
-    amount: 0,
-    status: 'paid',
-    dueDate: '2026-09-20',
-    paidAt: '2026-09-08T12:00:00.000Z',
-  },
-  {
-    id: 'pay-3',
-    enrollmentId: 'enr-3',
-    studentId: 'student-2',
-    activityId: 'act-5',
-    amount: 22000,
-    status: 'pending',
-    dueDate: '2026-09-25',
-    paidAt: null,
-  },
-];
+export const MOCK_CHILDREN = DEMO_STUDENTS.slice(0, 2);
+export const MOCK_ENROLLMENTS = DEMO_ENROLLMENTS;
+export const MOCK_PAYMENTS = DEMO_PAYMENTS;
 
 /**
  * Enriches enrollments with activity and group details
@@ -177,10 +98,15 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
           ];
 
     // 2. Resolve enrollments
+    const isTargetStudent = (itemStudentId) =>
+      itemStudentId === studentId ||
+      (!studentId && itemStudentId === 'student-1') ||
+      (studentId === 'dev-user-1' && itemStudentId === 'student-1');
+
     const rawEnr =
       enrollmentsList && enrollmentsList.length > 0
         ? enrollmentsList
-        : MOCK_ENROLLMENTS.filter((e) => e.studentId === studentId);
+        : MOCK_ENROLLMENTS.filter((e) => isTargetStudent(e.studentId));
 
     const acts = activitiesList && activitiesList.length > 0 ? activitiesList : MOCK_ACTIVITIES;
     const grps = groupsList && groupsList.length > 0 ? groupsList : MOCK_ACTIVITY_GROUPS;
@@ -193,7 +119,7 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
     const finalPayments =
       paymentsList && paymentsList.length > 0
         ? paymentsList
-        : MOCK_PAYMENTS.filter((p) => p.studentId === studentId);
+        : MOCK_PAYMENTS.filter((p) => isTargetStudent(p.studentId));
 
     onUpdate({
       children: finalChildren,

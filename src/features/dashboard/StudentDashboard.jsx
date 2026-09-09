@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { useParentDashboard } from './useParentDashboard.js';
-import { Card, Badge, Button, Spinner, Modal, PageHeader } from '../../shared/ui/index.js';
+import { Card, Badge, Button, Spinner, Modal, PageHeader, CountdownTimer } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
+import { DEMO_ACHIEVEMENTS } from '../../shared/data/demoData.js';
 
 export function StudentDashboard() {
   const { user } = useAuth();
@@ -21,26 +22,7 @@ export function StudentDashboard() {
     confirmCancel,
   } = useParentDashboard(user?.id);
 
-  const mockAchievements = [
-    {
-      id: 'ach-1',
-      title: 'Первый робот',
-      desc: 'Собрана первая рабочая модель робота',
-      icon: '🤖',
-    },
-    {
-      id: 'ach-2',
-      title: 'Шахматный дебют',
-      desc: 'Победа в первом школьном турнире',
-      icon: '♟️',
-    },
-    {
-      id: 'ach-3',
-      title: '100% Посещаемость',
-      desc: 'Ни одного пропуска за первый месяц',
-      icon: '⭐',
-    },
-  ];
+  const mockAchievements = DEMO_ACHIEVEMENTS;
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '48px' }}>
@@ -152,7 +134,9 @@ export function StudentDashboard() {
                             ? 'var(--success)'
                             : enr.status === 'pending_parent_approval'
                               ? 'var(--accent-coral)'
-                              : 'var(--border-color)'
+                              : enr.status === 'waitlisted'
+                                ? 'var(--warning)'
+                                : 'var(--border-color)'
                         }`,
                       }}
                     >
@@ -206,6 +190,9 @@ export function StudentDashboard() {
                           {enr.status === 'pending_parent_approval' && (
                             <Badge variant="warning">Бронь (ожидает подтверждения)</Badge>
                           )}
+                          {enr.status === 'waitlisted' && (
+                            <Badge variant="warning">Лист ожидания (№{enr.queuePosition || 1})</Badge>
+                          )}
                           {enr.status === 'cancelled' && <Badge variant="default">Отменено</Badge>}
                           {enr.status === 'cancelled_by_timeout' && (
                             <Badge variant="danger">Истекло</Badge>
@@ -217,16 +204,39 @@ export function StudentDashboard() {
                       {enr.status === 'pending_parent_approval' && (
                         <div
                           style={{
-                            padding: '8px 12px',
+                            padding: '10px 14px',
                             backgroundColor: 'var(--accent-coral-light)',
                             color: 'var(--accent-coral)',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            marginBottom: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: '8px',
+                          }}
+                        >
+                          <div>⏱ Запись забронирована. Ожидается подтверждение от родителя.</div>
+                          <CountdownTimer expiresAt={enr.holdExpiresAt} variant="badge" />
+                        </div>
+                      )}
+
+                      {/* Waitlist Notice for student */}
+                      {enr.status === 'waitlisted' && (
+                        <div
+                          style={{
+                            padding: '8px 12px',
+                            backgroundColor: 'var(--warning-light)',
+                            color: 'var(--warning)',
                             borderRadius: 'var(--radius-sm)',
                             fontSize: '12.5px',
                             fontWeight: 500,
                             marginBottom: '12px',
                           }}
                         >
-                          ⏱ Запись забронирована. Ожидается подтверждение от родителя.
+                          📋 Вы в листе ожидания на позиции #{enr.queuePosition || 1}. Как только место освободится, вам придёт уведомление!
                         </div>
                       )}
 

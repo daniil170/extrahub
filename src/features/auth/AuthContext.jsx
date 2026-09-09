@@ -6,10 +6,10 @@ import { createUser } from '../../entities/user/model.js';
 import { AuthContext } from './context.js';
 
 const DEV_DEFAULT_USER = createUser({
-  id: 'dev-user-1',
-  fullName: 'Александр Иванов',
+  id: 'student-1',
+  fullName: 'Алихан Сейткали',
   role: 'student',
-  email: 'student@extrahub.local',
+  email: 'a.seytkali@extrahub.school',
   status: 'active',
 });
 
@@ -48,19 +48,46 @@ export function AuthProvider({ children }) {
   }, []);
 
   const switchDevRole = (newRole) => {
-    const roleNames = {
-      student: 'Александр Иванов (Ученик)',
-      parent: 'Елена Иванова (Родитель)',
-      teacher: 'Михаил Петров (Преподаватель)',
-      coordinator: 'Анна Смирнова (Координатор)',
-      admin: 'Администратор системы',
+    const roleProfiles = {
+      student: {
+        id: 'student-1',
+        fullName: 'Алихан Сейткали',
+        email: 'a.seytkali@extrahub.school',
+      },
+      parent: {
+        id: 'parent-1',
+        fullName: 'Айдар Сейткалиев',
+        email: 'a.seytkaliev@extrahub.school',
+      },
+      teacher: {
+        id: 'teacher-1',
+        fullName: 'Аскаров Данияр Серикович',
+        email: 'd.askarov@extrahub.school',
+      },
+      coordinator: {
+        id: 'coordinator-1',
+        fullName: 'Гульнара Бауыржановна',
+        email: 'g.bauyrzhanovna@extrahub.school',
+      },
+      admin: {
+        id: 'admin-1',
+        fullName: 'Администратор школы',
+        email: 'admin@extrahub.school',
+      },
+    };
+
+    const targetProfile = roleProfiles[newRole] || {
+      id: `dev-${newRole}-1`,
+      fullName: `Пользователь (${newRole})`,
+      email: `${newRole}@extrahub.school`,
     };
 
     const updatedUser = createUser({
       ...user,
+      id: targetProfile.id,
       role: newRole,
-      fullName: roleNames[newRole] || `Пользователь (${newRole})`,
-      email: `${newRole}@extrahub.local`,
+      fullName: targetProfile.fullName,
+      email: targetProfile.email,
     });
     setUser(updatedUser);
     localStorage.setItem('extrahub_dev_user', JSON.stringify(updatedUser));

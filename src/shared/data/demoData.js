@@ -1,0 +1,1156 @@
+/**
+ * Comprehensive Demo Dataset for ExtraHub School Demonstration
+ * Realistic school activities, teachers, groups, attendance records, payments, and notifications.
+ * Currency is strictly in Kazakhstani Tenge (₸).
+ */
+
+export const DEMO_TEACHERS = {
+  'teacher-1': {
+    id: 'teacher-1',
+    fullName: 'Михаил Сергеевич Петров',
+    email: 'm.petrov@extrahub.school',
+    phone: '+7 (777) 123-45-01',
+    subject: 'Робототехника и микроэлектроника',
+  },
+  'teacher-2': {
+    id: 'teacher-2',
+    fullName: 'Соколова Елена Викторовна',
+    email: 'e.sokolova@extrahub.school',
+    phone: '+7 (777) 123-45-02',
+    subject: 'Театральное искусство и сценическая речь',
+  },
+  'teacher-3': {
+    id: 'teacher-3',
+    fullName: 'Смирнов Дмитрий Анатольевич',
+    email: 'd.smirnov@extrahub.school',
+    phone: '+7 (777) 123-45-03',
+    subject: 'Шахматная стратегия и тактика',
+  },
+  'teacher-4': {
+    id: 'teacher-4',
+    fullName: 'Кузнецов Сергей Иванович',
+    email: 's.kuznetsov@extrahub.school',
+    phone: '+7 (777) 123-45-04',
+    subject: 'Волейбол и общая физическая подготовка',
+  },
+  'teacher-5': {
+    id: 'teacher-5',
+    fullName: 'Морозова Анна Владимировна',
+    email: 'a.morozova@extrahub.school',
+    phone: '+7 (777) 123-45-05',
+    subject: 'Английский язык и дебаты',
+  },
+  'teacher-6': {
+    id: 'teacher-6',
+    fullName: 'Васильева Ольга Николаевна',
+    email: 'o.vasilyeva@extrahub.school',
+    phone: '+7 (777) 123-45-06',
+    subject: 'Олимпиадная математика',
+  },
+  'teacher-7': {
+    id: 'teacher-7',
+    fullName: 'Аскаров Данияр Серикович',
+    email: 'd.askarov@extrahub.school',
+    phone: '+7 (777) 123-45-07',
+    subject: 'Баскетбол и робототехника IoT',
+  },
+  'teacher-8': {
+    id: 'teacher-8',
+    fullName: 'Турсунов Нурлан Серикович',
+    email: 'n.tursunov@extrahub.school',
+    phone: '+7 (777) 123-45-08',
+    subject: 'Школьный футбол',
+  },
+  'teacher-9': {
+    id: 'teacher-9',
+    fullName: 'Калинина Гульнара Мухтаровна',
+    email: 'g.kalinina@extrahub.school',
+    phone: '+7 (777) 123-45-09',
+    subject: 'Изостудия и академический рисунок',
+  },
+  'teacher-10': {
+    id: 'teacher-10',
+    fullName: 'Жумабаева Айгерим Бериковна',
+    email: 'a.zhumabayeva@extrahub.school',
+    phone: '+7 (777) 123-45-10',
+    subject: 'Гончарное мастерство и керамика',
+  },
+};
+
+export const DEMO_ACTIVITIES = [
+  {
+    id: 'act-1',
+    title: 'Робототехника и Arduino',
+    category: 'Технологии',
+    description:
+      'Основы схемотехники, пайка, программирование микроконтроллеров на C++ и конструирование автономных мобильных роботов.',
+    teacherId: 'teacher-1',
+    teacherName: 'Михаил Сергеевич Петров',
+    ageGroup: '10–14 лет (5–8 класс)',
+    price: 25000,
+    location: 'Кабинет 304 (IT-лаборатория)',
+    targetAudience:
+      'Для школьников, увлекающихся инженерным делом, точными науками и программированием микроконтроллеров.',
+    teacherBio:
+      'Аскаров Данияр Серикович — преподаватель высшей категории, сертифицированный тренер WorldSkills Junior по мобильной робототехнике, стаж 9 лет.',
+    requirements:
+      'Все наборы Arduino Uno, датчики, сервоприводы и паяльные станции предоставляются школьной лабораторией.',
+    learningOutcomes: [
+      'Понимание законов электротехники, чтение и сборка принципиальных схем',
+      'Написание управляющего кода на языке C/C++ для микроконтроллеров',
+      'Подключение цифровых и аналоговых датчиков, драйверов двигателей и дисплеев',
+      'Создание собственного автономного робота для участия в школьном хакатоне',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Основы электроники и макетирования',
+        description: 'Закон Ома, резисторы, светодиоды и сборка базовых схем на макетной плате без пайки.',
+        hours: '6 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'Архитектура Arduino и программирование на C++',
+        description: 'Работа со средой Arduino IDE, циклы, функции setup() и loop(), прерывания.',
+        hours: '8 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'Датчики, приводы и индикация',
+        description: 'Ультразвуковые дальномеры HC-SR04, сервоприводы SG90, датчики линии и символьные экраны.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 4',
+        title: 'Сборка и калибровка мобильного робота',
+        description: 'Двухмоторное колесное шасси, алгоритм объезда препятствий и PID-регулятор следования по линии.',
+        hours: '12 ак. ч.',
+      },
+    ],
+  },
+  {
+    id: 'act-2',
+    title: 'Театральная студия "Маска"',
+    category: 'Искусство',
+    description:
+      'Развитие сценической речи, актёрского мастерства, снятие зажимов и постановка классических и современных школьных пьес.',
+    teacherId: 'teacher-2',
+    teacherName: 'Соколова Елена Викторовна',
+    ageGroup: '7–16 лет (1–10 класс)',
+    price: 18000,
+    location: 'Актовый зал школы',
+    targetAudience:
+      'Для раскрепощения, уверенности в публичных выступлениях и погружения в драматургию.',
+    teacherBio:
+      'Соколова Елена Викторовна — профессиональный режиссёр-постановщик, лауреат городских театральных премий, педагогический стаж 12 лет.',
+    requirements:
+      'Удобная свободная одежда тёмных тонов и мягкая сменная обувь (чешки или балетки).',
+    learningOutcomes: [
+      'Преодоление страха сцены и психологических зажимов',
+      'Чёткая дикция, правильное дыхание и уверенная подача голоса',
+      'Опыт командного сценического взаимодействия и создания сценического образа',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Артикуляция и сценическая речь',
+        description: 'Дыхательная гимнастика, разминки на дикцию и диапазон голоса.',
+        hours: '8 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'Пластика и сценическое движение',
+        description: 'Этюды на физическое действие, координация и взаимодействие в пространстве.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'Репетиция спектакля',
+        description: 'Разбор сценария, читка ролей, мизансцены и генеральные прогоны с костюмами.',
+        hours: '14 ак. ч.',
+      },
+    ],
+  },
+  {
+    id: 'act-3',
+    title: 'Шахматный клуб "Гроссмейстер"',
+    category: 'Интеллект',
+    description:
+      'Тактика и стратегия шахматной игры, расчёт вариантов, дебютная теория и регулярная турнирная практика.',
+    teacherId: 'teacher-3',
+    teacherName: 'Смирнов Дмитрий Анатольевич',
+    ageGroup: '7–17 лет (1–11 класс)',
+    price: 0,
+    location: 'Библиотека (читальный зал)',
+    targetAudience:
+      'Для всех любителей шахмат — от начинающих до участников городских и республиканских первенств.',
+    teacherBio:
+      'Смирнов Дмитрий Анатольевич — кандидат в мастера спорта по шахматам, национальный арбитр, стаж 15 лет.',
+    requirements: 'Электронные часы DGT и турнирные доски предоставляются школой.',
+    learningOutcomes: [
+      'Умение рассчитывать ходы на 5-6 ходов вперёд',
+      'Глубокое понимание стратегических слабостей и типовых эндшпилей',
+      'Самодисциплина и стрессоустойчивость в условиях дефицита времени',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Тактические приёмы в миттельшпиле',
+        description: 'Связка, двойной удар, мельница, завлечение и отвлечение.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'Эндшпильные законы',
+        description: 'Пешечные окончания, ключевые поля, позиция Лусены и Филидора.',
+        hours: '12 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'Турнирная практика и анализ партий',
+        description: 'Партии с контролем времени, запись ходов и разбор типичных ошибок.',
+        hours: '14 ак. ч.',
+      },
+    ],
+  },
+  {
+    id: 'act-4',
+    title: 'Школьный волейбол',
+    category: 'Спорт',
+    description:
+      'Командная спортивная секция, отработка нападающего удара, подачи, блокирования и участие в школьной лиге.',
+    teacherId: 'teacher-4',
+    teacherName: 'Кузнецов Сергей Иванович',
+    ageGroup: '12–17 лет (6–11 класс)',
+    price: 15000,
+    location: 'Большой спортивный зал №1',
+    targetAudience: 'Для учеников средних и старших классов, любящих командный спорт.',
+    teacherBio:
+      'Кузнецов Сергей Иванович — мастер спорта, тренер сборной школы, педагогический стаж 14 лет.',
+    requirements: 'Спортивная форма, наколенники и кроссовки для зала с нескользящей подошвой.',
+    learningOutcomes: [
+      'Техника верхней и нижней передачи мяча с высокой точностью',
+      'Нападающий удар в разбеге и планирующая подача',
+      'Умение играть в расстановках 4-2 и 5-1',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Техника приёма и передач',
+        description: 'Верхняя передача, доводка мяча связующему, приём подачи в падении.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'Атакующие действия и блок',
+        description: 'Прыжковая тренировка, тайминг разбега и постановка одиночного/двойного блока.',
+        hours: '12 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'Тактика игры и товарищеские матчи',
+        description: 'Игровые расстановки 4-2 и 5-1, зоны ответственности и турнирная практика.',
+        hours: '10 ак. ч.',
+      },
+    ],
+  },
+  {
+    id: 'act-5',
+    title: 'Разговорный английский Debate Club',
+    category: 'Языки',
+    description:
+      'Практика живого английского языка, развитие критического мышления, участие в дебатах по формату WSDC.',
+    teacherId: 'teacher-5',
+    teacherName: 'Морозова Анна Владимировна',
+    ageGroup: '11–16 лет (5–10 класс)',
+    price: 22000,
+    location: 'Кабинет 214 (Лингафонный класс)',
+    targetAudience: 'Для школьников с уровнем A2–B2, желающих свободно говорить и аргументировать на английском.',
+    teacherBio:
+      'Морозова Анна Владимировна — обладатель сертификата Cambridge CELTA, судья республиканских турниров дебатов.',
+    requirements: 'Тетрадь для подготовки тезисов и готовность высказываться на английском.',
+    learningOutcomes: [
+      'Беглость речи и преодоление страха ошибок при спонтанном общении',
+      'Структурирование аргументов по модели PEEL (Point, Explanation, Evidence, Link)',
+      'Значительное расширение академического словарного запаса',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Public Speaking Fundamentals',
+        description: 'Интонация, контакт с аудиторией, спонтанные импровизационные спичи.',
+        hours: '8 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'The Art of Argumentation',
+        description: 'Структура аргумента PEEL, поиск логических ошибок и контраргументация.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'WSDC Debate Tournaments',
+        description: 'Парламентский формат, роли премьер-министра и лидера оппозиции, перекрёстные вопросы.',
+        hours: '12 ак. ч.',
+      },
+    ],
+  },
+  {
+    id: 'act-6',
+    title: 'Олимпиадная математика',
+    category: 'Наука',
+    description:
+      'Нестандартные логические задачи, комбинаторика, теория графов и подготовка к городским олимпиадам.',
+    teacherId: 'teacher-6',
+    teacherName: 'Васильева Ольга Николаевна',
+    ageGroup: '8–12 лет (2–6 класс)',
+    price: 20000,
+    location: 'Кабинет 108',
+    targetAudience: 'Для ребят с живым интересом к логическим головоломкам и математическим олимпиадам.',
+    teacherBio:
+      'Васильева Ольга Николаевна — почётный педагог, автор сборников олимпиадных задач, стаж 20 лет.',
+    requirements: 'Тетрадь в клетку, цветные ручки и линейка.',
+    learningOutcomes: [
+      'Методы решения олимпиадных задач: принцип Дирихле, инварианты, ретроспективный анализ',
+      'Комбинаторное мышление и основы теории графов',
+      'Умение строго доказывать математические утверждения',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Логика и теория множеств',
+        description: 'Круги Эйлера, рыцари и лжецы, взвешивания и переливания.',
+        hours: '8 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'Комбинаторика и графы',
+        description: 'Правило произведения, перестановки, мосты Эйлера и связность графов.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'Принцип Дирихле и раскраски',
+        description: 'Задачи на клетки и кроликов, шахматные раскраски доски.',
+        hours: '8 ак. ч.',
+      },
+    ],
+  },
+  {
+    id: 'act-7',
+    title: 'Баскетбольная секция',
+    category: 'Спорт',
+    description:
+      'Отработка ведения мяча, бросков с дистанции, быстрых отрывов и тактики зонной защиты.',
+    teacherId: 'teacher-7',
+    teacherName: 'Аскаров Данияр Серикович',
+    ageGroup: '10–15 лет (4–9 класс)',
+    price: 18000,
+    location: 'Малый спортивный зал №2',
+    targetAudience: 'Для мальчиков и девочек, желающих научиться динамичной игре в баскетбол.',
+    teacherBio:
+      'Аскаров Данияр Серикович — тренер спортивной школы олимпийского резерва, стаж 10 лет.',
+    requirements: 'Баскетбольные кроссовки с хорошей амортизацией и спортивная форма.',
+    learningOutcomes: [
+      'Уверенный дриблинг правой и левой рукой без зрительного контроля',
+      'Техника броска в прыжке и штрафных бросков',
+      'Командная игра в защите и переход в быстрый отрыв',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Дриблинг и передачи',
+        description: 'Кроссоверы, перевод за спиной, передачи одной и двумя руками от пола.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'Техника броска',
+        description: 'Позиция тройной угрозы, лей-ап с двух шагов, броски с дистанции.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'Тактика и позиционная игра',
+        description: 'Зонная защита 2-3, заслоны (Pick and Roll) и контратаки.',
+        hours: '12 ак. ч.',
+      },
+    ],
+  },
+  {
+    id: 'act-8',
+    title: 'Школьный футбольный клуб "Барыс"',
+    category: 'Спорт',
+    description:
+      'Футбольная секция на открытом и крытом поле. Тактика короткого паса, дриблинг и двусторонние матчи.',
+    teacherId: 'teacher-8',
+    teacherName: 'Турсунов Нурлан Серикович',
+    ageGroup: '7–14 лет (1–8 класс)',
+    price: 0,
+    location: 'Школьный стадион / Поле с искусственным газоном',
+    targetAudience: 'Для всех юных футболистов школы.',
+    teacherBio:
+      'Турсунов Нурлан Серикович — тренер категории UEFA C, судья соревнований, стаж 11 лет.',
+    requirements: 'Щитки, гетры, бутсы для искусственного покрытия (сороконожки).',
+    learningOutcomes: [
+      'Техника остановки и обработки мяча подошвой и внутренней стороной стопы',
+      'Позиционная игра и стандарты (угловые, штрафные)',
+      'Командное взаимодействие и поддержка темпа матча',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Владение мячом и пас',
+        description: 'Короткий и средний пас, контроль мяча в ограниченном пространстве.',
+        hours: '12 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'Дриблинг и обводка',
+        description: 'Финты, смена темпа и направления, обыгрыш защитника 1-в-1.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'Тактика и игровые схемы',
+        description: 'Прессинг, зонная опека, стандарты и двусторонние товарищеские игры.',
+        hours: '14 ак. ч.',
+      },
+    ],
+  },
+  {
+    id: 'act-9',
+    title: 'Изостудия и академический рисунок',
+    category: 'Искусство',
+    description:
+      'Основы композиции, цветоведение, акварель, гуашь, пастель и подготовка к художественным выставкам.',
+    teacherId: 'teacher-9',
+    teacherName: 'Калинина Гульнара Мухтаровна',
+    ageGroup: '8–15 лет (2–9 класс)',
+    price: 20000,
+    location: 'Кабинет 205 (Мастерская искусств)',
+    targetAudience: 'Для творческих ребят, стремящихся научиться грамотно рисовать с натуры и воображения.',
+    teacherBio:
+      'Калинина Гульнара Мухтаровна — член Союза художников, стаж преподавания живописи 16 лет.',
+    requirements: 'Мольберты и планшеты есть в мастерской. Кисти и краски по списку преподавателя.',
+    learningOutcomes: [
+      'Понимание светотени, перспективы и пропорций предметов',
+      'Уверенная работа с акварелью, маслом и графическими материалами',
+      'Умение строить гармоничную цветовую и пространственную композицию',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Графика и перспектива',
+        description: 'Линейная и воздушная перспектива, натюрморт из простых геометрических тел.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'Цветоведение и колорит',
+        description: 'Цветовой круг, теплые и холодные тона, лессировки в акварели.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'Портрет и фигура человека',
+        description: 'Анатомические пропорции лица, наброски с натуры мягкими материалами.',
+        hours: '12 ак. ч.',
+      },
+    ],
+  },
+  {
+    id: 'act-10',
+    title: 'Гончарное мастерство и керамика',
+    category: 'Творчество',
+    description:
+      'Работа за гончарным кругом, ручная лепка из белой и красной глины, обжиг в муфельной печи и роспись глазурями.',
+    teacherId: 'teacher-10',
+    teacherName: 'Жумабаева Айгерим Бериковна',
+    ageGroup: '9–16 лет (3–10 класс)',
+    price: 24000,
+    location: 'Кабинет 102 (Студия керамики)',
+    targetAudience: 'Для развития мелкой моторики, пространственного воображения и создания авторской посуды.',
+    teacherBio:
+      'Жумабаева Айгерим Бериковна — керамист-дизайнер, участник международных выставок прикладного искусства.',
+    requirements: 'Фартуки и глина предоставляются школьной мастерской.',
+    learningOutcomes: [
+      'Центровка глины на гончарном круге и вытягивание цилиндра',
+      'Техники ручной лепки: жгутовой, пластовой, отминание',
+      'Декорирование ангобами и глазурование изделий',
+    ],
+    syllabus: [
+      {
+        module: 'Модуль 1',
+        title: 'Основы формообразования',
+        description: 'Свойства глины, подготовка массы, формование пиалы за гончарным кругом.',
+        hours: '8 ак. ч.',
+      },
+      {
+        module: 'Модуль 2',
+        title: 'Ручная лепка сложных форм',
+        description: 'Пластовая техника, сграффито и текстурирование поверхности штампами.',
+        hours: '10 ак. ч.',
+      },
+      {
+        module: 'Модуль 3',
+        title: 'Обжиг и глазурование',
+        description: 'Утильный обжиг в печи, нанесение майоликовых глазурей и финальный политой обжиг.',
+        hours: '10 ак. ч.',
+      },
+    ],
+  },
+];
+
+export const DEMO_ACTIVITY_GROUPS = [
+  // 1. Робототехника (act-1)
+  {
+    id: 'grp-1-1',
+    activityId: 'act-1',
+    name: 'Группа А (Начинающие)',
+    capacity: 12,
+    enrolledCount: 8, // 66% заполненность
+    daysOfWeek: [1, 3], // Пн, Ср
+    startTime: '15:30',
+    endTime: '17:00',
+  },
+  {
+    id: 'grp-1-2',
+    activityId: 'act-1',
+    name: 'Группа Б (Продвинутые)',
+    capacity: 10,
+    enrolledCount: 10, // 100% ПОЛНАЯ (с листом ожидания!)
+    daysOfWeek: [2, 4], // Вт, Чт
+    startTime: '16:00',
+    endTime: '17:30',
+  },
+
+  // 2. Театр (act-2) — 100% ПОЛНАЯ (с активным листом ожидания!)
+  {
+    id: 'grp-2-1',
+    activityId: 'act-2',
+    name: 'Основная труппа (7-16 лет)',
+    capacity: 15,
+    enrolledCount: 15, // 100% ПОЛНАЯ
+    daysOfWeek: [2, 5], // Вт, Пт
+    startTime: '16:00',
+    endTime: '18:00',
+  },
+
+  // 3. Шахматы (act-3)
+  {
+    id: 'grp-3-1',
+    activityId: 'act-3',
+    name: 'Турнирная группа',
+    capacity: 16,
+    enrolledCount: 10,
+    daysOfWeek: [3, 6], // Ср, Сб
+    startTime: '15:00',
+    endTime: '16:30',
+  },
+
+  // 4. Волейбол (act-4) — ОСТАЛОСЬ 1 МЕСТО!
+  {
+    id: 'grp-4-1',
+    activityId: 'act-4',
+    name: 'Сборная секция (6-11 класс)',
+    capacity: 14,
+    enrolledCount: 13, // 1 МЕСТО ОСТАЛОСЬ!
+    daysOfWeek: [2, 4], // Вт, Чт
+    startTime: '17:00',
+    endTime: '18:30',
+  },
+
+  // 5. Английский Debate Club (act-5)
+  {
+    id: 'grp-5-1',
+    activityId: 'act-5',
+    name: 'English Debates League',
+    capacity: 10,
+    enrolledCount: 6,
+    daysOfWeek: [6], // Сб
+    startTime: '11:00',
+    endTime: '12:30',
+  },
+
+  // 6. Олимпиадная математика (act-6)
+  {
+    id: 'grp-6-1',
+    activityId: 'act-6',
+    name: 'Младшая лига олимпийцев',
+    capacity: 12,
+    enrolledCount: 7,
+    daysOfWeek: [1, 5], // Пн, Пт
+    startTime: '14:30',
+    endTime: '16:00',
+  },
+
+  // 7. Баскетбол (act-7) — ОСТАЛОСЬ 1 МЕСТО!
+  {
+    id: 'grp-7-1',
+    activityId: 'act-7',
+    name: 'Младшая баскетбольная сборная',
+    capacity: 12,
+    enrolledCount: 11, // 1 МЕСТО ОСТАЛОСЬ!
+    daysOfWeek: [1, 3], // Пн, Ср
+    startTime: '17:00',
+    endTime: '18:30',
+  },
+
+  // 8. Футбол "Барыс" (act-8) — Свежая группа
+  {
+    id: 'grp-8-1',
+    activityId: 'act-8',
+    name: 'Младшая футбольная группа',
+    capacity: 16,
+    enrolledCount: 2,
+    daysOfWeek: [2, 5], // Вт, Пт
+    startTime: '15:30',
+    endTime: '17:00',
+  },
+
+  // 9. Изостудия (act-9)
+  {
+    id: 'grp-9-1',
+    activityId: 'act-9',
+    name: 'Академическая живопись и рисунок',
+    capacity: 14,
+    enrolledCount: 8,
+    daysOfWeek: [3, 6], // Ср, Сб
+    startTime: '16:30',
+    endTime: '18:00',
+  },
+
+  // 10. Гончарное дело (act-10) — Свежая группа
+  {
+    id: 'grp-10-1',
+    activityId: 'act-10',
+    name: 'Студия ручной лепки и круга',
+    capacity: 8,
+    enrolledCount: 1,
+    daysOfWeek: [4], // Чт
+    startTime: '15:00',
+    endTime: '17:00',
+  },
+];
+
+export const DEMO_STUDENTS = [
+  {
+    id: 'student-1',
+    fullName: 'Алихан Сейткали',
+    className: '7-А класс',
+    parentIds: ['parent-1', 'dev-user-1'],
+    phone: '+7 (701) 555-01-11',
+  },
+  {
+    id: 'student-2',
+    fullName: 'Амина Сейткали',
+    className: '5-Б класс',
+    parentIds: ['parent-1', 'dev-user-1'],
+    phone: '+7 (701) 555-01-12',
+  },
+  {
+    id: 'student-3',
+    fullName: 'Данияр Маратов',
+    className: '7-А класс',
+    parentIds: ['parent-2'],
+  },
+  {
+    id: 'student-4',
+    fullName: 'Карина Исаева',
+    className: '7-Б класс',
+    parentIds: ['parent-3'],
+  },
+  {
+    id: 'student-5',
+    fullName: 'Тимур Нургалиев',
+    className: '8-В класс',
+    parentIds: ['parent-4'],
+  },
+  {
+    id: 'student-6',
+    fullName: 'Диас Куанышев',
+    className: '6-А класс',
+    parentIds: ['parent-5'],
+  },
+  {
+    id: 'student-7',
+    fullName: 'София Ким',
+    className: '7-Б класс',
+    parentIds: ['parent-6'],
+  },
+  {
+    id: 'student-8',
+    fullName: 'Томирис Болатова',
+    className: '7-А класс',
+    parentIds: ['parent-7'],
+  },
+];
+
+export const DEMO_WAITLIST = [
+  // Театральная студия (grp-2-1): 3 человека в очереди
+  {
+    id: 'w-1',
+    studentId: 'student-1',
+    studentName: 'Алихан Сейткали',
+    className: '7-А класс',
+    groupId: 'grp-2-1',
+    activityId: 'act-2',
+    position: 1,
+    queuedAt: '2026-09-07T09:30:00.000Z',
+    parentPhone: '+7 (701) 555-01-11',
+  },
+  {
+    id: 'w-2',
+    studentId: 'student-4',
+    studentName: 'Карина Исаева',
+    className: '7-Б класс',
+    groupId: 'grp-2-1',
+    activityId: 'act-2',
+    position: 2,
+    queuedAt: '2026-09-07T11:20:00.000Z',
+    parentPhone: '+7 (701) 555-01-24',
+  },
+  {
+    id: 'w-3',
+    studentId: 'student-5',
+    studentName: 'Тимур Нургалиев',
+    className: '8-В класс',
+    groupId: 'grp-2-1',
+    activityId: 'act-2',
+    position: 3,
+    queuedAt: '2026-09-07T14:45:00.000Z',
+    parentPhone: '+7 (701) 555-01-35',
+  },
+  // Робототехника Продвинутые (grp-1-2): 2 человека в очереди
+  {
+    id: 'w-4',
+    studentId: 'student-6',
+    studentName: 'Диас Куанышев',
+    className: '6-А класс',
+    groupId: 'grp-1-2',
+    activityId: 'act-1',
+    position: 1,
+    queuedAt: '2026-09-08T08:15:00.000Z',
+    parentPhone: '+7 (701) 555-01-46',
+  },
+  {
+    id: 'w-5',
+    studentId: 'student-7',
+    studentName: 'София Ким',
+    className: '7-Б класс',
+    groupId: 'grp-1-2',
+    activityId: 'act-1',
+    position: 2,
+    queuedAt: '2026-09-08T12:00:00.000Z',
+    parentPhone: '+7 (701) 555-01-57',
+  },
+];
+
+export const DEMO_ENROLLMENTS = [
+  // 1. ACTIVE: Робототехника (Пн, Ср 15:30-17:00)
+  {
+    id: 'enr-1',
+    studentId: 'student-1',
+    groupId: 'grp-1-1',
+    activityId: 'act-1',
+    status: 'active',
+    holdExpiresAt: null,
+    enrolledAt: '2026-08-20T10:00:00.000Z',
+  },
+  // 2. ACTIVE: Школьный волейбол (Вт, Чт 17:00-18:30)
+  {
+    id: 'enr-2',
+    studentId: 'student-1',
+    groupId: 'grp-4-1',
+    activityId: 'act-4',
+    status: 'active',
+    holdExpiresAt: null,
+    enrolledAt: '2026-08-22T12:30:00.000Z',
+  },
+  // 3. PENDING HOLD: Разговорный английский Debate Club (Сб 11:00-12:30) — active ticking timer (~18 hours left)
+  {
+    id: 'enr-3',
+    studentId: 'student-1',
+    groupId: 'grp-5-1',
+    activityId: 'act-5',
+    status: 'pending_parent_approval',
+    holdExpiresAt: new Date(Date.now() + 18 * 60 * 60 * 1000 + 45 * 60 * 1000).toISOString(),
+    enrolledAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+  },
+  // 4. WAITLISTED: Театральная студия (Позиция №1)
+  {
+    id: 'enr-4',
+    studentId: 'student-1',
+    groupId: 'grp-2-1',
+    activityId: 'act-2',
+    status: 'waitlisted',
+    queuePosition: 1,
+    holdExpiresAt: null,
+    enrolledAt: '2026-09-07T09:30:00.000Z',
+  },
+  // 5. CANCELLED BY TIMEOUT: Олимпиадная математика (место ушло по таймауту)
+  {
+    id: 'enr-5',
+    studentId: 'student-1',
+    groupId: 'grp-6-1',
+    activityId: 'act-6',
+    status: 'cancelled_by_timeout',
+    holdExpiresAt: '2026-09-03T18:00:00.000Z',
+    cancelledAt: '2026-09-03T18:00:01.000Z',
+    enrolledAt: '2026-09-02T18:00:00.000Z',
+  },
+
+  // Enrollments for second child: Амина Сейткали (student-2)
+  {
+    id: 'enr-6',
+    studentId: 'student-2',
+    groupId: 'grp-3-1',
+    activityId: 'act-3',
+    status: 'active',
+    holdExpiresAt: null,
+    enrolledAt: '2026-08-25T11:00:00.000Z',
+  },
+  {
+    id: 'enr-7',
+    studentId: 'student-2',
+    groupId: 'grp-9-1',
+    activityId: 'act-9',
+    status: 'active',
+    holdExpiresAt: null,
+    enrolledAt: '2026-08-26T14:00:00.000Z',
+  },
+];
+
+export const DEMO_PAYMENTS = [
+  // 1. PAID (Оплачено)
+  {
+    id: 'pay-1',
+    enrollmentId: 'enr-1',
+    studentId: 'student-1',
+    activityId: 'act-1',
+    amount: 25000,
+    status: 'paid',
+    dueDate: '2026-09-10',
+    paidAt: '2026-09-03T14:20:00.000Z',
+    title: 'Робототехника и Arduino (Сентябрь 2026)',
+    paymentMethod: 'Kaspi QR / Офлайн',
+  },
+  // 2. PENDING (Выставлен счёт — с кнопкой «Оплатить»)
+  {
+    id: 'pay-2',
+    enrollmentId: 'enr-2',
+    studentId: 'student-1',
+    activityId: 'act-4',
+    amount: 15000,
+    status: 'pending',
+    dueDate: '2026-09-25',
+    paidAt: null,
+    title: 'Школьный волейбол (Сентябрь 2026)',
+  },
+  // 3. OVERDUE (Просрочен — с предупреждением)
+  {
+    id: 'pay-3',
+    enrollmentId: 'enr-3',
+    studentId: 'student-1',
+    activityId: 'act-5',
+    amount: 22000,
+    status: 'overdue',
+    dueDate: '2026-09-05',
+    paidAt: null,
+    title: 'Разговорный английский Debate Club (Сентябрь 2026)',
+  },
+  // 4. FREE / PAID for second child
+  {
+    id: 'pay-4',
+    enrollmentId: 'enr-6',
+    studentId: 'student-2',
+    activityId: 'act-3',
+    amount: 0,
+    status: 'paid',
+    dueDate: '2026-09-30',
+    paidAt: '2026-08-25T11:00:00.000Z',
+    title: 'Шахматный клуб (Бесплатный школьный кружок)',
+  },
+  // 5. PENDING for second child
+  {
+    id: 'pay-5',
+    enrollmentId: 'enr-7',
+    studentId: 'student-2',
+    activityId: 'act-9',
+    amount: 20000,
+    status: 'pending',
+    dueDate: '2026-09-28',
+    paidAt: null,
+    title: 'Изостудия и академический рисунок (Сентябрь 2026)',
+  },
+];
+
+export const DEMO_ATTENDANCE_HISTORY = {
+  // Lesson 1: 2026-08-26
+  'grp-1-1_2026-08-26': {
+    'student-1': 'present',
+    'student-2': 'present',
+    'student-3': 'present',
+    'student-4': 'present',
+    'student-5': 'present',
+    'student-6': 'present',
+    'student-7': 'present',
+    'student-8': 'present',
+  },
+  // Lesson 2: 2026-08-31
+  'grp-1-1_2026-08-31': {
+    'student-1': 'present',
+    'student-2': 'present',
+    'student-3': 'late',
+    'student-4': 'present',
+    'student-5': 'excused',
+    'student-6': 'present',
+    'student-7': 'present',
+    'student-8': 'present',
+  },
+  // Lesson 3: 2026-09-02
+  'grp-1-1_2026-09-02': {
+    'student-1': 'present',
+    'student-2': 'present',
+    'student-3': 'present',
+    'student-4': 'absent',
+    'student-5': 'excused',
+    'student-6': 'present',
+    'student-7': 'late',
+    'student-8': 'present',
+  },
+  // Lesson 4: 2026-09-07
+  'grp-1-1_2026-09-07': {
+    'student-1': 'present',
+    'student-2': 'present',
+    'student-3': 'present',
+    'student-4': 'present',
+    'student-5': 'present',
+    'student-6': 'excused',
+    'student-7': 'present',
+    'student-8': 'late',
+  },
+  // Lesson 5 (Recent / Today): 2026-09-09
+  'grp-1-1_2026-09-09': {
+    'student-1': 'present',
+    'student-2': 'present',
+    'student-3': 'late',
+    'student-4': 'present',
+    'student-5': 'present',
+    'student-6': 'present',
+    'student-7': 'excused',
+    'student-8': 'present',
+  },
+};
+
+export const DEMO_ACHIEVEMENTS = [
+  {
+    id: 'ach-1',
+    title: 'Первые шаги',
+    desc: 'Успешная запись и посещение первого школьного кружка',
+    icon: '🌟',
+  },
+  {
+    id: 'ach-2',
+    title: '100% дисциплина',
+    desc: 'Ни одного пропуска занятий по робототехнике за первый месяц',
+    icon: '🏆',
+  },
+  {
+    id: 'ach-3',
+    title: 'Победитель хакатона',
+    desc: '1-е место в школьном турнире мобильных роботов Arduino',
+    icon: '🥇',
+  },
+  {
+    id: 'ach-4',
+    title: 'Активный дебатёр',
+    desc: 'Победа в раунде дебатов на английском языке',
+    icon: '🗣',
+  },
+];
+
+export const DEMO_NOTIFICATIONS = {
+  student: [
+    {
+      id: 'notif-s1',
+      role: 'student',
+      type: 'hold_expiry',
+      title: 'Истекает бронь места (осталось 18 ч.)',
+      text: 'Ваша бронь в кружок «Разговорный английский Debate Club» истекает завтра. Напомните родителям подтвердить запись!',
+      isRead: false,
+      sentAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-s2',
+      role: 'student',
+      type: 'waitlist_promotion',
+      title: 'Вы на 1-м месте в очереди!',
+      text: 'В группе «Театральная студия "Маска"» вы первый в листе ожидания. Как только освободится место, вам придёт ссылка на бронь.',
+      isRead: false,
+      sentAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-s3',
+      role: 'student',
+      type: 'achievement',
+      title: 'Новая награда получена! 🏆',
+      text: 'Поздравляем! Вам присвоен бейдж «100% дисциплина» за идеальное посещение кружка по робототехнике.',
+      isRead: false,
+      sentAt: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-s4',
+      role: 'student',
+      type: 'attendance_alert',
+      title: 'Отметка в журнале',
+      text: 'Преподаватель Данияр Серикович отметил ваше присутствие на занятии «Робототехника и Arduino».',
+      isRead: true,
+      sentAt: new Date(Date.now() - 28 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-s5',
+      role: 'student',
+      type: 'catalog_new',
+      title: 'Открыт новый кружок!',
+      text: 'В каталоге открыта запись в новую секцию: «Гончарное мастерство и керамика» (кабинет 102).',
+      isRead: true,
+      sentAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+    },
+  ],
+  parent: [
+    {
+      id: 'notif-p1',
+      role: 'parent',
+      type: 'parent_approval',
+      title: 'Требуется подтверждение записи',
+      text: 'Алихан забронировал место в кружке «Разговорный английский Debate Club». Бронь действует до завтра.',
+      isRead: false,
+      sentAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-p2',
+      role: 'parent',
+      type: 'invoice_created',
+      title: 'Выставлен счёт за волейбол',
+      text: 'Счёт на сумму 15 000 ₸ за секцию «Школьный волейбол» ожидает оплаты до 25 сентября.',
+      isRead: false,
+      sentAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-p3',
+      role: 'parent',
+      type: 'payment_confirmed',
+      title: 'Оплата успешно подтверждена ✅',
+      text: 'Платёж на сумму 25 000 ₸ за кружок «Робототехника» подтверждён координатором школы.',
+      isRead: true,
+      sentAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-p4',
+      role: 'parent',
+      type: 'attendance_alert',
+      title: 'Посещаемость ребёнка',
+      text: 'Алихан сегодня присутствовал на занятии в IT-лаборатории (15:30–17:00).',
+      isRead: true,
+      sentAt: new Date(Date.now() - 30 * 3600 * 1000).toISOString(),
+    },
+  ],
+  teacher: [
+    {
+      id: 'notif-t1',
+      role: 'teacher',
+      type: 'attendance_journal',
+      title: 'Журнал на сегодня сформирован',
+      text: 'Журнал посещаемости для группы «Робототехника — Группа А» готов к заполнению (8 учеников).',
+      isRead: false,
+      sentAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-t2',
+      role: 'teacher',
+      type: 'student_enrolled',
+      title: 'Новый ученик в группе',
+      text: 'Томирис Болатова зачислена в группу «Робототехника — Группа А». Контакты родителей в журнале.',
+      isRead: false,
+      sentAt: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-t3',
+      role: 'teacher',
+      type: 'system',
+      title: 'Кабинет подтверждён',
+      text: 'IT-лаборатория (кабинет 304) зарезервирована за вашими группами на весь учебный год.',
+      isRead: true,
+      sentAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString(),
+    },
+  ],
+  coordinator: [
+    {
+      id: 'notif-c1',
+      role: 'coordinator',
+      type: 'capacity_alert',
+      title: 'Группа 100% заполнена ⚠️',
+      text: 'Группа «Театральная студия "Маска"» набрала максимум (15/15). В листе ожидания уже 3 человека!',
+      isRead: false,
+      sentAt: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-c2',
+      role: 'coordinator',
+      type: 'hold_expired',
+      title: 'Истёк 24-часовой холд',
+      text: 'Истёк срок бронирования места. Место в кружке автоматически предложено следующему в очереди.',
+      isRead: false,
+      sentAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-c3',
+      role: 'coordinator',
+      type: 'offline_payment',
+      title: 'Поступил платёж за кружок',
+      text: 'Родитель Айдар Сейткалиев оплатил 25 000 ₸ за кружок робототехники. Требуется подтверждение в биллинге.',
+      isRead: false,
+      sentAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-c4',
+      role: 'coordinator',
+      type: 'group_almost_full',
+      title: 'Осталось 1 место',
+      text: 'Секция «Школьный волейбол» заполнена на 13/14 мест. Высокий спрос среди 7-х классов.',
+      isRead: true,
+      sentAt: new Date(Date.now() - 26 * 3600 * 1000).toISOString(),
+    },
+  ],
+  admin: [
+    {
+      id: 'notif-a1',
+      role: 'admin',
+      type: 'system',
+      title: 'Система работает штатно',
+      text: 'Все 10 активностей и 11 групп школы синхронизированы в реальном времени.',
+      isRead: false,
+      sentAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-a2',
+      role: 'admin',
+      type: 'group_full',
+      title: 'Мониторинг вместимости',
+      text: '2 группы достигли 100% заполненности. Рекомендуется открыть дополнительный набор.',
+      isRead: false,
+      sentAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+    },
+    {
+      id: 'notif-a3',
+      role: 'admin',
+      type: 'billing_report',
+      title: 'Ежемесячный финансовый отчёт',
+      text: 'Формирование сводного отчёта по поступлениям от платных кружков за текущий месяц завершено.',
+      isRead: true,
+      sentAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    },
+  ],
+};

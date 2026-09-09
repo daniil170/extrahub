@@ -10,74 +10,46 @@ import {
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 
+import {
+  DEMO_STUDENTS,
+  DEMO_ATTENDANCE_HISTORY,
+} from '../../shared/data/demoData.js';
+
 export const MOCK_TEACHER_GROUPS = [
   {
     id: 'grp-1-1',
     activityId: 'act-1',
-    activityTitle: 'Робототехника и Arduino',
+    activityTitle: 'Робототехника и микроэлектроника Arduino',
     name: 'Группа А (Начинающие)',
     location: 'Кабинет 304 (IT-лаборатория)',
     daysOfWeek: [1, 3],
     startTime: '15:30',
     endTime: '17:00',
-    enrolledCount: 5,
+    enrolledCount: 8,
     capacity: 12,
   },
   {
     id: 'grp-1-2',
     activityId: 'act-1',
-    activityTitle: 'Робототехника и Arduino',
+    activityTitle: 'Робототехника и микроэлектроника Arduino',
     name: 'Группа Б (Продвинутые)',
     location: 'Кабинет 304 (IT-лаборатория)',
     daysOfWeek: [2, 4],
     startTime: '16:00',
     endTime: '17:30',
-    enrolledCount: 3,
+    enrolledCount: 10,
     capacity: 10,
-  },
-  {
-    id: 'grp-3-1',
-    activityId: 'act-3',
-    activityTitle: 'Шахматный клуб "Гроссмейстер"',
-    name: 'Все уровни',
-    location: 'Библиотека, читальный зал',
-    daysOfWeek: [3, 6],
-    startTime: '15:00',
-    endTime: '16:30',
-    enrolledCount: 3,
-    capacity: 16,
   },
 ];
 
 export const MOCK_GROUP_STUDENTS = {
-  'grp-1-1': [
-    { id: 'student-1', fullName: 'Александр Иванов', className: '7-Б класс' },
-    { id: 'student-2', fullName: 'София Иванова', className: '5-Б класс' },
-    { id: 'student-3', fullName: 'Дарья Смирнова', className: '7-А класс' },
-    { id: 'student-4', fullName: 'Илья Кузнецов', className: '8-В класс' },
-    { id: 'student-5', fullName: 'Максим Смирнов', className: '7-Б класс' },
-  ],
-  'grp-1-2': [
-    { id: 'student-6', fullName: 'Екатерина Попова', className: '8-А класс' },
-    { id: 'student-7', fullName: 'Артем Соколов', className: '7-А класс' },
-    { id: 'student-8', fullName: 'Виктория Морозова', className: '6-Б класс' },
-  ],
-  'grp-3-1': [
-    { id: 'student-1', fullName: 'Александр Иванов', className: '7-Б класс' },
-    { id: 'student-4', fullName: 'Илья Кузнецов', className: '8-В класс' },
-    { id: 'student-9', fullName: 'Денис Новиков', className: '9-А класс' },
-  ],
+  'grp-1-1': DEMO_STUDENTS,
+  'grp-1-2': DEMO_STUDENTS.slice(2, 8),
 };
 
-// In-memory mock storage for local session testing
+// In-memory mock storage pre-filled with 3 weeks of realistic school attendance
 const devAttendanceStore = {
-  'grp-1-1_2026-09-08': {
-    'student-1': 'present',
-    'student-2': 'present',
-    'student-3': 'late',
-    'student-4': 'absent',
-    'student-5': 'excused',
-  },
+  ...DEMO_ATTENDANCE_HISTORY,
 };
 
 /**

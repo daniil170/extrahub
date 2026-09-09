@@ -16,51 +16,12 @@ import {
   subscribeActivities,
   createActivityRecord,
 } from '../catalog/api.js';
+import { DEMO_WAITLIST, DEMO_STUDENTS } from '../../shared/data/demoData.js';
 
 export { createActivityRecord };
 
-export const MOCK_WAITLIST = [
-  {
-    id: 'w-1',
-    studentId: 'student-3',
-    groupId: 'grp-1-2',
-    position: 1,
-    queuedAt: '2026-09-07T10:00:00.000Z',
-  },
-  {
-    id: 'w-2',
-    studentId: 'student-4',
-    groupId: 'grp-2-1',
-    position: 1,
-    queuedAt: '2026-09-06T12:00:00.000Z',
-  },
-  {
-    id: 'w-3',
-    studentId: 'student-5',
-    groupId: 'grp-2-1',
-    position: 2,
-    queuedAt: '2026-09-06T15:00:00.000Z',
-  },
-];
-
-export const MOCK_STUDENTS_CATALOG = [
-  {
-    id: 'student-1',
-    fullName: 'Александр Иванов',
-    className: '7-Б класс',
-    parentIds: ['dev-user-1'],
-  },
-  { id: 'student-2', fullName: 'София Иванова', className: '5-Б класс', parentIds: ['dev-user-1'] },
-  { id: 'student-3', fullName: 'Дарья Смирнова', className: '7-А класс', parentIds: ['parent-2'] },
-  { id: 'student-4', fullName: 'Илья Кузнецов', className: '8-В класс', parentIds: ['parent-3'] },
-  { id: 'student-5', fullName: 'Максим Смирнов', className: '7-Б класс', parentIds: ['parent-4'] },
-  {
-    id: 'student-6',
-    fullName: 'Екатерина Попова',
-    className: '8-А класс',
-    parentIds: ['parent-5'],
-  },
-];
+export const MOCK_WAITLIST = DEMO_WAITLIST;
+export const MOCK_STUDENTS_CATALOG = DEMO_STUDENTS;
 
 export const MOCK_COORDINATOR_ENROLLMENTS = [
   // Robotics Group A (grp-1-1)

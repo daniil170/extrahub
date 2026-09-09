@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useParentDashboard } from './useParentDashboard.js';
-import { Card, Badge, Button, Spinner, Modal, PageHeader } from '../../shared/ui/index.js';
+import { Card, Badge, Button, Spinner, Modal, PageHeader, CountdownTimer } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
 
 export function ParentDashboard() {
@@ -205,7 +205,9 @@ export function ParentDashboard() {
                             ? 'var(--success)'
                             : enr.status === 'pending_parent_approval'
                               ? 'var(--accent-coral)'
-                              : 'var(--border-color)'
+                              : enr.status === 'waitlisted'
+                                ? 'var(--warning)'
+                                : 'var(--border-color)'
                         }`,
                       }}
                     >
@@ -261,6 +263,9 @@ export function ParentDashboard() {
                           {enr.status === 'pending_parent_approval' && (
                             <Badge variant="warning">Бронь (ожидает подтверждения)</Badge>
                           )}
+                          {enr.status === 'waitlisted' && (
+                            <Badge variant="warning">Лист ожидания (№{enr.queuePosition || 1})</Badge>
+                          )}
                           {enr.status === 'cancelled' && <Badge variant="default">Отменено</Badge>}
                           {enr.status === 'cancelled_by_timeout' && (
                             <Badge variant="danger">Истекло</Badge>
@@ -272,17 +277,42 @@ export function ParentDashboard() {
                       {enr.status === 'pending_parent_approval' && enr.holdExpiresAt && (
                         <div
                           style={{
-                            padding: '8px 12px',
+                            padding: '10px 14px',
                             backgroundColor: 'var(--accent-coral-light)',
                             color: 'var(--accent-coral)',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            marginBottom: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: '8px',
+                          }}
+                        >
+                          <div>
+                            ⏱ Бронь места удерживается до {formatDate(enr.holdExpiresAt)}. Пожалуйста,
+                            подтвердите участие или отмените бронь.
+                          </div>
+                          <CountdownTimer expiresAt={enr.holdExpiresAt} variant="badge" />
+                        </div>
+                      )}
+
+                      {/* Waitlist Notice */}
+                      {enr.status === 'waitlisted' && (
+                        <div
+                          style={{
+                            padding: '8px 12px',
+                            backgroundColor: 'var(--warning-light)',
+                            color: 'var(--warning)',
                             borderRadius: 'var(--radius-sm)',
                             fontSize: '12.5px',
                             fontWeight: 500,
                             marginBottom: '12px',
                           }}
                         >
-                          ⏱ Бронь места удерживается до {formatDate(enr.holdExpiresAt)}. Пожалуйста,
-                          подтвердите участие или отмените, если планы изменились.
+                          📋 Заявка находится в листе ожидания на позиции #{enr.queuePosition || 1}. Как только место в группе освободится, вы получите приоритетное право бронирования.
                         </div>
                       )}
 
