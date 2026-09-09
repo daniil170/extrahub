@@ -21,7 +21,13 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Listen to real Firebase auth changes, fallback gracefully to mock user in dev
+    // In demo / prototype mode, fallback gracefully to mock user without spawning Identity Toolkit iframe
+    const useLiveAuth = import.meta.env.VITE_ENABLE_FIREBASE_AUTH === 'true';
+    if (!useLiveAuth) {
+      setLoading(false);
+      return;
+    }
+
     let isSubscribed = true;
     try {
       const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
