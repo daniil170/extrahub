@@ -375,8 +375,30 @@ export function AttendanceJournal() {
             <Spinner size="md" label="Загрузка списка учеников..." />
           </div>
         ) : students.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '36px 0', color: 'var(--text-secondary)' }}>
-            В выбранной группе пока нет активных учеников
+          <div
+            style={{
+              textAlign: 'center',
+              padding: '40px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ fontSize: '36px', marginBottom: '8px' }}>👥</div>
+            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
+              В этой группе пока нет активных учеников
+            </div>
+            <div
+              style={{
+                fontSize: '13px',
+                color: 'var(--text-secondary)',
+                marginTop: '4px',
+                maxWidth: '380px',
+                lineHeight: 1.4,
+              }}
+            >
+              Как только ученики запишутся в секцию или координатор подтвердит бронирование, они сразу отобразятся в журнале.
+            </div>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

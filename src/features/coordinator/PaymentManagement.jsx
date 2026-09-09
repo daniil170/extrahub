@@ -314,12 +314,50 @@ export function PaymentManagement() {
 
         {filteredPayments.length === 0 ? (
           <div
-            style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-secondary)' }}
+            style={{
+              textAlign: 'center',
+              padding: '48px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
           >
-            <div style={{ fontSize: '32px', marginBottom: '8px' }}>💳</div>
-            <div style={{ fontSize: '16px', fontWeight: 600 }}>Счета не найдены</div>
-            <div style={{ fontSize: '13px', marginTop: '4px' }}>
-              Попробуйте изменить параметры поиска или сбросить фильтры
+            <div style={{ fontSize: '40px', marginBottom: '10px' }}>💳</div>
+            <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)' }}>
+              Счета не найдены
+            </div>
+            <p
+              style={{
+                fontSize: '13.5px',
+                color: 'var(--text-secondary)',
+                marginTop: '6px',
+                marginBottom: '16px',
+                maxWidth: '420px',
+                lineHeight: 1.4,
+              }}
+            >
+              {searchQuery || filterStatus !== 'all' || filterGroupId !== 'all'
+                ? 'По текущим критериям поиска ничего не найдено. Попробуйте изменить параметры или сбросить фильтры.'
+                : 'В системе пока нет выставленных счетов за кружки. Вы можете выставить первый счёт ученику или всей группе.'}
+            </p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              {searchQuery || filterStatus !== 'all' || filterGroupId !== 'all' ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setFilterStatus('all');
+                    setSearchQuery('');
+                    setFilterGroupId('all');
+                  }}
+                >
+                  Сбросить фильтры
+                </Button>
+              ) : (
+                <Button size="sm" variant="primary" onClick={() => openCreateModal('group')}>
+                  + Выставить счёт группе
+                </Button>
+              )}
             </div>
           </div>
         ) : (

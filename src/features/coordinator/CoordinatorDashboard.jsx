@@ -7,12 +7,19 @@ import { PaymentManagement } from './PaymentManagement.jsx';
 export function CoordinatorDashboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('capacity'); // 'capacity' | 'payments'
+  const isAdmin = user?.role === 'admin';
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '48px' }}>
       <PageHeader
-        title={`Панель координатора: ${user?.fullName || 'Координатор'}`}
-        subtitle="Мониторинг загрузки кружков, управление вместимостью групп и биллинг школьных оплат"
+        title={`${isAdmin ? '⚙️ Панель администратора' : '📋 Панель координатора'}: ${
+          user?.fullName || (isAdmin ? 'Администратор школы' : 'Координатор')
+        }`}
+        subtitle={
+          isAdmin
+            ? 'Администрирование школьных программ, мониторинг заполняемости групп и финансовый аудит'
+            : 'Мониторинг загрузки кружков, управление вместимостью групп и биллинг школьных оплат'
+        }
       />
 
       {/* Main Feature Tabs */}
