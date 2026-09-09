@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { subscribeCoordinatorOverview, updateGroupCapacity, createActivityGroup } from './api.js';
+import {
+  subscribeCoordinatorOverview,
+  updateGroupCapacity,
+  createActivityGroup,
+  createActivityRecord,
+} from './api.js';
 
 export function useCoordinatorOverview() {
   const [summary, setSummary] = useState({
@@ -127,6 +132,39 @@ export function useCoordinatorOverview() {
     }
   }, []);
 
+  // Create Activity Modal State
+  const [createActivityModalOpen, setCreateActivityModalOpen] = useState(false);
+  const [isCreatingActivity, setIsCreatingActivity] = useState(false);
+
+  const openCreateActivity = useCallback(() => {
+    setCreateActivityModalOpen(true);
+  }, []);
+
+  const closeCreateActivity = useCallback(() => {
+    if (isCreatingActivity) return;
+    setCreateActivityModalOpen(false);
+  }, [isCreatingActivity]);
+
+  const saveNewActivity = useCallback(async (activityData, initialGroupData) => {
+    setIsCreatingActivity(true);
+    try {
+      const res = await createActivityRecord(activityData);
+      if (initialGroupData && res.activity?.id) {
+        await createActivityGroup({
+          ...initialGroupData,
+          activityId: res.activity.id,
+        });
+      }
+      setActionSuccess('Новый кружок успешно создан и опубликован!');
+      setCreateActivityModalOpen(false);
+    } catch (err) {
+      console.error('Failed to create activity:', err);
+      setError(err.message || 'Ошибка создания кружка');
+    } finally {
+      setIsCreatingActivity(false);
+    }
+  }, []);
+
   return {
     summary,
     activities,
@@ -148,5 +186,11 @@ export function useCoordinatorOverview() {
     openCreateGroup,
     closeCreateGroup,
     saveNewGroup,
+    // Create Activity Modal
+    createActivityModalOpen,
+    isCreatingActivity,
+    openCreateActivity,
+    closeCreateActivity,
+    saveNewActivity,
   };
 }

@@ -3,6 +3,7 @@ import { Card, Badge, Button, Spinner } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 import { EditCapacityModal } from './EditCapacityModal.jsx';
 import { CreateGroupModal } from './CreateGroupModal.jsx';
+import { CreateActivityModal } from './CreateActivityModal.jsx';
 
 export function CapacityOverview() {
   const {
@@ -24,6 +25,11 @@ export function CapacityOverview() {
     openCreateGroup,
     closeCreateGroup,
     saveNewGroup,
+    createActivityModalOpen,
+    isCreatingActivity,
+    openCreateActivity,
+    closeCreateActivity,
+    saveNewActivity,
   } = useCoordinatorOverview();
 
   if (loading) {
@@ -202,33 +208,160 @@ export function CapacityOverview() {
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: '16px',
+            flexWrap: 'wrap',
+            gap: '12px',
           }}
         >
-          <h3
-            style={{ margin: 0, fontSize: '19px', fontWeight: 700, color: 'var(--text-primary)' }}
+          <div>
+            <h3
+              style={{ margin: 0, fontSize: '19px', fontWeight: 700, color: 'var(--text-primary)' }}
+            >
+              Мониторинг групп и управление вместимостью
+            </h3>
+            <span style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>
+              Всего групп: <strong>{groups.length}</strong> &bull; Кружков: <strong>{activities.length}</strong>
+            </span>
+          </div>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={openCreateActivity}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontWeight: 700,
+              boxShadow: 'var(--shadow-sm)',
+            }}
           >
-            Мониторинг групп и управление вместимостью
-          </h3>
-          <span style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>
-            Всего групп: <strong>{groups.length}</strong>
-          </span>
+            + Создать кружок
+          </Button>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-            gap: '18px',
-          }}
-        >
-          {groups.map((group) => {
-            const enrolled = Number(group.enrolledCount) || 0;
-            const capacity = Number(group.capacity) || 0;
-            const percent = group.percent;
-            const parentActivity = activities.find((a) => a.id === group.activityId) || {
-              id: group.activityId,
-              title: group.activityTitle,
-            };
+        {/* Section for Activities without groups (if any) */}
+        {activities.filter((a) => !groups.some((g) => g.activityId === a.id)).length > 0 && (
+          <div
+            style={{
+              marginBottom: '22px',
+              padding: '16px',
+              backgroundColor: 'var(--primary-light)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px dashed var(--primary)',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '14px',
+                fontWeight: 700,
+                color: 'var(--primary)',
+                marginBottom: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <span>✨</span>
+              <span>Новые кружки без сформированных групп:</span>
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: '12px',
+              }}
+            >
+              {activities
+                .filter((a) => !groups.some((g) => g.activityId === a.id))
+                .map((act) => (
+                  <div
+                    key={act.id}
+                    style={{
+                      padding: '12px',
+                      backgroundColor: '#ffffff',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid var(--border-color)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        <Badge variant="info" style={{ fontSize: '11px' }}>
+                          {act.category}
+                        </Badge>
+                        <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                          {act.price === 0 ? 'Бесплатно' : formatCurrency(act.price)}
+                        </span>
+                      </div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '6px' }}>
+                        {act.title}
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
+                        👨‍🏫 {act.teacherName} &bull; 📍 {act.location}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={() => openCreateGroup(act)}
+                      style={{ width: '100%', justifyContent: 'center', fontSize: '12.5px' }}
+                    >
+                      + Открыть первую группу
+                    </Button>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {groups.length === 0 ? (
+          <Card style={{ textAlign: 'center', padding: '48px 24px' }}>
+            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🏫</div>
+            <h3 style={{ margin: '0 0 8px', color: 'var(--text-primary)' }}>
+              Нет активных учебных групп
+            </h3>
+            <p
+              style={{
+                color: 'var(--text-secondary)',
+                fontSize: '14px',
+                margin: '0 0 16px',
+                maxWidth: '440px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
+            >
+              Создайте новый кружок или откройте учебную группу для существующей школьной секции.
+            </p>
+            <Button variant="primary" onClick={openCreateActivity}>
+              + Создать первый кружок
+            </Button>
+          </Card>
+        ) : (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+              gap: '18px',
+            }}
+          >
+            {groups.map((group) => {
+              const enrolled = Number(group.enrolledCount) || 0;
+              const capacity = Number(group.capacity) || 0;
+              const percent = group.percent;
+              const parentActivity = activities.find((a) => a.id === group.activityId) || {
+                id: group.activityId,
+                title: group.activityTitle,
+              };
 
             return (
               <Card
@@ -383,6 +516,7 @@ export function CapacityOverview() {
             );
           })}
         </div>
+        )}
       </div>
 
       {/* Edit Capacity Modal */}
@@ -401,6 +535,14 @@ export function CapacityOverview() {
         activity={selectedActivity}
         onSave={saveNewGroup}
         isCreating={isCreatingGroup}
+      />
+
+      {/* Create Activity (Club) Modal */}
+      <CreateActivityModal
+        isOpen={createActivityModalOpen}
+        onClose={closeCreateActivity}
+        onSave={saveNewActivity}
+        isCreating={isCreatingActivity}
       />
     </div>
   );

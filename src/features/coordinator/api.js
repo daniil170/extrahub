@@ -9,7 +9,15 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
-import { MOCK_ACTIVITIES, MOCK_ACTIVITY_GROUPS } from '../catalog/api.js';
+import {
+  MOCK_ACTIVITIES,
+  MOCK_ACTIVITY_GROUPS,
+  devActivitiesStore,
+  subscribeActivities,
+  createActivityRecord,
+} from '../catalog/api.js';
+
+export { createActivityRecord };
 
 export const MOCK_WAITLIST = [
   {
@@ -372,7 +380,7 @@ export function subscribeCoordinatorOverview(onUpdate, onError) {
   let waitlistList = null;
 
   function emit() {
-    const acts = actsList && actsList.length > 0 ? actsList : MOCK_ACTIVITIES;
+    const acts = actsList && actsList.length > 0 ? actsList : devActivitiesStore;
     const grps = grpsList && grpsList.length > 0 ? grpsList : devGroupsStore;
     const wlist = waitlistList && waitlistList.length > 0 ? waitlistList : MOCK_WAITLIST;
 
@@ -391,6 +399,14 @@ export function subscribeCoordinatorOverview(onUpdate, onError) {
   }
 
   const unsubs = [];
+
+  // Listen to local activity updates
+  const unsubLocalActivities = subscribeActivities(() => {
+    if (!actsList || actsList.length === 0) {
+      emit();
+    }
+  });
+  unsubs.push(unsubLocalActivities);
 
   try {
     const unsubActs = onSnapshot(
@@ -428,7 +444,7 @@ export function subscribeCoordinatorOverview(onUpdate, onError) {
     console.warn('subscribeCoordinatorOverview fallback to mock:', err.message);
     emit();
     if (onError) onError(err);
-    return () => {};
+    return () => unsubs.forEach((fn) => fn && fn());
   }
 }
 
