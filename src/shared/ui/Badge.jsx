@@ -20,7 +20,7 @@ export function Badge({ children, variant = 'default', className = '', ...rest }
     success: { backgroundColor: 'var(--success-light)', color: 'var(--success)' },
     warning: { backgroundColor: 'var(--warning-light)', color: 'var(--warning)' },
     danger: { backgroundColor: 'var(--danger-light)', color: 'var(--danger)' },
-    info: { backgroundColor: 'var(--primary-light)', color: 'var(--primary)' },
+    info: { backgroundColor: 'var(--info-light)', color: 'var(--info)' },
   };
 
   return (
