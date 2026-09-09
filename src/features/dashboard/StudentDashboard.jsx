@@ -270,18 +270,34 @@ export function StudentDashboard() {
                           style={{
                             display: 'flex',
                             justifyContent: 'flex-end',
-                            paddingTop: '8px',
+                            paddingTop: '12px',
+                            marginTop: '12px',
                             borderTop: '1px solid var(--border-color)',
                           }}
                         >
-                          <Button
-                            size="sm"
-                            variant="outline"
+                          <button
+                            type="button"
+                            className="btn-cancel-enrollment"
                             onClick={() => openCancelModal(enr)}
-                            style={{ color: 'var(--danger)', borderColor: 'var(--border-color)' }}
+                            title="Отменить запись в кружок"
                           >
-                            Отменить запись
-                          </Button>
+                            <svg
+                              width="13"
+                              height="13"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.4"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <circle cx="12" cy="12" r="10" />
+                              <line x1="15" y1="9" x2="9" y2="15" />
+                              <line x1="9" y1="9" x2="15" y2="15" />
+                            </svg>
+                            <span>Отменить запись</span>
+                          </button>
                         </div>
                       )}
                     </Card>
@@ -470,14 +486,9 @@ export function StudentDashboard() {
               Не отменять
             </Button>
             <Button
-              variant="secondary"
+              variant="danger"
               onClick={confirmCancel}
               disabled={isCancelling}
-              style={{
-                backgroundColor: 'var(--danger)',
-                color: '#ffffff',
-                borderColor: 'var(--danger)',
-              }}
             >
               {isCancelling ? 'Отмена...' : 'Да, отменить запись'}
             </Button>
