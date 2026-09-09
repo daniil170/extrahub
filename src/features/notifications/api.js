@@ -248,7 +248,7 @@ export async function fetchUserNotifications(userId, role = 'student') {
     const data = await Promise.race([fetchPromise, timeoutPromise]);
     const userNotifs = data.filter((n) => n.userId === userId || n.role === role);
     if (userNotifs.length > 0) return userNotifs;
-  } catch (error) {
+  } catch {
     // Graceful offline fallback
   }
 

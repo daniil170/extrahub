@@ -65,7 +65,7 @@ export function NotificationCenter({ currentUser }) {
 
   return (
     <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
-      {/* Bell Button with Badge */}
+      {/* Simplified Bell Button with Badge */}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -76,24 +76,42 @@ export function NotificationCenter({ currentUser }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: '38px',
-          height: '38px',
-          borderRadius: '50%',
+          width: '36px',
+          height: '36px',
+          borderRadius: 'var(--radius-sm)',
           border: '1px solid var(--border-color)',
-          backgroundColor: isOpen ? 'var(--bg-subtle)' : 'var(--bg-surface)',
+          backgroundColor: isOpen ? 'var(--bg-subtle)' : 'transparent',
           cursor: 'pointer',
-          fontSize: '17px',
-          color: 'var(--text-primary)',
+          color: isOpen ? 'var(--primary)' : 'var(--text-secondary)',
           transition: 'all 0.15s ease',
+          padding: 0,
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
+          e.currentTarget.style.color = 'var(--text-primary)';
         }}
         onMouseLeave={(e) => {
-          if (!isOpen) e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
+          if (!isOpen) {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = 'var(--text-secondary)';
+          }
         }}
       >
-        <span>🔔</span>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+
         {unreadCount > 0 && (
           <span
             style={{
@@ -102,17 +120,17 @@ export function NotificationCenter({ currentUser }) {
               right: '-3px',
               backgroundColor: 'var(--danger)',
               color: '#ffffff',
-              fontSize: '11px',
-              fontWeight: 800,
-              minWidth: '18px',
-              height: '18px',
+              fontSize: '10px',
+              fontWeight: 700,
+              minWidth: '16px',
+              height: '16px',
               borderRadius: '9999px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '0 4px',
-              boxShadow: '0 0 0 2px var(--bg-surface)',
-              animation: 'pulse 2s infinite',
+              padding: '0 3px',
+              lineHeight: 1,
+              border: '2px solid var(--bg-surface)',
             }}
           >
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -220,7 +238,33 @@ export function NotificationCenter({ currentUser }) {
                   alignItems: 'center',
                 }}
               >
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>🔕</div>
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--bg-subtle)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '10px',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                  </svg>
+                </div>
                 <div
                   style={{
                     fontSize: '14px',
