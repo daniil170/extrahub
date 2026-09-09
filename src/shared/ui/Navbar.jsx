@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import logoImg from '../../assets/logo.png';
+import { NotificationCenter } from '../../features/notifications/index.js';
 
 /**
  * Role to personal cabinet link mapping
@@ -10,7 +11,7 @@ const ROLE_CABINETS = {
   parent: { to: '/parent', label: 'Кабинет родителя' },
   teacher: { to: '/teacher', label: 'Кабинет преподавателя' },
   coordinator: { to: '/coordinator', label: 'Панель координатора' },
-  admin: { to: '/coordinator', label: 'Панель координатора' },
+  admin: { to: '/coordinator', label: 'Панель администратора' },
 };
 
 /**
@@ -129,10 +130,13 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
         <div className="nav-desktop-user">
           {currentUser ? (
             <>
+              {/* Notification Center */}
+              <NotificationCenter currentUser={currentUser} />
+
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '13px', fontWeight: 600 }}>{currentUser.fullName}</div>
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                  Роль: <b>{currentUser.role}</b>
+                  Роль: <b>{currentUser.role === 'admin' ? 'Администратор ⚙️' : currentUser.role === 'coordinator' ? 'Координатор 📋' : currentUser.role}</b>
                 </div>
               </div>
 
@@ -207,16 +211,20 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
           )}
         </div>
 
-        {/* Mobile Hamburger Button */}
-        <button
-          type="button"
-          className="nav-mobile-toggle"
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          aria-label={mobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
-          aria-expanded={mobileMenuOpen}
-        >
-          {mobileMenuOpen ? '✕' : '☰'}
-        </button>
+        {/* Mobile Actions: Notification Bell + Hamburger */}
+        <div className="nav-mobile-actions">
+          {currentUser && <NotificationCenter currentUser={currentUser} />}
+
+          <button
+            type="button"
+            className="nav-mobile-toggle"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label={mobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Drawer / Slide-down Menu */}
