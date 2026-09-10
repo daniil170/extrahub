@@ -10,5 +10,9 @@ export { cancelEnrollment } from './callable/cancelEnrollment.js';
 export { getInviteDetails } from './callable/getInviteDetails.js';
 export { expireHoldsScheduled, processExpiredHolds } from './scheduled/expireHolds.js';
 
+export { createEquipmentIssue } from './callable/createEquipmentIssue.js';
+export { updateIssueStatus } from './callable/updateIssueStatus.js';
+export { addIssueComment } from './callable/addIssueComment.js';
+
 export { promoteFromWaitlist } from './shared/waitlist.js';
 export { findScheduleConflict, doIntervalsOverlap } from './shared/scheduleConflict.js';
