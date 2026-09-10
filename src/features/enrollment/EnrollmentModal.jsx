@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import {
+  Check,
+  Copy,
+  Send,
+  MessageSquare,
+  Share2,
+  QrCode,
+  Clock,
+  AlertTriangle,
+  Calendar,
+} from 'lucide-react';
 import { Modal, Button, Badge } from '../../shared/ui/index.js';
 import { formatDaysOfWeek, formatCurrency } from '../../shared/utils/index.js';
 import { MOCK_STUDENTS } from './useEnrollment.js';
@@ -147,12 +158,12 @@ export function EnrollmentModal({
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="🎉 Место забронировано на 24 часа!"
+        title="Место забронировано на 24 часа"
         maxWidth="540px"
       >
         <div>
           <div style={{ textAlign: 'center', marginBottom: '8px' }}>
-            <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-heading)' }}>
               {activity.title}
             </div>
             {selectedGroup && (
@@ -186,9 +197,17 @@ export function EnrollmentModal({
             <Button
               variant="primary"
               onClick={handleCopyLink}
-              style={{ width: '100%', justifyContent: 'center' }}
+              style={{ width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '8px' }}
             >
-              {copied ? '✅ Ссылка скопирована!' : '🔗 Скопировать ссылку для родителя'}
+              {copied ? (
+                <>
+                  <Check size={16} /> Ссылка скопирована!
+                </>
+              ) : (
+                <>
+                  <Copy size={16} /> Скопировать ссылку для родителя
+                </>
+              )}
             </Button>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
@@ -211,7 +230,7 @@ export function EnrollmentModal({
                   transition: 'opacity 0.15s ease',
                 }}
               >
-                💬 WhatsApp
+                <MessageSquare size={15} /> WhatsApp
               </a>
 
               <a
@@ -233,7 +252,7 @@ export function EnrollmentModal({
                   transition: 'opacity 0.15s ease',
                 }}
               >
-                ✈️ Telegram
+                <Send size={15} /> Telegram
               </a>
             </div>
 
@@ -242,9 +261,9 @@ export function EnrollmentModal({
                 variant="outline"
                 size="sm"
                 onClick={handleNativeShare}
-                style={{ width: '100%', justifyContent: 'center' }}
+                style={{ width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
-                📱 Поделиться через телефон
+                <Share2 size={14} /> Поделиться через телефон
               </Button>
             )}
 
@@ -252,9 +271,10 @@ export function EnrollmentModal({
               variant="secondary"
               size="sm"
               onClick={() => setShowQr((prev) => !prev)}
-              style={{ width: '100%', justifyContent: 'center' }}
+              style={{ width: '100%', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              {showQr ? 'Скрыть QR-код' : '📷 Показать QR-код для родителя'}
+              <QrCode size={14} />
+              {showQr ? 'Скрыть QR-код' : 'Показать QR-код для родителя'}
             </Button>
 
             {showQr && (
@@ -299,26 +319,25 @@ export function EnrollmentModal({
   // 2. Waitlist state
   if (enrollmentResult && enrollmentResult.waitlisted) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} title="📋 Вы в листе ожидания" maxWidth="480px">
+      <Modal isOpen={isOpen} onClose={onClose} title="Вы в листе ожидания" maxWidth="480px">
         <div style={{ textAlign: 'center', padding: '10px 0' }}>
           <div
             style={{
-              width: '64px',
-              height: '64px',
+              width: '56px',
+              height: '56px',
               borderRadius: '50%',
               backgroundColor: 'var(--warning-light)',
               color: 'var(--warning)',
-              fontSize: '28px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 16px',
             }}
           >
-            ⏳
+            <Clock size={28} />
           </div>
 
-          <h4 style={{ fontSize: '18px', margin: '0 0 6px', color: 'var(--text-primary)' }}>
+          <h4 style={{ fontFamily: 'var(--font-heading)', fontSize: '18px', margin: '0 0 6px', color: 'var(--text-primary)' }}>
             {activity.title}
           </h4>
 
@@ -326,20 +345,22 @@ export function EnrollmentModal({
             style={{
               display: 'inline-block',
               margin: '12px auto',
-              padding: '6px 16px',
-              backgroundColor: 'var(--primary-light)',
-              color: 'var(--primary)',
-              borderRadius: '9999px',
-              fontSize: '15px',
-              fontWeight: 700,
+              padding: '4px 12px',
+              backgroundColor: 'var(--bg-subtle)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-primary)',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '13px',
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 600,
             }}
           >
-            Ваша позиция в очереди: №{enrollmentResult.position || 1}
+            POSITION IN QUEUE: #{enrollmentResult.position || 1}
           </div>
 
           <p
             style={{
-              fontSize: '14px',
+              fontSize: '13.5px',
               color: 'var(--text-secondary)',
               lineHeight: 1.5,
               margin: '16px 0 24px',
@@ -374,7 +395,7 @@ export function EnrollmentModal({
     >
       <div>
         <div style={{ marginBottom: '16px' }}>
-          <div style={{ fontSize: '17px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          <div style={{ fontSize: '17px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font-heading)' }}>
             {activity.title}
           </div>
           <div style={{ display: 'flex', gap: '8px', marginTop: '6px', alignItems: 'center' }}>
@@ -382,10 +403,11 @@ export function EnrollmentModal({
             <Badge variant="default">{activity.ageGroup}</Badge>
             <span
               style={{
-                fontSize: '13px',
+                fontSize: '14px',
                 fontWeight: 600,
                 color: 'var(--primary)',
                 marginLeft: 'auto',
+                fontFamily: 'var(--font-mono)',
               }}
             >
               {activity.price === 0 ? 'Бесплатно' : formatCurrency(activity.price)}
@@ -406,7 +428,7 @@ export function EnrollmentModal({
             }}
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-              <span style={{ fontSize: '18px', lineHeight: 1 }}>⚠️</span>
+              <AlertTriangle size={18} color="var(--danger)" style={{ flexShrink: 0, marginTop: '2px' }} />
               <div>
                 <div style={{ fontWeight: 600, color: 'var(--danger)', fontSize: '14px' }}>
                   Конфликт расписания!
@@ -477,8 +499,8 @@ export function EnrollmentModal({
                     justifyContent: 'space-between',
                     padding: '12px 14px',
                     borderRadius: 'var(--radius-md)',
-                    border: `2px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
-                    backgroundColor: isSelected ? 'var(--primary-light)' : 'var(--bg-surface)',
+                    border: `1.5px solid ${isSelected ? 'var(--primary)' : 'var(--border-color)'}`,
+                    backgroundColor: isSelected ? 'var(--bg-subtle)' : 'var(--bg-surface)',
                     cursor: 'pointer',
                     transition: 'border-color 0.15s ease',
                   }}
@@ -494,10 +516,15 @@ export function EnrollmentModal({
                         fontSize: '12.5px',
                         color: 'var(--text-secondary)',
                         marginTop: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
                       }}
                     >
-                      📅 {formatDaysOfWeek(group.daysOfWeek)} &bull; {group.startTime}–
-                      {group.endTime}
+                      <Calendar size={13} style={{ flexShrink: 0 }} />
+                      <span>
+                        {formatDaysOfWeek(group.daysOfWeek)} &bull; {group.startTime}–{group.endTime}
+                      </span>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>

@@ -1,3 +1,15 @@
+import {
+  BookOpen,
+  User,
+  MapPin,
+  Clock,
+  CheckCircle2,
+  Check,
+  GraduationCap,
+  Calendar,
+  Info,
+  Target,
+} from 'lucide-react';
 import { Modal, Badge, Button } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 
@@ -56,7 +68,8 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
       onClose={onClose}
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span>📖 Содержание и программа кружка</span>
+          <BookOpen size={17} style={{ color: 'var(--primary)' }} />
+          <span>Программа и содержание кружка</span>
         </div>
       }
       maxWidth="720px"
@@ -110,12 +123,15 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
             <div
               style={{
                 marginTop: '10px',
-                fontSize: '13px',
-                color: 'var(--text-muted)',
-                fontStyle: 'italic',
+                fontSize: '12px',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
             >
-              🎯 {activity.targetAudience}
+              <Target size={13} style={{ color: 'var(--primary)' }} />
+              <span>{activity.targetAudience}</span>
             </div>
           )}
         </div>
@@ -136,8 +152,9 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
             <div
               style={{
                 fontSize: '11px',
-                color: 'var(--text-secondary)',
+                color: 'var(--text-muted)',
                 textTransform: 'uppercase',
+                letterSpacing: '0.04em',
               }}
             >
               Преподаватель
@@ -148,9 +165,13 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                 fontWeight: 600,
                 color: 'var(--text-primary)',
                 marginTop: '2px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
             >
-              👨‍🏫 {activity.teacherName}
+              <User size={13} style={{ color: 'var(--text-muted)' }} />
+              <span>{activity.teacherName}</span>
             </div>
           </div>
 
@@ -158,8 +179,9 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
             <div
               style={{
                 fontSize: '11px',
-                color: 'var(--text-secondary)',
+                color: 'var(--text-muted)',
                 textTransform: 'uppercase',
+                letterSpacing: '0.04em',
               }}
             >
               Локация
@@ -170,9 +192,13 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                 fontWeight: 600,
                 color: 'var(--text-primary)',
                 marginTop: '2px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
             >
-              📍 {activity.location || 'Школьный корпус'}
+              <MapPin size={13} style={{ color: 'var(--text-muted)' }} />
+              <span>{activity.location || 'Школьный корпус'}</span>
             </div>
           </div>
 
@@ -180,8 +206,9 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
             <div
               style={{
                 fontSize: '11px',
-                color: 'var(--text-secondary)',
+                color: 'var(--text-muted)',
                 textTransform: 'uppercase',
+                letterSpacing: '0.04em',
               }}
             >
               Стоимость
@@ -190,6 +217,7 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
               style={{
                 fontSize: '14px',
                 fontWeight: 700,
+                fontFamily: 'var(--font-heading)',
                 color: 'var(--primary)',
                 marginTop: '2px',
               }}
@@ -211,8 +239,9 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
           >
             <h3
               style={{
-                fontSize: '17px',
-                fontWeight: 700,
+                fontSize: '15px',
+                fontWeight: 600,
+                fontFamily: 'var(--font-heading)',
                 color: 'var(--text-primary)',
                 margin: 0,
                 display: 'flex',
@@ -220,10 +249,11 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                 gap: '8px',
               }}
             >
-              <span>📚 Содержание программы курса</span>
+              <BookOpen size={16} style={{ color: 'var(--primary)' }} />
+              <span>Содержание программы курса</span>
             </h3>
-            <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-              Всего модулей: {syllabus.length}
+            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+              МОДУЛЕЙ: {syllabus.length}
             </span>
           </div>
 
@@ -243,16 +273,18 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
               >
                 <div
                   style={{
-                    minWidth: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--primary)',
-                    color: '#fff',
+                    minWidth: '26px',
+                    height: '26px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--bg-subtle)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '13px',
+                    fontSize: '12px',
                     fontWeight: 700,
+                    fontFamily: 'var(--font-mono)',
                     marginTop: '2px',
                     flexShrink: 0,
                   }}
@@ -272,9 +304,9 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                     }}
                   >
                     <div
-                      style={{ fontSize: '14.5px', fontWeight: 600, color: 'var(--text-primary)' }}
+                      style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}
                     >
-                      <span style={{ color: 'var(--text-secondary)', marginRight: '6px' }}>
+                      <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '12px', marginRight: '6px' }}>
                         {item.module}:
                       </span>
                       {item.title}
@@ -282,20 +314,25 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                     {item.hours && (
                       <span
                         style={{
-                          fontSize: '12px',
+                          fontSize: '11px',
+                          fontFamily: 'var(--font-mono)',
                           color: 'var(--primary)',
-                          backgroundColor: 'var(--primary-subtle)',
+                          backgroundColor: 'var(--primary-light)',
+                          border: '1px solid var(--border-color)',
                           padding: '2px 8px',
                           borderRadius: 'var(--radius-sm)',
-                          fontWeight: 500,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
                         }}
                       >
-                        ⏱️ {item.hours}
+                        <Clock size={11} />
+                        {item.hours}
                       </span>
                     )}
                   </div>
                   <div
-                    style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.5 }}
+                    style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}
                   >
                     {item.description}
                   </div>
@@ -309,8 +346,9 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
         <div>
           <h3
             style={{
-              fontSize: '17px',
-              fontWeight: 700,
+              fontSize: '15px',
+              fontWeight: 600,
+              fontFamily: 'var(--font-heading)',
               color: 'var(--text-primary)',
               margin: '0 0 12px',
               display: 'flex',
@@ -318,7 +356,8 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
               gap: '8px',
             }}
           >
-            <span>🎯 Чему научится ребёнок</span>
+            <CheckCircle2 size={16} style={{ color: 'var(--primary)' }} />
+            <span>Чему научится ребёнок</span>
           </h3>
 
           <div
@@ -344,9 +383,7 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                   lineHeight: 1.45,
                 }}
               >
-                <span style={{ color: 'var(--success)', fontWeight: 700, fontSize: '15px' }}>
-                  ✓
-                </span>
+                <Check size={14} style={{ color: 'var(--success)', marginTop: '2px', flexShrink: 0 }} />
                 <span>{skill}</span>
               </div>
             ))}
@@ -368,33 +405,33 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
           >
             <div
               style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--primary-subtle)',
+                width: '40px',
+                height: '40px',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--primary-light)',
                 color: 'var(--primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '22px',
                 flexShrink: 0,
               }}
             >
-              🎓
+              <GraduationCap size={20} />
             </div>
             <div>
               <div
                 style={{
-                  fontSize: '12px',
-                  color: 'var(--text-secondary)',
+                  fontSize: '11px',
+                  color: 'var(--text-muted)',
                   textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
                 }}
               >
                 О преподавателе
               </div>
               <div
                 style={{
-                  fontSize: '13.5px',
+                  fontSize: '13px',
                   color: 'var(--text-primary)',
                   marginTop: '3px',
                   lineHeight: 1.5,
@@ -411,16 +448,16 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
           <div
             style={{
               padding: '12px 16px',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: '#FEF3C7',
-              border: '1px solid #FCD34D',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'var(--bg-subtle)',
+              border: '1px solid var(--border-color)',
               display: 'flex',
               gap: '10px',
               alignItems: 'flex-start',
             }}
           >
-            <span style={{ fontSize: '18px' }}>🎒</span>
-            <div style={{ fontSize: '13px', color: '#92400E', lineHeight: 1.5 }}>
+            <Info size={16} style={{ color: 'var(--primary)', marginTop: '2px', flexShrink: 0 }} />
+            <div style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: 1.5 }}>
               <strong>Что потребуется:</strong> {activity.requirements}
             </div>
           </div>
@@ -431,8 +468,9 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
           <div>
             <h3
               style={{
-                fontSize: '16px',
-                fontWeight: 700,
+                fontSize: '15px',
+                fontWeight: 600,
+                fontFamily: 'var(--font-heading)',
                 color: 'var(--text-primary)',
                 margin: '0 0 10px',
                 display: 'flex',
@@ -440,7 +478,8 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                 gap: '8px',
               }}
             >
-              <span>📅 Расписание групп</span>
+              <Calendar size={16} style={{ color: 'var(--primary)' }} />
+              <span>Расписание групп</span>
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -460,25 +499,29 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                       flexWrap: 'wrap',
                       gap: '10px',
                       padding: '10px 14px',
-                      borderRadius: 'var(--radius-md)',
+                      borderRadius: 'var(--radius-sm)',
                       backgroundColor: 'var(--bg-subtle)',
                       border: '1px solid var(--border-color)',
                     }}
                   >
                     <div>
                       <div
-                        style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}
+                        style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}
                       >
                         {group.name}
                       </div>
                       <div
                         style={{
-                          fontSize: '12.5px',
+                          fontSize: '12px',
                           color: 'var(--text-secondary)',
                           marginTop: '2px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
                         }}
                       >
-                        📅 {formatDaysOfWeek(group.daysOfWeek)} {group.startTime}–{group.endTime}
+                        <Calendar size={12} style={{ color: 'var(--text-muted)' }} />
+                        <span>{formatDaysOfWeek(group.daysOfWeek)} {group.startTime}–{group.endTime}</span>
                       </div>
                     </div>
 
@@ -491,7 +534,7 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                       {onEnroll && (
                         <Button
                           size="sm"
-                          variant={gIsFull ? 'secondary' : 'primary'}
+                          variant={gIsFull ? 'outline' : 'primary'}
                           onClick={() => onEnroll(group)}
                         >
                           {gIsFull ? 'В лист ожидания' : 'Выбрать группу'}
