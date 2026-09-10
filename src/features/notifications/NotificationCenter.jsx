@@ -1,4 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
+import {
+  Clock,
+  Sparkles,
+  Users,
+  CreditCard,
+  CheckCircle2,
+  ClipboardList,
+  AlertTriangle,
+  Banknote,
+  GraduationCap,
+  FileText,
+  Bell,
+  Wrench,
+  AlertCircle,
+} from 'lucide-react';
 import { useNotifications } from './useNotifications.js';
 
 /**
@@ -21,18 +36,23 @@ function formatTimeAgo(isoString) {
  * Type-to-icon mapping for notifications
  */
 const TYPE_ICONS = {
-  hold_expiry: { icon: '⏱️', bg: 'var(--accent-coral-light)', border: 'var(--accent-coral)' },
-  waitlist_promotion: { icon: '🎉', bg: 'var(--primary-light)', border: 'var(--primary)' },
-  parent_approval: { icon: '👨‍👩‍👦', bg: 'var(--primary-light)', border: 'var(--primary)' },
-  invoice_created: { icon: '💳', bg: 'var(--warning-light)', border: 'var(--warning)' },
-  payment_confirmed: { icon: '✅', bg: 'var(--success-light)', border: 'var(--success)' },
-  attendance_alert: { icon: '📋', bg: 'var(--primary-light)', border: 'var(--primary)' },
-  capacity_alert: { icon: '⚠️', bg: 'var(--danger-light)', border: 'var(--danger)' },
-  offline_payment: { icon: '💵', bg: 'var(--success-light)', border: 'var(--success)' },
-  student_enrolled: { icon: '🎒', bg: 'var(--primary-light)', border: 'var(--primary)' },
-  attendance_journal: { icon: '📝', bg: 'var(--primary-light)', border: 'var(--primary)' },
-  catalog_new: { icon: '✨', bg: 'var(--primary-light)', border: 'var(--primary)' },
-  system_notice: { icon: '📢', bg: 'var(--bg-subtle)', border: 'var(--border-color)' },
+  hold_expiry: { Icon: Clock, color: 'var(--warning)', bg: 'var(--warning-light)', border: 'rgba(217, 119, 6, 0.25)' },
+  waitlist_promotion: { Icon: Sparkles, color: 'var(--primary)', bg: 'var(--primary-light)', border: 'rgba(14, 124, 107, 0.25)' },
+  parent_approval: { Icon: Users, color: 'var(--primary)', bg: 'var(--primary-light)', border: 'rgba(14, 124, 107, 0.25)' },
+  invoice_created: { Icon: CreditCard, color: 'var(--warning)', bg: 'var(--warning-light)', border: 'rgba(217, 119, 6, 0.25)' },
+  payment_confirmed: { Icon: CheckCircle2, color: 'var(--success)', bg: 'var(--success-light)', border: 'rgba(46, 117, 89, 0.25)' },
+  attendance_alert: { Icon: ClipboardList, color: 'var(--primary)', bg: 'var(--primary-light)', border: 'rgba(14, 124, 107, 0.25)' },
+  capacity_alert: { Icon: AlertTriangle, color: 'var(--danger)', bg: 'var(--danger-light)', border: 'rgba(219, 68, 85, 0.25)' },
+  offline_payment: { Icon: Banknote, color: 'var(--success)', bg: 'var(--success-light)', border: 'rgba(46, 117, 89, 0.25)' },
+  student_enrolled: { Icon: GraduationCap, color: 'var(--primary)', bg: 'var(--primary-light)', border: 'rgba(14, 124, 107, 0.25)' },
+  attendance_journal: { Icon: FileText, color: 'var(--primary)', bg: 'var(--primary-light)', border: 'rgba(14, 124, 107, 0.25)' },
+  catalog_new: { Icon: Sparkles, color: 'var(--primary)', bg: 'var(--primary-light)', border: 'rgba(14, 124, 107, 0.25)' },
+  system_notice: { Icon: Bell, color: 'var(--text-secondary)', bg: 'var(--bg-subtle)', border: 'var(--border-color)' },
+  equipment_critical: { Icon: AlertCircle, color: 'var(--danger)', bg: 'var(--danger-light)', border: 'rgba(219, 68, 85, 0.25)' },
+  equipment_issue_created: { Icon: Wrench, color: 'var(--primary)', bg: 'var(--primary-light)', border: 'rgba(14, 124, 107, 0.25)' },
+  equipment_issue_in_progress: { Icon: Wrench, color: 'var(--warning)', bg: 'var(--warning-light)', border: 'rgba(217, 119, 6, 0.25)' },
+  equipment_issue_resolved: { Icon: CheckCircle2, color: 'var(--success)', bg: 'var(--success-light)', border: 'rgba(46, 117, 89, 0.25)' },
+  equipment_issue_cancelled: { Icon: AlertCircle, color: 'var(--text-muted)', bg: 'var(--bg-subtle)', border: 'var(--border-color)' },
 };
 
 export function NotificationCenter({ currentUser }) {
@@ -325,11 +345,10 @@ export function NotificationCenter({ currentUser }) {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '16px',
                         flexShrink: 0,
                       }}
                     >
-                      {conf.icon}
+                      {conf.Icon && <conf.Icon size={16} style={{ color: conf.color }} />}
                     </div>
 
                     {/* Content */}

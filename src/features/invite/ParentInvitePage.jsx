@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Clock, CheckCircle2, XCircle, User, Calendar, MapPin, CreditCard } from 'lucide-react';
 import { useParentInvite } from './useParentInvite.js';
 import { Card, Badge, Button, Spinner, PageHeader } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
@@ -40,21 +41,20 @@ export function ParentInvitePage() {
         >
           <div
             style={{
-              width: '64px',
-              height: '64px',
+              width: '56px',
+              height: '56px',
               borderRadius: '50%',
               backgroundColor: 'var(--warning-light)',
               color: 'var(--warning)',
-              fontSize: '30px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 16px',
             }}
           >
-            ⏳
+            <Clock size={28} />
           </div>
-          <h2 style={{ fontSize: '20px', margin: '0 0 10px', color: 'var(--text-primary)' }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', margin: '0 0 10px', color: 'var(--text-primary)' }}>
             Срок действия брони истёк
           </h2>
           <p
@@ -85,21 +85,20 @@ export function ParentInvitePage() {
         >
           <div
             style={{
-              width: '64px',
-              height: '64px',
+              width: '56px',
+              height: '56px',
               borderRadius: '50%',
               backgroundColor: 'var(--success-light)',
               color: 'var(--success)',
-              fontSize: '32px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 16px',
             }}
           >
-            🎉
+            <CheckCircle2 size={28} />
           </div>
-          <h2 style={{ fontSize: '22px', margin: '0 0 10px', color: 'var(--text-primary)' }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', margin: '0 0 10px', color: 'var(--text-primary)' }}>
             Запись подтверждена!
           </h2>
           <p
@@ -135,21 +134,21 @@ export function ParentInvitePage() {
         >
           <div
             style={{
-              width: '64px',
-              height: '64px',
+              width: '56px',
+              height: '56px',
               borderRadius: '50%',
-              backgroundColor: 'var(--border-color)',
+              backgroundColor: 'var(--bg-subtle)',
+              border: '1px solid var(--border-color)',
               color: 'var(--text-secondary)',
-              fontSize: '30px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 16px',
             }}
           >
-            🚫
+            <XCircle size={28} />
           </div>
-          <h2 style={{ fontSize: '20px', margin: '0 0 10px', color: 'var(--text-primary)' }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', margin: '0 0 10px', color: 'var(--text-primary)' }}>
             Запись отклонена
           </h2>
           <p
@@ -299,9 +298,13 @@ export function ParentInvitePage() {
                 fontWeight: 500,
                 color: 'var(--text-primary)',
                 marginTop: '2px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
             >
-              👨‍🏫 {teacher.fullName}
+              <User size={14} color="var(--primary)" />
+              <span>{teacher.fullName}</span>
             </div>
           </div>
 
@@ -311,8 +314,9 @@ export function ParentInvitePage() {
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                 Расписание занятий
               </div>
-              <div style={{ fontSize: '14px', fontWeight: 500, marginTop: '2px' }}>
-                📅 {formatDaysOfWeek(group.daysOfWeek)} &bull; {group.startTime}–{group.endTime}
+              <div style={{ fontSize: '14px', fontWeight: 500, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Calendar size={14} style={{ flexShrink: 0 }} />
+                <span>{formatDaysOfWeek(group.daysOfWeek)} &bull; {group.startTime}–{group.endTime}</span>
               </div>
             </div>
 
@@ -320,8 +324,9 @@ export function ParentInvitePage() {
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                 Место проведения
               </div>
-              <div style={{ fontSize: '14px', fontWeight: 500, marginTop: '2px' }}>
-                📍 {activity.location}
+              <div style={{ fontSize: '14px', fontWeight: 500, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <MapPin size={14} style={{ flexShrink: 0 }} />
+                <span>{activity.location}</span>
               </div>
             </div>
           </div>
@@ -346,23 +351,27 @@ export function ParentInvitePage() {
               <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                 Стоимость занятий:
               </span>
-              <strong style={{ fontSize: '18px', color: 'var(--primary)' }}>
+              <strong style={{ fontSize: '18px', color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>
                 {activity.price === 0 ? 'Бесплатно' : formatCurrency(activity.price)}
               </strong>
             </div>
 
             {paymentTerms?.dueDate && activity.price > 0 && (
-              <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-                💳 <strong>Условия оплаты:</strong> срок внесения первого взноса до{' '}
-                <strong>{formatDate(paymentTerms.dueDate)}</strong>.
+              <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CreditCard size={14} style={{ flexShrink: 0 }} />
+                <span>
+                  <strong>Условия оплаты:</strong> срок внесения первого взноса до{' '}
+                  <strong>{formatDate(paymentTerms.dueDate)}</strong>.
+                </span>
               </div>
             )}
           </div>
 
           {/* Hold Expiration notice */}
           {invite?.expiresAt && (
-            <div style={{ fontSize: '12px', color: 'var(--accent-coral)', fontStyle: 'italic' }}>
-              ⏱ Бронь удерживается до {formatDate(invite.expiresAt)}
+            <div style={{ fontSize: '12px', color: 'var(--accent-coral)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Clock size={13} style={{ flexShrink: 0 }} />
+              <span>Бронь удерживается до {formatDate(invite.expiresAt)}</span>
             </div>
           )}
         </div>

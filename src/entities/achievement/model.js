@@ -22,7 +22,7 @@ export function createAchievement(data = {}) {
     activityId: data.activityId || '',
     title: data.title || '',
     description: data.description || '',
-    badgeIcon: data.badgeIcon || '🏆',
+    badgeIcon: data.badgeIcon || 'trophy',
     issuedBy: data.issuedBy || '',
     createdAt: data.createdAt || new Date().toISOString(),
   };

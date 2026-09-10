@@ -1,3 +1,12 @@
+import {
+  Check,
+  AlertTriangle,
+  MapPin,
+  Calendar,
+  Users,
+  CheckCheck,
+  Save,
+} from 'lucide-react';
 import { useAttendance } from './useAttendance.js';
 import { Card, Button, Spinner } from '../../shared/ui/index.js';
 import { formatDaysOfWeek } from '../../shared/utils/index.js';
@@ -6,28 +15,24 @@ const STATUS_OPTIONS = [
   {
     value: 'present',
     label: 'Присутствовал',
-    icon: '🟢',
     color: 'var(--success)',
     bg: 'var(--success-light)',
   },
   {
     value: 'absent',
     label: 'Отсутствовал',
-    icon: '🔴',
     color: 'var(--danger)',
     bg: 'var(--danger-light)',
   },
   {
     value: 'late',
     label: 'Опоздал',
-    icon: '🟡',
     color: 'var(--warning)',
     bg: 'var(--warning-light)',
   },
   {
     value: 'excused',
     label: 'Уважительная',
-    icon: '🔵',
     color: 'var(--primary)',
     bg: 'var(--primary-light)',
   },
@@ -77,7 +82,7 @@ export function AttendanceJournal() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* Save Success Alert */}
+      {/* Success Notification */}
       {saveSuccess && (
         <div
           role="status"
@@ -89,11 +94,14 @@ export function AttendanceJournal() {
             border: '1px solid var(--success)',
             fontWeight: 600,
             fontSize: '14px',
-            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
             animation: 'fadeIn 0.2s ease',
           }}
         >
-          ✅ Посещаемость успешно сохранена!
+          <Check size={16} />
+          <span>Посещаемость успешно сохранена!</span>
         </div>
       )}
 
@@ -107,9 +115,13 @@ export function AttendanceJournal() {
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--danger)',
             fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          ⚠️ Ошибка: {error}
+          <AlertTriangle size={16} />
+          <span>Ошибка: {error}</span>
         </div>
       )}
 
@@ -134,33 +146,31 @@ export function AttendanceJournal() {
                 marginBottom: '6px',
               }}
             >
-              Группа и кружок:
+              Учебная группа:
             </label>
             <select
               value={selectedGroupId}
               onChange={(e) => setSelectedGroupId(e.target.value)}
-              aria-label="Выбор группы"
               style={{
                 width: '100%',
-                padding: '10px 14px',
+                padding: '10px 12px',
                 borderRadius: 'var(--radius-md)',
                 border: '1px solid var(--border-color)',
-                fontSize: '14px',
                 backgroundColor: 'var(--bg-primary)',
                 color: 'var(--text-primary)',
-                fontWeight: 600,
+                fontSize: '14px',
+                fontWeight: 500,
               }}
             >
               {teacherGroups.map((g) => (
                 <option key={g.id} value={g.id}>
-                  {g.activityTitle} — {g.name || 'Основная группа'} (
-                  {formatDaysOfWeek(g.daysOfWeek)} {g.startTime}–{g.endTime})
+                  {g.activityTitle} — {g.name || 'Основная группа'} ({g.enrolledCount} уч.)
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Date Picker */}
+          {/* Date Selector */}
           <div>
             <label
               style={{
@@ -178,15 +188,16 @@ export function AttendanceJournal() {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                aria-label="Дата занятия"
                 style={{
                   flex: 1,
-                  padding: '9px 12px',
+                  padding: '8px 12px',
                   borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--border-color)',
-                  fontSize: '14px',
                   backgroundColor: 'var(--bg-primary)',
                   color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  boxSizing: 'border-box',
                 }}
               />
               <Button size="sm" variant="outline" onClick={handleSetToday}>
@@ -199,14 +210,13 @@ export function AttendanceJournal() {
           </div>
         </div>
 
-        {/* Selected Group Info Banner */}
+        {/* Selected Group Quick Metadata */}
         {selectedGroup && (
           <div
             style={{
               marginTop: '16px',
-              padding: '12px 14px',
-              backgroundColor: 'var(--bg-subtle)',
-              borderRadius: 'var(--radius-md)',
+              paddingTop: '14px',
+              borderTop: '1px solid var(--border-color)',
               display: 'flex',
               flexWrap: 'wrap',
               gap: '16px',
@@ -215,15 +225,24 @@ export function AttendanceJournal() {
               color: 'var(--text-secondary)',
             }}
           >
-            <div>
-              📍 <strong>Локация:</strong> {selectedGroup.location || 'Школьный корпус'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <MapPin size={13} style={{ flexShrink: 0 }} />
+              <span>
+                <strong>Локация:</strong> {selectedGroup.location || 'Школьный корпус'}
+              </span>
             </div>
-            <div>
-              📅 <strong>Расписание:</strong> {formatDaysOfWeek(selectedGroup.daysOfWeek)}{' '}
-              {selectedGroup.startTime}–{selectedGroup.endTime}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Calendar size={13} style={{ flexShrink: 0 }} />
+              <span>
+                <strong>Расписание:</strong> {formatDaysOfWeek(selectedGroup.daysOfWeek)}{' '}
+                {selectedGroup.startTime}–{selectedGroup.endTime}
+              </span>
             </div>
-            <div>
-              👥 <strong>Учеников в группе:</strong> {students.length}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Users size={13} style={{ flexShrink: 0 }} />
+              <span>
+                <strong>Учеников в группе:</strong> {students.length}
+              </span>
             </div>
           </div>
         )}
@@ -346,7 +365,7 @@ export function AttendanceJournal() {
         >
           <div>
             <h3
-              style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}
+              style={{ fontFamily: 'var(--font-heading)', margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}
             >
               Журнал посещаемости на {selectedDate}
             </h3>
@@ -356,16 +375,30 @@ export function AttendanceJournal() {
           </div>
 
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <Button size="sm" variant="outline" onClick={() => markAll('present')}>
-              👍 Отметить всех присутствующими
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => markAll('present')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <CheckCheck size={14} />
+              <span>Отметить всех присутствующими</span>
             </Button>
             <Button
               size="sm"
               variant="primary"
               onClick={saveAttendance}
               disabled={isSaving || students.length === 0}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              {isSaving ? 'Сохранение...' : '💾 Сохранить посещаемость'}
+              {isSaving ? (
+                'Сохранение...'
+              ) : (
+                <>
+                  <Save size={14} />
+                  <span>Сохранить посещаемость</span>
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -384,8 +417,8 @@ export function AttendanceJournal() {
               alignItems: 'center',
             }}
           >
-            <div style={{ fontSize: '36px', marginBottom: '8px' }}>👥</div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <Users size={36} color="var(--text-muted)" style={{ margin: '0 auto 8px' }} />
+            <div style={{ fontFamily: 'var(--font-heading)', fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
               В этой группе пока нет активных учеников
             </div>
             <div
@@ -460,12 +493,12 @@ export function AttendanceJournal() {
                           style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '4px',
+                            gap: '6px',
                             padding: '6px 10px',
                             borderRadius: 'var(--radius-sm)',
                             border: 'none',
                             fontSize: '12px',
-                            fontWeight: isSelected ? 700 : 500,
+                            fontWeight: isSelected ? 600 : 500,
                             cursor: 'pointer',
                             backgroundColor: isSelected ? opt.bg : 'transparent',
                             color: isSelected ? opt.color : 'var(--text-secondary)',
@@ -473,7 +506,15 @@ export function AttendanceJournal() {
                             transition: 'all 0.12s ease',
                           }}
                         >
-                          <span>{opt.icon}</span>
+                          <span
+                            style={{
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              backgroundColor: opt.color,
+                              display: 'inline-block',
+                            }}
+                          />
                           <span>{opt.label}</span>
                         </button>
                       );
@@ -496,8 +537,20 @@ export function AttendanceJournal() {
               borderTop: '1px solid var(--border-color)',
             }}
           >
-            <Button variant="primary" onClick={saveAttendance} disabled={isSaving}>
-              {isSaving ? 'Сохранение журнала...' : '💾 Сохранить посещаемость'}
+            <Button
+              variant="primary"
+              onClick={saveAttendance}
+              disabled={isSaving}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              {isSaving ? (
+                'Сохранение журнала...'
+              ) : (
+                <>
+                  <Save size={14} />
+                  <span>Сохранить посещаемость</span>
+                </>
+              )}
             </Button>
           </div>
         )}

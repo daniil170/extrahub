@@ -1,4 +1,16 @@
 import { Link } from 'react-router-dom';
+import {
+  Code,
+  Lightbulb,
+  TrendingUp,
+  GraduationCap,
+  Users,
+  UserCheck,
+  ClipboardList,
+  Rocket,
+  Check,
+  ShieldCheck,
+} from 'lucide-react';
 import { Card, Badge, PageHeader } from '../../shared/ui/index.js';
 
 export function AboutPage() {
@@ -9,7 +21,7 @@ export function AboutPage() {
       role: 'Lead Software Engineer & System Architect',
       tag: 'Разработка всей платформы',
       tagVariant: 'info',
-      avatar: '💻',
+      avatarIcon: Code,
       bio: 'Архитектор и ведущий разработчик программного комплекса ExtraHub. Спроектировал и реализовал систему с нуля, объединив передовые инженерные практики веб-разработки.',
       achievements: [
         'Архитектура и FSD: спроектировал модульную клиентскую архитектуру по методологии Feature-Sliced Design (FSD) на React 19 и Vite с полной изоляцией слоёв (shared, features, entities, app).',
@@ -27,7 +39,7 @@ export function AboutPage() {
       role: 'Product Idea & Lead UX/Market Researcher',
       tag: 'Идея продукта и исследования',
       tagVariant: 'success',
-      avatar: '💡',
+      avatarIcon: Lightbulb,
       bio: 'Инициатор создания ExtraHub и руководитель продуктовых исследований. Сформулировал фундаментальную идею единого хаба внеурочной школьной деятельности.',
       achievements: [
         'Исследование потребностей школ (CustDev): провёл серию глубинных интервью с администрацией школ, завучами по воспитательной работе, родителями и школьниками.',
@@ -42,7 +54,7 @@ export function AboutPage() {
       role: 'Head of Marketing & Business Development',
       tag: 'Маркетинг и переговоры',
       tagVariant: 'warning',
-      avatar: '📈',
+      avatarIcon: TrendingUp,
       bio: 'Директор по маркетингу и развитию партнёрских отношений. Отвечает за стратегию вывода ExtraHub на рынок, переговоры со школами и презентацию ценности продукта.',
       achievements: [
         'Переговоры с администрацией школ: организует встречи с директорами и завучами учебных заведений, проводит демонстрации возможностей платформы ExtraHub.',
@@ -56,7 +68,7 @@ export function AboutPage() {
   const capabilities = [
     {
       role: 'Для учеников',
-      icon: '🎓',
+      iconComponent: GraduationCap,
       color: 'var(--primary)',
       items: [
         'Интерактивный каталог секций и кружков с фильтрами по категориям (Спорт, IT, Языки, Творчество, Наука)',
@@ -68,7 +80,7 @@ export function AboutPage() {
     },
     {
       role: 'Для родителей',
-      icon: '👨‍👩‍👦',
+      iconComponent: Users,
       color: 'var(--accent-coral)',
       items: [
         'Подтверждение бронирования ребёнка в один клик через веб-кабинет или защищённую ссылку',
@@ -80,7 +92,7 @@ export function AboutPage() {
     },
     {
       role: 'Для преподавателей',
-      icon: '👨‍🏫',
+      iconComponent: UserCheck,
       color: 'var(--success)',
       items: [
         'Электронный журнал посещаемости в один клик с поддержкой 4 статусов («Был», «Опоздал», «Уважительная», «Не был»)',
@@ -92,7 +104,7 @@ export function AboutPage() {
     },
     {
       role: 'Для координаторов и администрации',
-      icon: '📋',
+      iconComponent: ClipboardList,
       color: 'var(--warning)',
       items: [
         'Мониторинг загрузки групп в реальном времени с автоматическими алертами о 100% заполнении',
@@ -125,24 +137,28 @@ export function AboutPage() {
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '4px 12px',
-              borderRadius: '9999px',
-              backgroundColor: 'var(--primary-light)',
+              gap: '6px',
+              padding: '4px 10px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'var(--bg-subtle)',
+              border: '1px solid var(--border-color)',
               color: 'var(--primary)',
-              fontSize: '12.5px',
-              fontWeight: 700,
+              fontSize: '11px',
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 600,
               marginBottom: '14px',
               textTransform: 'uppercase',
-              letterSpacing: '0.6px',
+              letterSpacing: '0.04em',
             }}
           >
-            🚀 Наша миссия
+            <Rocket size={13} />
+            <span>НАША МИССИЯ</span>
           </div>
           <h2
             style={{
+              fontFamily: 'var(--font-heading)',
               fontSize: '24px',
-              fontWeight: 800,
+              fontWeight: 700,
               margin: '0 0 12px',
               color: 'var(--text-primary)',
               lineHeight: 1.3,
@@ -171,13 +187,14 @@ export function AboutPage() {
         <div style={{ marginBottom: '20px' }}>
           <h3
             style={{
+              fontFamily: 'var(--font-heading)',
               fontSize: '22px',
-              fontWeight: 800,
+              fontWeight: 700,
               margin: '0 0 6px',
               color: 'var(--text-primary)',
             }}
           >
-            👥 Команда проекта ExtraHub
+            Команда проекта ExtraHub
           </h3>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
             Специалисты, создавшие идею, архитектуру, продукт и стратегию развития платформы
@@ -213,9 +230,8 @@ export function AboutPage() {
               >
                 <div
                   style={{
-                    fontSize: '32px',
-                    width: '54px',
-                    height: '54px',
+                    width: '48px',
+                    height: '48px',
                     borderRadius: 'var(--radius-md)',
                     backgroundColor: 'var(--bg-subtle)',
                     display: 'flex',
@@ -223,9 +239,10 @@ export function AboutPage() {
                     justifyContent: 'center',
                     flexShrink: 0,
                     border: '1px solid var(--border-color)',
+                    color: 'var(--primary)',
                   }}
                 >
-                  {member.avatar}
+                  <member.avatarIcon size={24} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <Badge variant={member.tagVariant} style={{ marginBottom: '6px' }}>
@@ -312,13 +329,14 @@ export function AboutPage() {
         <div style={{ marginBottom: '20px' }}>
           <h3
             style={{
+              fontFamily: 'var(--font-heading)',
               fontSize: '22px',
-              fontWeight: 800,
+              fontWeight: 700,
               margin: '0 0 6px',
               color: 'var(--text-primary)',
             }}
           >
-            ⚡ Возможности платформы ExtraHub
+            Возможности платформы ExtraHub
           </h3>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
             Инструменты, закрывающие полный цикл управления внеучебной деятельностью школы
@@ -352,10 +370,24 @@ export function AboutPage() {
                   borderBottom: '1px solid var(--border-color)',
                 }}
               >
-                <span style={{ fontSize: '24px' }}>{cap.icon}</span>
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--bg-subtle)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--primary)',
+                  }}
+                >
+                  <cap.iconComponent size={18} />
+                </div>
                 <h4
                   style={{
-                    fontSize: '16px',
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: '15px',
                     fontWeight: 700,
                     color: 'var(--text-primary)',
                     margin: 0,
@@ -380,7 +412,7 @@ export function AboutPage() {
               >
                 {cap.items.map((it, i) => (
                   <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                    <span style={{ color: 'var(--success)', fontWeight: 700 }}>✓</span>
+                    <Check size={14} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <span>{it}</span>
                   </li>
                 ))}
@@ -412,13 +444,18 @@ export function AboutPage() {
           <div>
             <h4
               style={{
+                fontFamily: 'var(--font-heading)',
                 fontSize: '16px',
                 fontWeight: 700,
                 margin: '0 0 4px',
                 color: 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
               }}
             >
-              🛡 Защита прав и стандарты качества
+              <ShieldCheck size={18} color="var(--primary)" />
+              <span>Защита прав и стандарты качества</span>
             </h4>
             <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
               ExtraHub Platform • Зарегистрированная интеллектуальная собственность команды
@@ -431,12 +468,13 @@ export function AboutPage() {
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--bg-subtle)',
               border: '1px solid var(--border-color)',
-              fontSize: '12.5px',
+              fontSize: '12px',
+              fontFamily: 'var(--font-mono)',
               fontWeight: 600,
               color: 'var(--text-primary)',
             }}
           >
-            © 2026 ExtraHub. Все права защищены.
+            © 2026 EXTRAHUB. ALL RIGHTS RESERVED.
           </div>
         </div>
 
