@@ -1,4 +1,17 @@
 import { Link } from 'react-router-dom';
+import {
+  Search,
+  Clock,
+  CreditCard,
+  ClipboardList,
+  BarChart2,
+  Code,
+  Lightbulb,
+  TrendingUp,
+  ShieldCheck,
+  MapPin,
+  ArrowRight,
+} from 'lucide-react';
 import { useTheme } from '../hooks/index.js';
 import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
@@ -50,7 +63,8 @@ export function Footer() {
               />
               <span
                 style={{
-                  fontWeight: 800,
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 700,
                   fontSize: '20px',
                   color: 'var(--primary)',
                   letterSpacing: '-0.4px',
@@ -78,23 +92,27 @@ export function Footer() {
                 alignItems: 'center',
                 gap: '8px',
                 padding: '4px 10px',
-                borderRadius: '9999px',
-                backgroundColor: 'var(--success-light)',
-                color: 'var(--success)',
-                fontSize: '12px',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--bg-subtle)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)',
+                fontSize: '11px',
+                fontFamily: 'var(--font-mono)',
                 fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
               }}
             >
               <span
                 style={{
-                  width: '7px',
-                  height: '7px',
+                  width: '6px',
+                  height: '6px',
                   borderRadius: '50%',
                   backgroundColor: 'var(--success)',
                   display: 'inline-block',
                 }}
               />
-              Платформа активна • Релиз 2026
+              SYSTEM ONLINE • RELEASE 2026
             </div>
           </div>
 
@@ -102,12 +120,13 @@ export function Footer() {
           <div>
             <h4
               style={{
-                fontSize: '15px',
+                fontFamily: 'var(--font-heading)',
+                fontSize: '14px',
                 fontWeight: 700,
                 color: 'var(--text-primary)',
                 margin: '0 0 16px',
                 textTransform: 'uppercase',
-                letterSpacing: '0.5px',
+                letterSpacing: '0.05em',
               }}
             >
               Возможности
@@ -124,28 +143,48 @@ export function Footer() {
               }}
             >
               <li>
-                <Link to="/catalog" style={{ color: 'inherit' }} className="footer-link">
-                  🔍 Каталог секций и кружков
+                <Link
+                  to="/catalog"
+                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  className="footer-link"
+                >
+                  <Search size={14} /> Каталог секций и кружков
                 </Link>
               </li>
               <li>
-                <Link to="/student" style={{ color: 'inherit' }} className="footer-link">
-                  ⏱ Бронь места с таймером 24ч
+                <Link
+                  to="/student"
+                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  className="footer-link"
+                >
+                  <Clock size={14} /> Бронь места с таймером 24ч
                 </Link>
               </li>
               <li>
-                <Link to="/parent" style={{ color: 'inherit' }} className="footer-link">
-                  💳 Онлайн-биллинг и оплата (₸)
+                <Link
+                  to="/parent"
+                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  className="footer-link"
+                >
+                  <CreditCard size={14} /> Онлайн-биллинг и оплата (₸)
                 </Link>
               </li>
               <li>
-                <Link to="/teacher" style={{ color: 'inherit' }} className="footer-link">
-                  📋 Электронный журнал в 1 клик
+                <Link
+                  to="/teacher"
+                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  className="footer-link"
+                >
+                  <ClipboardList size={14} /> Электронный журнал в 1 клик
                 </Link>
               </li>
               <li>
-                <Link to="/coordinator" style={{ color: 'inherit' }} className="footer-link">
-                  📊 Контроль вместимости и очереди
+                <Link
+                  to="/coordinator"
+                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  className="footer-link"
+                >
+                  <BarChart2 size={14} /> Контроль вместимости и очереди
                 </Link>
               </li>
             </ul>
@@ -155,29 +194,30 @@ export function Footer() {
           <div>
             <h4
               style={{
-                fontSize: '15px',
+                fontFamily: 'var(--font-heading)',
+                fontSize: '14px',
                 fontWeight: 700,
                 color: 'var(--text-primary)',
                 margin: '0 0 16px',
                 textTransform: 'uppercase',
-                letterSpacing: '0.5px',
+                letterSpacing: '0.05em',
               }}
             >
               Команда проекта
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}>
               <div>
-                <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                  💻 Ivakin Daniil
+                <div style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <Code size={14} color="var(--primary)" /> Ivakin Daniil
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  Lead Developer & System Architect (вся платформа)
+                  Lead Developer & System Architect
                 </div>
               </div>
 
               <div>
-                <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                  💡 Amir Timurbulat
+                <div style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <Lightbulb size={14} color="var(--primary)" /> Amir Timurbulat
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                   Product Idea & UX Research
@@ -185,11 +225,11 @@ export function Footer() {
               </div>
 
               <div>
-                <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                  📈 Maulen Stanbaev
+                <div style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <TrendingUp size={14} color="var(--primary)" /> Maulen Stanbaev
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  Head of Marketing & BizDev (переговоры и презентации)
+                  Head of Marketing & BizDev
                 </div>
               </div>
 
@@ -205,7 +245,7 @@ export function Footer() {
                     gap: '4px',
                   }}
                 >
-                  Подробнее о команде и стеке →
+                  Подробнее о команде и стеке <ArrowRight size={14} />
                 </Link>
               </div>
             </div>
@@ -215,48 +255,57 @@ export function Footer() {
           <div>
             <h4
               style={{
-                fontSize: '15px',
+                fontFamily: 'var(--font-heading)',
+                fontSize: '14px',
                 fontWeight: 700,
                 color: 'var(--text-primary)',
                 margin: '0 0 16px',
                 textTransform: 'uppercase',
-                letterSpacing: '0.5px',
+                letterSpacing: '0.05em',
               }}
             >
               Безопасность и регион
             </h4>
-            <p
+            <div
               style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '8px',
                 fontSize: '13px',
                 lineHeight: 1.6,
                 color: 'var(--text-secondary)',
                 marginBottom: '12px',
               }}
             >
-              🇰🇿 Разработано с учётом образовательных стандартов и регламентов школ Республики Казахстан.
-            </p>
-            <p
+              <MapPin size={16} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--primary)' }} />
+              <span>Разработано с учётом образовательных стандартов и регламентов школ Республики Казахстан.</span>
+            </div>
+            <div
               style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '8px',
                 fontSize: '12.5px',
                 lineHeight: 1.5,
                 color: 'var(--text-muted)',
                 marginBottom: '16px',
               }}
             >
-              🔒 100% защита персональных данных учащихся и родителей на уровне изолированных правил Cloud Security Rules.
-            </p>
+              <ShieldCheck size={16} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--primary)' }} />
+              <span>100% защита персональных данных учащихся и родителей на уровне правил Cloud Security Rules.</span>
+            </div>
             <div
               style={{
-                padding: '10px 14px',
+                padding: '8px 12px',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--bg-subtle)',
-                fontSize: '12px',
-                fontWeight: 500,
+                fontSize: '11px',
+                fontFamily: 'var(--font-mono)',
                 color: 'var(--text-secondary)',
                 border: '1px solid var(--border-color)',
               }}
             >
-              Валюта расчётов: <strong>Казахстанский тенге (₸)</strong>
+              CURRENCY: <strong>KZT (₸)</strong>
             </div>
           </div>
         </div>

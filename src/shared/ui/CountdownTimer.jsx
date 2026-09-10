@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Clock } from 'lucide-react';
 
 function calculateTimeLeft(expiresAt) {
   if (!expiresAt) {
@@ -36,12 +37,16 @@ export function CountdownTimer({ expiresAt, variant = 'block' }) {
     return (
       <span
         style={{
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-          fontWeight: 700,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          fontFamily: 'var(--font-mono)',
+          fontWeight: 600,
           color: timeLeft.isExpired ? 'var(--danger)' : 'var(--accent-coral)',
         }}
       >
-        ⏱ {timeLeft.formatted}
+        <Clock size={13} strokeWidth={2} />
+        {timeLeft.formatted}
       </span>
     );
   }
@@ -58,11 +63,12 @@ export function CountdownTimer({ expiresAt, variant = 'block' }) {
           backgroundColor: 'var(--accent-coral-light)',
           color: 'var(--accent-coral)',
           fontSize: '12px',
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-          fontWeight: 700,
+          fontFamily: 'var(--font-mono)',
+          fontWeight: 600,
         }}
       >
-        ⏱ {timeLeft.formatted}
+        <Clock size={12} strokeWidth={2} />
+        {timeLeft.formatted}
       </span>
     );
   }

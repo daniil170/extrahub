@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { X } from 'lucide-react';
 
 /**
  * Reusable accessible modal dialog
@@ -44,7 +45,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = '520px' }) 
         alignItems: 'center',
         justifyContent: 'center',
         padding: '16px',
-        backgroundColor: 'rgba(15, 23, 42, 0.55)',
+        backgroundColor: 'rgba(10, 12, 16, 0.65)',
         backdropFilter: 'blur(4px)',
         WebkitBackdropFilter: 'blur(4px)',
       }}
@@ -60,18 +61,18 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = '520px' }) 
           maxWidth,
           backgroundColor: 'var(--bg-surface)',
           borderRadius: 'var(--radius-lg)',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+          boxShadow: 'var(--shadow-lg)',
           border: '1px solid var(--border-color)',
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
-          animation: 'modalFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+          animation: 'modalFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         {title && (
           <div
             style={{
-              padding: '18px 24px',
+              padding: '16px 20px',
               borderBottom: '1px solid var(--border-color)',
               display: 'flex',
               alignItems: 'center',
@@ -81,8 +82,10 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = '520px' }) 
             <h3
               style={{
                 margin: 0,
-                fontSize: '18px',
+                fontFamily: 'var(--font-heading)',
+                fontSize: '17px',
                 fontWeight: 600,
+                letterSpacing: '-0.01em',
                 color: 'var(--text-primary)',
               }}
             >
@@ -96,20 +99,24 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = '520px' }) 
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '22px',
-                lineHeight: 1,
                 color: 'var(--text-muted)',
                 padding: '4px',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: 'var(--radius-xs)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'color 0.15s ease',
+                transition: 'color 0.15s ease, background-color 0.15s ease',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--text-primary)';
+                e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-muted)';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
-              &times;
+              <X size={17} />
             </button>
           </div>
         )}

@@ -1,10 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import {
+  ChevronDown,
+  LogOut,
+  Sun,
+  Moon,
+  Check,
+  Menu,
+  X,
+} from 'lucide-react';
 import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
 import { NotificationCenter } from '../../features/notifications/index.js';
 import { useTheme } from '../hooks/index.js';
-import { IconChevronDown, IconLogout, IconUser } from './Icons.jsx';
 
 /**
  * Role to personal cabinet link mapping
@@ -66,41 +74,7 @@ function ThemeToggleButton({ isDark, onToggle }) {
         e.currentTarget.style.color = 'var(--text-secondary)';
       }}
     >
-      {isDark ? (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="5" />
-          <line x1="12" y1="1" x2="12" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="23" />
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-          <line x1="1" y1="12" x2="3" y2="12" />
-          <line x1="21" y1="12" x2="23" y2="12" />
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-        </svg>
-      ) : (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
-      )}
+      {isDark ? <Sun size={15} strokeWidth={1.8} /> : <Moon size={15} strokeWidth={1.8} />}
     </button>
   );
 }
@@ -140,9 +114,9 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
   const navLinkStyle = ({ isActive }) => ({
     display: 'inline-flex',
     alignItems: 'center',
-    height: '56px',
+    height: '52px',
     padding: '0 4px',
-    margin: '0 10px',
+    margin: '0 8px',
     fontSize: '13.5px',
     fontWeight: isActive ? 600 : 500,
     color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
@@ -160,7 +134,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
     fontWeight: isActive ? 600 : 500,
     color: isActive ? 'var(--primary)' : 'var(--text-primary)',
     backgroundColor: isActive ? 'var(--primary-light)' : 'transparent',
-    borderRadius: 'var(--radius-md)',
+    borderRadius: 'var(--radius-sm)',
     textDecoration: 'none',
     transition: 'background-color 0.15s ease',
   });
@@ -192,14 +166,14 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          height: '56px',
+          height: '52px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
       >
         {/* Left: Brand logo & Desktop Links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <NavLink
             to={currentUser?.role === 'technician' ? '/technician' : '/catalog'}
             onClick={() => setMobileMenuOpen(false)}
@@ -213,17 +187,18 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
             <img
               src={isDark ? logoDarkImg : logoImg}
               alt="ExtraHub"
-              style={{ width: '26px', height: '26px', objectFit: 'contain' }}
+              style={{ width: '24px', height: '24px', objectFit: 'contain' }}
             />
             <span
               style={{
+                fontFamily: 'var(--font-heading)',
                 fontWeight: 700,
-                fontSize: '17px',
-                color: 'var(--primary)',
-                letterSpacing: '-0.3px',
+                fontSize: '16px',
+                color: 'var(--text-primary)',
+                letterSpacing: '-0.02em',
               }}
             >
-              ExtraHub
+              Extra<span style={{ color: 'var(--primary)' }}>Hub</span>
             </span>
           </NavLink>
 
@@ -293,16 +268,18 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                 >
                   <div
                     style={{
-                      width: '26px',
-                      height: '26px',
-                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: 'var(--radius-xs)',
                       backgroundColor: 'var(--primary-light)',
                       color: 'var(--primary)',
                       fontSize: '11px',
-                      fontWeight: 700,
+                      fontWeight: 600,
+                      fontFamily: 'var(--font-mono)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      flexShrink: 0,
                     }}
                   >
                     {getInitials(currentUser.fullName)}
@@ -310,8 +287,8 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
 
                   <span
                     style={{
-                      fontSize: '12px',
-                      fontWeight: 600,
+                      fontSize: '12.5px',
+                      fontWeight: 500,
                       color: 'var(--text-primary)',
                       maxWidth: '120px',
                       whiteSpace: 'nowrap',
@@ -324,18 +301,22 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
 
                   <span
                     style={{
+                      fontFamily: 'var(--font-mono)',
                       fontSize: '10px',
-                      padding: '2px 6px',
-                      borderRadius: '4px',
+                      padding: '1px 5px',
+                      borderRadius: 'var(--radius-xs)',
+                      border: '1px solid var(--border-color)',
                       backgroundColor: 'var(--bg-subtle)',
                       color: 'var(--text-secondary)',
                       fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
                     }}
                   >
                     {ROLE_LABELS[currentUser.role] || currentUser.role}
                   </span>
 
-                  <IconChevronDown size={12} style={{ color: 'var(--text-muted)' }} />
+                  <ChevronDown size={13} style={{ color: 'var(--text-muted)' }} />
                 </button>
 
                 {/* Dropdown Popover */}
@@ -343,20 +324,20 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                   <div
                     style={{
                       position: 'absolute',
-                      top: 'calc(100% + 8px)',
+                      top: 'calc(100% + 6px)',
                       right: 0,
-                      width: '240px',
+                      width: '230px',
                       backgroundColor: 'var(--bg-surface)',
                       borderRadius: 'var(--radius-md)',
-                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)',
+                      boxShadow: 'var(--shadow-lg)',
                       border: '1px solid var(--border-color)',
-                      padding: '8px 0',
+                      padding: '6px 0',
                       zIndex: 100,
-                      animation: 'fadeIn 0.15s ease',
+                      animation: 'fadeIn 0.12s ease',
                     }}
                   >
                     {/* User info */}
-                    <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--border-color)' }}>
+                    <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border-color)' }}>
                       <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
                         {currentUser.fullName}
                       </div>
@@ -366,21 +347,23 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                     </div>
 
                     {/* Role switcher list */}
-                    <div style={{ padding: '6px 14px' }}>
+                    <div style={{ padding: '6px 8px' }}>
                       <div
                         style={{
-                          fontSize: '10.5px',
-                          fontWeight: 700,
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          fontFamily: 'var(--font-mono)',
                           textTransform: 'uppercase',
-                          letterSpacing: '0.4px',
+                          letterSpacing: '0.06em',
                           color: 'var(--text-muted)',
-                          marginBottom: '6px',
+                          padding: '4px 6px',
+                          marginBottom: '2px',
                         }}
                       >
                         Демонстрационная роль:
                       </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
                         {AVAILABLE_ROLES.map((r) => {
                           const isSelected = currentUser.role === r.role;
                           return (
@@ -394,11 +377,11 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                                 justifyContent: 'space-between',
                                 width: '100%',
                                 padding: '6px 8px',
-                                borderRadius: 'var(--radius-sm)',
+                                borderRadius: 'var(--radius-xs)',
                                 border: 'none',
                                 backgroundColor: isSelected ? 'var(--primary-light)' : 'transparent',
                                 color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
-                                fontSize: '12px',
+                                fontSize: '12.5px',
                                 fontWeight: isSelected ? 600 : 400,
                                 cursor: 'pointer',
                                 textAlign: 'left',
@@ -412,7 +395,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                               }}
                             >
                               <span>{r.label}</span>
-                              {isSelected && <span style={{ fontSize: '12px' }}>✓</span>}
+                              {isSelected && <Check size={13} strokeWidth={2.5} />}
                             </button>
                           );
                         })}
@@ -432,19 +415,19 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                           alignItems: 'center',
                           gap: '8px',
                           width: '100%',
-                          padding: '8px 14px',
+                          padding: '8px 12px',
                           border: 'none',
                           backgroundColor: 'transparent',
                           color: 'var(--danger)',
-                          fontSize: '12px',
+                          fontSize: '12.5px',
                           fontWeight: 500,
                           cursor: 'pointer',
                           textAlign: 'left',
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--danger-light)')}
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                       >
-                        <IconLogout size={14} />
+                        <LogOut size={13} />
                         <span>Выйти из аккаунта</span>
                       </button>
                     </div>
@@ -456,7 +439,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
             <NavLink
               to="/login"
               style={{
-                padding: '6px 14px',
+                padding: '5px 12px',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--primary)',
                 color: '#ffffff',
@@ -482,7 +465,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
             aria-label={mobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
             aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? '✕' : '☰'}
+            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
       </div>
