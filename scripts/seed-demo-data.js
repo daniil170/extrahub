@@ -10,6 +10,7 @@
 
 import {
   DEMO_TEACHERS,
+  DEMO_TECHNICIANS,
   DEMO_ACTIVITIES,
   DEMO_ACTIVITY_GROUPS,
   DEMO_STUDENTS,
@@ -19,6 +20,7 @@ import {
   DEMO_ATTENDANCE_HISTORY,
   DEMO_NOTIFICATIONS,
   DEMO_ACHIEVEMENTS,
+  DEMO_EQUIPMENT_ISSUES,
 } from '../src/shared/data/demoData.js';
 
 async function main() {
@@ -28,6 +30,7 @@ async function main() {
 
   console.log('📦 Dataset Overview:');
   console.log(`  • Teachers:          ${Object.keys(DEMO_TEACHERS).length}`);
+  console.log(`  • Technicians:       ${Object.keys(DEMO_TECHNICIANS).length} (Maintenance & repairs)`);
   console.log(`  • Activities:        ${DEMO_ACTIVITIES.length} (Sports, Art, Science, Languages, Music)`);
   console.log(`  • Activity Groups:   ${DEMO_ACTIVITY_GROUPS.length} (Including 100% full, 1 spot left, moderate)`);
   console.log(`  • Students:          ${DEMO_STUDENTS.length}`);
@@ -36,7 +39,8 @@ async function main() {
   console.log(`  • Payments:          ${DEMO_PAYMENTS.length} (Paid, Pending, Overdue in ₸)`);
   console.log(`  • Attendance Dates:  ${Object.keys(DEMO_ATTENDANCE_HISTORY).length} (Multi-week records with 4 statuses)`);
   console.log(`  • Achievements:      ${DEMO_ACHIEVEMENTS.length}`);
-  console.log(`  • Notifications:     ${Object.values(DEMO_NOTIFICATIONS).flat().length} (Tailored for 5 roles)\n`);
+  console.log(`  • Equipment Issues:  ${DEMO_EQUIPMENT_ISSUES.length} (Critical, High, Medium, Low breakdown requests)`);
+  console.log(`  • Notifications:     ${Object.values(DEMO_NOTIFICATIONS).flat().length} (Tailored for 6 roles)\n`);
 
   console.log('🔍 Validating Activity Pricing (Strictly in ₸):');
   DEMO_ACTIVITIES.forEach((act) => {
@@ -80,6 +84,12 @@ async function main() {
       }
       for (const pay of DEMO_PAYMENTS) {
         await setDoc(doc(db, 'payments', pay.id), pay);
+      }
+      for (const iss of DEMO_EQUIPMENT_ISSUES) {
+        await setDoc(doc(db, 'equipmentIssues', iss.id), iss);
+      }
+      for (const tech of Object.values(DEMO_TECHNICIANS)) {
+        await setDoc(doc(db, 'users', tech.id), tech);
       }
       console.log('✅ Successfully seeded documents to Firestore emulator!');
     } catch (err) {
