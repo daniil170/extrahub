@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { Modal, Button } from '../../shared/ui/index.js';
+import {
+  Modal,
+  Button,
+  IconAlertCircle,
+  IconMonitor,
+  IconZap,
+  IconLayoutGrid,
+  IconWrench,
+  IconSettings,
+  IconPlus,
+} from '../../shared/ui/index.js';
 import {
   ISSUE_CATEGORIES,
   ISSUE_CATEGORY_META,
@@ -15,6 +25,14 @@ const QUICK_LOCATIONS = [
   'Большой спортзал',
   'Актовый зал',
 ];
+
+const CATEGORY_ICONS = {
+  hardware: IconMonitor,
+  electrical: IconZap,
+  furniture: IconLayoutGrid,
+  plumbing: IconWrench,
+  other: IconSettings,
+};
 
 /**
  * Modal dialog for filing a new equipment maintenance request
@@ -113,9 +131,13 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
               color: 'var(--danger)',
               fontSize: '13px',
               border: '1px solid rgba(230, 57, 70, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
             }}
           >
-            ⚠️ {formError}
+            <IconAlertCircle size={16} />
+            <span>{formError}</span>
           </div>
         )}
 
@@ -206,6 +228,7 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
             {Object.values(ISSUE_CATEGORIES).map((catKey) => {
               const meta = ISSUE_CATEGORY_META[catKey];
               const isSelected = category === catKey;
+              const IconComp = CATEGORY_ICONS[catKey] || IconSettings;
               return (
                 <button
                   key={catKey}
@@ -216,16 +239,17 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '8px',
+                    padding: '10px 8px',
                     borderRadius: 'var(--radius-sm)',
                     border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border-color)',
                     backgroundColor: isSelected ? 'var(--primary-light)' : 'transparent',
                     color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
+                    gap: '6px',
                   }}
                 >
-                  <span style={{ fontSize: '20px', marginBottom: '4px' }}>{meta.icon}</span>
+                  <IconComp size={18} />
                   <span style={{ fontSize: '12px', fontWeight: isSelected ? 600 : 500 }}>{meta.label}</span>
                 </button>
               );
@@ -249,14 +273,15 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
                   onClick={() => setPriority(pKey)}
                   style={{
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
-                    padding: '8px 4px',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    padding: '10px 6px',
                     borderRadius: 'var(--radius-sm)',
                     border: isSelected ? `2px solid ${meta.color}` : '1px solid var(--border-color)',
                     backgroundColor: isSelected
                       ? pKey === 'critical'
-                        ? 'rgba(230, 57, 70, 0.15)'
+                        ? 'rgba(230, 57, 70, 0.12)'
                         : 'var(--bg-subtle)'
                       : 'transparent',
                     color: isSelected && pKey === 'critical' ? 'var(--danger)' : 'var(--text-primary)',
@@ -265,7 +290,15 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  <span style={{ fontSize: '16px', marginBottom: '2px' }}>{meta.icon}</span>
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: meta.color,
+                      flexShrink: 0,
+                    }}
+                  />
                   <span style={{ fontSize: '12px' }}>{meta.label}</span>
                 </button>
               );
@@ -286,7 +319,7 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
                 gap: '8px',
               }}
             >
-              <span>🚨</span>
+              <IconAlertCircle size={16} />
               <span>
                 <b>Критический приоритет:</b> дежурному технику и администрации школы будет немедленно отправлено срочное уведомление!
               </span>
@@ -380,8 +413,14 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
           <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
             Отмена
           </Button>
-          <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? 'Отправка...' : 'Подать заявку'}
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={loading}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          >
+            <IconPlus size={16} />
+            <span>{loading ? 'Отправка...' : 'Подать заявку'}</span>
           </Button>
         </div>
       </form>

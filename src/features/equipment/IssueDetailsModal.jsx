@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Modal, Badge, Button } from '../../shared/ui/index.js';
+import {
+  Modal,
+  Badge,
+  Button,
+  IconMapPin,
+  IconAlertCircle,
+  IconCheck,
+  IconCheckCircle,
+  IconWrench,
+} from '../../shared/ui/index.js';
 import {
   ISSUE_PRIORITY_META,
   ISSUE_STATUS_META,
@@ -40,12 +49,14 @@ export function IssueDetailsModal({
   const [resolutionComment, setResolutionComment] = useState('');
   const [submittingResolution, setSubmittingResolution] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   useEffect(() => {
     if (issue?.id && isOpen) {
       setIsResolving(false);
       setResolutionComment('');
       setActionError('');
+      setConfirmCancel(false);
       onGetComments?.(issue.id).then((data) => {
         setComments(data || []);
       });
@@ -58,7 +69,8 @@ export function IssueDetailsModal({
   const statusMeta = ISSUE_STATUS_META[issue.status] || ISSUE_STATUS_META.new;
   const categoryMeta = ISSUE_CATEGORY_META[issue.category] || ISSUE_CATEGORY_META.other;
 
-  const isTechnicianOrAdmin = currentUser?.role === 'technician' || currentUser?.role === 'admin';
+  // Strict role permission: only technician can take tickets or resolve them
+  const isTechnician = currentUser?.role === 'technician';
   const isOwnerTeacher = issue.reportedBy === currentUser?.id && currentUser?.role === 'teacher';
 
   const handleSendComment = async (e) => {
@@ -111,6 +123,7 @@ export function IssueDetailsModal({
     try {
       setActionError('');
       await onCancel(issue.id);
+      setConfirmCancel(false);
       onClose();
     } catch (err) {
       setActionError(err.message || 'Ошибка при отмене заявки');
@@ -123,7 +136,6 @@ export function IssueDetailsModal({
       onClose={onClose}
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span>{categoryMeta.icon}</span>
           <span>{issue.title}</span>
         </div>
       }
@@ -138,9 +150,13 @@ export function IssueDetailsModal({
               backgroundColor: 'var(--danger-light)',
               color: 'var(--danger)',
               fontSize: '13px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
             }}
           >
-            ⚠️ {actionError}
+            <IconAlertCircle size={16} />
+            <span>{actionError}</span>
           </div>
         )}
 
@@ -162,12 +178,25 @@ export function IssueDetailsModal({
           <div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Приоритет</div>
             <Badge variant={priorityMeta.badgeVariant}>
-              {priorityMeta.icon} {priorityMeta.label}
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  backgroundColor: priorityMeta.color,
+                  marginRight: 5,
+                }}
+              />
+              {priorityMeta.label}
             </Badge>
           </div>
           <div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Локация</div>
-            <div style={{ fontSize: '13px', fontWeight: 600 }}>📍 {issue.location}</div>
+            <div style={{ fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <IconMapPin size={14} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+              <span>{issue.location}</span>
+            </div>
           </div>
           <div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Категория</div>
@@ -227,8 +256,18 @@ export function IssueDetailsModal({
               padding: '14px 16px',
             }}
           >
-            <div style={{ fontWeight: 700, color: 'var(--success)', marginBottom: '4px' }}>
-              ✅ Выполненные работы по ремонту:
+            <div
+              style={{
+                fontWeight: 700,
+                color: 'var(--success)',
+                marginBottom: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <IconCheckCircle size={16} />
+              <span>Выполненные работы по ремонту:</span>
             </div>
             <div style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: '6px' }}>
               {issue.resolutionComment || 'Работы завершены без дополнительных комментариев.'}
@@ -256,37 +295,76 @@ export function IssueDetailsModal({
             Автор заявки: <b>{issue.reportedByName || 'Преподаватель'}</b> • Создана: {formatDate(issue.createdAt)}
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {isTechnicianOrAdmin && issue.status === 'new' && (
-              <Button size="sm" variant="primary" onClick={handleExecuteTakeIntoWork}>
-                🛠️ Взять заявку в работу
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Technician actions only */}
+            {isTechnician && issue.status === 'new' && (
+              <Button
+                size="sm"
+                variant="primary"
+                onClick={handleExecuteTakeIntoWork}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <IconWrench size={15} />
+                <span>Взять заявку в работу</span>
               </Button>
             )}
 
-            {isTechnicianOrAdmin && issue.status === 'in_progress' && !isResolving && (
+            {isTechnician && issue.status === 'in_progress' && !isResolving && (
               <Button
                 size="sm"
-                style={{ backgroundColor: 'var(--success)', color: '#ffffff', border: 'none' }}
+                style={{
+                  backgroundColor: 'var(--success)',
+                  color: '#ffffff',
+                  border: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
                 onClick={() => setIsResolving(true)}
               >
-                ✓ Закрыть с отчётом
+                <IconCheck size={15} />
+                <span>Закрыть с отчётом</span>
               </Button>
             )}
 
+            {/* Teacher cancellation with confirmation */}
             {isOwnerTeacher && issue.status === 'new' && (
-              <Button
-                size="sm"
-                variant="outline"
-                style={{ color: 'var(--danger)' }}
-                onClick={handleExecuteCancel}
-              >
-                Отменить заявку
-              </Button>
+              confirmCancel ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    style={{ backgroundColor: 'var(--danger)', borderColor: 'var(--danger)' }}
+                    onClick={handleExecuteCancel}
+                  >
+                    Точно отменить?
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setConfirmCancel(false)}
+                  >
+                    Назад
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  style={{
+                    color: 'var(--danger)',
+                    borderColor: 'rgba(239, 68, 68, 0.3)',
+                  }}
+                  onClick={() => setConfirmCancel(true)}
+                >
+                  Отменить заявку
+                </Button>
+              )
             )}
           </div>
         </div>
 
-        {/* Resolution Form Form (Technician closing issue) */}
+        {/* Resolution Form (Technician closing issue) */}
         {isResolving && (
           <form
             onSubmit={handleExecuteResolve}
@@ -342,10 +420,18 @@ export function IssueDetailsModal({
               <Button
                 type="submit"
                 size="sm"
-                style={{ backgroundColor: 'var(--success)', color: '#ffffff', border: 'none' }}
+                style={{
+                  backgroundColor: 'var(--success)',
+                  color: '#ffffff',
+                  border: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
                 disabled={submittingResolution}
               >
-                {submittingResolution ? 'Сохранение...' : 'Подтвердить и закрыть'}
+                <IconCheck size={14} />
+                <span>{submittingResolution ? 'Сохранение...' : 'Подтвердить и закрыть'}</span>
               </Button>
             </div>
           </form>
@@ -353,8 +439,8 @@ export function IssueDetailsModal({
 
         {/* Comments / Discussion Thread */}
         <div style={{ paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
-          <h4 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '12px' }}>
-            💬 Переписка и уточнения ({comments.length})
+          <h4 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: 'var(--text-primary)' }}>
+            Переписка и уточнения ({comments.length})
           </h4>
 
           {/* Comments List */}
@@ -375,7 +461,12 @@ export function IssueDetailsModal({
             ) : (
               comments.map((c) => {
                 const isMyMessage = c.authorId === currentUser?.id;
-                const isTech = c.authorRole === 'technician' || c.authorRole === 'admin';
+                const roleLabel =
+                  c.authorRole === 'technician'
+                    ? 'Техник'
+                    : c.authorRole === 'admin'
+                    ? 'Администратор'
+                    : 'Преподаватель';
                 return (
                   <div
                     key={c.id}
@@ -397,9 +488,23 @@ export function IssueDetailsModal({
                         marginBottom: '4px',
                       }}
                     >
-                      <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                        {c.authorName} {isTech ? '🛠️' : '👨‍🏫'}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                          {c.authorName}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            padding: '1px 5px',
+                            borderRadius: '4px',
+                            backgroundColor: 'var(--bg-surface)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-secondary)',
+                          }}
+                        >
+                          {roleLabel}
+                        </span>
+                      </div>
                       <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
                         {formatDate(c.createdAt)}
                       </span>
