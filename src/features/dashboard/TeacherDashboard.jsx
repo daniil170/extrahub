@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
-import { PageHeader } from '../../shared/ui/index.js';
+import { PageHeader, IconBookOpen, IconWrench } from '../../shared/ui/index.js';
 import { AttendanceJournal } from '../attendance/index.js';
 import { TeacherEquipmentSection } from '../equipment/index.js';
 
@@ -37,9 +37,13 @@ export function TeacherDashboard() {
             fontSize: '14px',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          📖 Журнал посещаемости
+          <IconBookOpen size={16} />
+          <span>Журнал посещаемости</span>
         </button>
         <button
           type="button"
@@ -54,9 +58,13 @@ export function TeacherDashboard() {
             fontSize: '14px',
             cursor: 'pointer',
             transition: 'all 0.15s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          🛠️ Заявки на ремонт оборудования
+          <IconWrench size={16} />
+          <span>Заявки на ремонт</span>
         </button>
       </div>
 

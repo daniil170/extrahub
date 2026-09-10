@@ -1,6 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../shared/hooks/useAuth.js';
-import { Card, Button, PageHeader } from '../../shared/ui/index.js';
+import {
+  Card,
+  Button,
+  PageHeader,
+  IconGraduationCap,
+  IconUsers,
+  IconBookOpen,
+  IconBarChart,
+  IconWrench,
+  IconSettings,
+} from '../../shared/ui/index.js';
 
 export function LoginPage() {
   const { loginAsMock } = useAuth();
@@ -17,42 +27,42 @@ export function LoginPage() {
       title: 'Ученик',
       desc: 'Выбор кружков, просмотр расписания и личных достижений',
       path: '/student',
-      icon: '🎓',
+      IconComponent: IconGraduationCap,
     },
     {
       role: 'parent',
       title: 'Родитель',
       desc: 'Подтверждение записи детей на секции и оплата',
       path: '/parent',
-      icon: '👨‍👩‍👧',
+      IconComponent: IconUsers,
     },
     {
       role: 'teacher',
       title: 'Преподаватель',
       desc: 'Ведение групп, учет посещаемости и выставление наград',
       path: '/teacher',
-      icon: '👨‍🏫',
+      IconComponent: IconBookOpen,
     },
     {
       role: 'coordinator',
       title: 'Координатор',
       desc: 'Управление активностями, группами, мониторинг и отчёты',
       path: '/coordinator',
-      icon: '📊',
+      IconComponent: IconBarChart,
     },
     {
       role: 'technician',
       title: 'Техник / Завхоз',
       desc: 'Обслуживание оборудования, ремонт и исполнение заявок',
       path: '/technician',
-      icon: '🛠️',
+      IconComponent: IconWrench,
     },
     {
       role: 'admin',
       title: 'Администратор',
       desc: 'Полный доступ к системе, мониторинг заявок и координация',
       path: '/coordinator',
-      icon: '⚙️',
+      IconComponent: IconSettings,
     },
   ];
 
@@ -63,34 +73,51 @@ export function LoginPage() {
         subtitle="Выберите демонстрационную роль для входа в платформу"
       />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {roleOptions.map((item) => (
-          <Card key={item.role} style={{ cursor: 'pointer' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '16px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span style={{ fontSize: '32px' }}>{item.icon}</span>
-                <div>
-                  <h4 style={{ fontSize: '16px', fontWeight: 600 }}>{item.title}</h4>
-                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{item.desc}</p>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSelectRole(item.role, item.path)}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {roleOptions.map((item) => {
+          const { IconComponent } = item;
+          return (
+            <Card key={item.role} style={{ cursor: 'pointer', padding: '16px 20px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '16px',
+                }}
               >
-                Войти как {item.title}
-              </Button>
-            </div>
-          </Card>
-        ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div
+                    style={{
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: 'var(--primary-light)',
+                      color: 'var(--primary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <IconComponent size={22} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '15px', fontWeight: 600, margin: '0 0 2px 0' }}>{item.title}</h4>
+                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>{item.desc}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSelectRole(item.role, item.path)}
+                >
+                  Войти как {item.title}
+                </Button>
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
