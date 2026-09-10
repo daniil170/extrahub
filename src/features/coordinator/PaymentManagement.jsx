@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Check, AlertTriangle, Users, User, CreditCard } from 'lucide-react';
 import { useCoordinatorPayments } from './useCoordinatorPayments.js';
 import { Card, Badge, Button, Spinner, Modal } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate } from '../../shared/utils/index.js';
@@ -74,11 +75,14 @@ export function PaymentManagement() {
             border: '1px solid var(--success)',
             fontWeight: 600,
             fontSize: '14px',
-            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
             animation: 'fadeIn 0.2s ease',
           }}
         >
-          ✅ {actionSuccess}
+          <Check size={16} />
+          <span>{actionSuccess}</span>
         </div>
       )}
 
@@ -92,9 +96,13 @@ export function PaymentManagement() {
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--danger)',
             fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          ⚠️ Ошибка: {error}
+          <AlertTriangle size={16} />
+          <span>Ошибка: {error}</span>
         </div>
       )}
 
@@ -257,7 +265,7 @@ export function PaymentManagement() {
           >
             <input
               type="text"
-              placeholder="🔍 Поиск по ФИО, классу или кружку..."
+              placeholder="Поиск по ФИО, классу или кружку..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
@@ -280,7 +288,8 @@ export function PaymentManagement() {
               onClick={() => openCreateModal('group')}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              <span>+ 👥 Выставить счета группе</span>
+              <Users size={14} />
+              <span>Выставить счета группе</span>
             </Button>
 
             <Button
@@ -289,7 +298,8 @@ export function PaymentManagement() {
               onClick={() => openCreateModal('single')}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
-              <span>+ 👤 Индивидуально</span>
+              <User size={14} />
+              <span>Индивидуально</span>
             </Button>
           </div>
         </div>
@@ -306,7 +316,7 @@ export function PaymentManagement() {
           }}
         >
           <h3
-            style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}
+            style={{ fontFamily: 'var(--font-heading)', margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}
           >
             Реестр платежей ({filteredPayments.length})
           </h3>
@@ -322,8 +332,8 @@ export function PaymentManagement() {
               alignItems: 'center',
             }}
           >
-            <div style={{ fontSize: '40px', marginBottom: '10px' }}>💳</div>
-            <div style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <CreditCard size={40} color="var(--text-muted)" style={{ margin: '0 auto 10px' }} />
+            <div style={{ fontFamily: 'var(--font-heading)', fontSize: '17px', fontWeight: 700, color: 'var(--text-primary)' }}>
               Счета не найдены
             </div>
             <p
@@ -423,7 +433,8 @@ export function PaymentManagement() {
                         {p.groupName && (
                           <div style={{ marginTop: '3px' }}>
                             <Badge variant="info" style={{ fontSize: '11px', padding: '1px 6px' }}>
-                              👥 {p.groupName}
+                              <Users size={11} style={{ display: 'inline', verticalAlign: '-1px', marginRight: '3px' }} />
+                              {p.groupName}
                             </Badge>
                           </div>
                         )}
@@ -442,13 +453,13 @@ export function PaymentManagement() {
 
                       {/* Amount in Tenge */}
                       <td
-                        style={{ padding: '12px', fontWeight: 700, color: 'var(--text-primary)' }}
+                        style={{ padding: '12px', fontWeight: 600, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}
                       >
                         {formatCurrency(p.amount)}
                       </td>
 
                       {/* Due Date */}
-                      <td style={{ padding: '12px' }}>{formatDate(p.dueDate)}</td>
+                      <td style={{ padding: '12px', fontFamily: 'var(--font-mono)', fontSize: '13px' }}>{formatDate(p.dueDate)}</td>
 
                       {/* Status */}
                       <td style={{ padding: '12px' }}>
@@ -458,7 +469,7 @@ export function PaymentManagement() {
                       </td>
 
                       {/* Paid Date */}
-                      <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
+                      <td style={{ padding: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '13px' }}>
                         {p.paidAt ? formatDate(p.paidAt) : '—'}
                       </td>
 
@@ -471,9 +482,10 @@ export function PaymentManagement() {
                               variant="outline"
                               onClick={() => markAsPaid(p.id)}
                               disabled={isProcessing}
-                              style={{ borderColor: 'var(--success)', color: 'var(--success)' }}
+                              style={{ borderColor: 'var(--success)', color: 'var(--success)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                             >
-                              ✓ Оплачено офлайн
+                              <Check size={13} />
+                              <span>Оплачено офлайн</span>
                             </Button>
                           )}
 

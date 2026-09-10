@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { Users, User, AlertTriangle } from 'lucide-react';
 import { Modal, Button, Badge } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 
@@ -161,7 +162,7 @@ export function CreatePaymentModal({
       isOpen={isOpen}
       onClose={onClose}
       title={
-        mode === 'group' ? '👥 Выставление счетов группе кружка' : '👤 Индивидуальный счёт ученику'
+        mode === 'group' ? 'Выставление счетов группе кружка' : 'Индивидуальный счёт ученику'
       }
       maxWidth="560px"
     >
@@ -186,7 +187,7 @@ export function CreatePaymentModal({
               border: 'none',
               backgroundColor: mode === 'group' ? 'var(--primary)' : 'transparent',
               color: mode === 'group' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: mode === 'group' ? 700 : 500,
+              fontWeight: mode === 'group' ? 600 : 500,
               fontSize: '13.5px',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
@@ -196,7 +197,8 @@ export function CreatePaymentModal({
               gap: '6px',
             }}
           >
-            <span>👥 Всей группе (Рекомендуется)</span>
+            <Users size={15} />
+            <span>Всей группе (Рекомендуется)</span>
           </button>
           <button
             type="button"
@@ -208,7 +210,7 @@ export function CreatePaymentModal({
               border: 'none',
               backgroundColor: mode === 'single' ? 'var(--primary)' : 'transparent',
               color: mode === 'single' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: mode === 'single' ? 700 : 500,
+              fontWeight: mode === 'single' ? 600 : 500,
               fontSize: '13.5px',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
@@ -218,7 +220,8 @@ export function CreatePaymentModal({
               gap: '6px',
             }}
           >
-            <span>👤 Одному ученику</span>
+            <User size={15} />
+            <span>Одному ученику</span>
           </button>
         </div>
 
@@ -233,9 +236,13 @@ export function CreatePaymentModal({
               fontSize: '13px',
               marginBottom: '16px',
               border: '1px solid var(--danger)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
             }}
           >
-            ⚠️ {validationError}
+            <AlertTriangle size={15} style={{ flexShrink: 0 }} />
+            <span>{validationError}</span>
           </div>
         )}
 
@@ -364,9 +371,15 @@ export function CreatePaymentModal({
                         borderRadius: 'var(--radius-sm)',
                         border: '1px solid var(--border-color)',
                         color: 'var(--text-primary)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
                       }}
                     >
-                      👤 {st.fullName} {st.className ? `(${st.className})` : ''}
+                      <User size={11} />
+                      <span>
+                        {st.fullName} {st.className ? `(${st.className})` : ''}
+                      </span>
                     </span>
                   ))}
                 </div>

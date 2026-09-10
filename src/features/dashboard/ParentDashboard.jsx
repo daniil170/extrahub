@@ -1,4 +1,15 @@
 import { Link } from 'react-router-dom';
+import {
+  CheckCircle2,
+  Backpack,
+  Clock,
+  ClipboardList,
+  Calendar,
+  MapPin,
+  User,
+  Info,
+  AlertTriangle,
+} from 'lucide-react';
 import { useParentDashboard } from './useParentDashboard.js';
 import { Card, Badge, Button, Spinner, Modal, PageHeader, CountdownTimer } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
@@ -40,18 +51,17 @@ export function ParentDashboard() {
             padding: '12px 18px',
             backgroundColor: 'var(--success-light)',
             color: 'var(--success)',
-            borderRadius: 'var(--radius-md)',
+            borderRadius: 'var(--radius-sm)',
             border: '1px solid var(--success)',
             fontWeight: 600,
-            fontSize: '14px',
+            fontSize: '13px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            boxShadow: 'var(--shadow-sm)',
-            animation: 'fadeIn 0.2s ease',
+            gap: '8px',
           }}
         >
-          <span>✅ {toastMessage}</span>
+          <CheckCircle2 size={16} />
+          <span>{toastMessage}</span>
         </div>
       )}
 
@@ -153,8 +163,9 @@ export function ParentDashboard() {
             >
               <h2
                 style={{
-                  fontSize: '20px',
-                  fontWeight: 700,
+                  fontSize: '18px',
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-heading)',
                   margin: 0,
                   color: 'var(--text-primary)',
                 }}
@@ -171,12 +182,26 @@ export function ParentDashboard() {
 
             {enrollments.length === 0 ? (
               <Card style={{ textAlign: 'center', padding: '40px 20px' }}>
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎒</div>
-                <h3 style={{ margin: '0 0 6px', color: 'var(--text-primary)', fontSize: '17px' }}>
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--bg-subtle)',
+                    color: 'var(--primary)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '12px',
+                  }}
+                >
+                  <Backpack size={24} />
+                </div>
+                <h3 style={{ margin: '0 0 6px', fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '16px' }}>
                   Нет активных записей
                 </h3>
                 <p
-                  style={{ fontSize: '13.5px', color: 'var(--text-secondary)', margin: '0 0 16px' }}
+                  style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 16px' }}
                 >
                   Ученик пока не записан ни в один кружок. Выберите интересующее направление в
                   каталоге.
@@ -199,12 +224,12 @@ export function ParentDashboard() {
                     <Card
                       key={enr.id}
                       style={{
-                        borderRadius: 'var(--radius-lg)',
-                        borderLeft: `4px solid ${
+                        borderRadius: 'var(--radius-md)',
+                        borderLeft: `3px solid ${
                           enr.status === 'active'
                             ? 'var(--success)'
                             : enr.status === 'pending_parent_approval'
-                              ? 'var(--accent-coral)'
+                              ? 'var(--warning)'
                               : enr.status === 'waitlisted'
                                 ? 'var(--warning)'
                                 : 'var(--border-color)'
@@ -238,6 +263,7 @@ export function ParentDashboard() {
                                 style={{
                                   fontSize: '13px',
                                   fontWeight: 600,
+                                  fontFamily: 'var(--font-heading)',
                                   color: 'var(--primary)',
                                 }}
                               >
@@ -247,8 +273,9 @@ export function ParentDashboard() {
                           </div>
                           <h3
                             style={{
-                              fontSize: '18px',
-                              fontWeight: 700,
+                              fontSize: '16px',
+                              fontWeight: 600,
+                              fontFamily: 'var(--font-heading)',
                               margin: 0,
                               color: 'var(--text-primary)',
                             }}
@@ -261,10 +288,10 @@ export function ParentDashboard() {
                         <div>
                           {enr.status === 'active' && <Badge variant="success">Зачислен</Badge>}
                           {enr.status === 'pending_parent_approval' && (
-                            <Badge variant="warning">Бронь (ожидает подтверждения)</Badge>
+                            <Badge variant="warning">Бронь (ожидает)</Badge>
                           )}
                           {enr.status === 'waitlisted' && (
-                            <Badge variant="warning">Лист ожидания (№{enr.queuePosition || 1})</Badge>
+                            <Badge variant="warning">Ожидание #{enr.queuePosition || 1}</Badge>
                           )}
                           {enr.status === 'cancelled' && <Badge variant="default">Отменено</Badge>}
                           {enr.status === 'cancelled_by_timeout' && (
@@ -278,10 +305,11 @@ export function ParentDashboard() {
                         <div
                           style={{
                             padding: '10px 14px',
-                            backgroundColor: 'var(--accent-coral-light)',
-                            color: 'var(--accent-coral)',
+                            backgroundColor: 'var(--warning-light)',
+                            color: 'var(--warning)',
                             borderRadius: 'var(--radius-sm)',
-                            fontSize: '13px',
+                            border: '1px solid rgba(217, 119, 6, 0.25)',
+                            fontSize: '12px',
                             fontWeight: 500,
                             marginBottom: '12px',
                             display: 'flex',
@@ -291,9 +319,12 @@ export function ParentDashboard() {
                             gap: '8px',
                           }}
                         >
-                          <div>
-                            ⏱ Бронь места удерживается до {formatDate(enr.holdExpiresAt)}. Пожалуйста,
-                            подтвердите участие или отмените бронь.
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Clock size={13} />
+                            <span>
+                              Бронь места удерживается до {formatDate(enr.holdExpiresAt)}. Пожалуйста,
+                              подтвердите участие или отмените бронь.
+                            </span>
                           </div>
                           <CountdownTimer expiresAt={enr.holdExpiresAt} variant="badge" />
                         </div>
@@ -307,12 +338,17 @@ export function ParentDashboard() {
                             backgroundColor: 'var(--warning-light)',
                             color: 'var(--warning)',
                             borderRadius: 'var(--radius-sm)',
-                            fontSize: '12.5px',
+                            border: '1px solid rgba(217, 119, 6, 0.25)',
+                            fontSize: '12px',
                             fontWeight: 500,
                             marginBottom: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
                           }}
                         >
-                          📋 Заявка находится в листе ожидания на позиции #{enr.queuePosition || 1}. Как только место в группе освободится, вы получите приоритетное право бронирования.
+                          <ClipboardList size={13} />
+                          <span>Заявка находится в листе ожидания на позиции #{enr.queuePosition || 1}.</span>
                         </div>
                       )}
 
@@ -322,23 +358,26 @@ export function ParentDashboard() {
                           display: 'grid',
                           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                           gap: '8px',
-                          fontSize: '13px',
+                          fontSize: '12px',
                           color: 'var(--text-secondary)',
                           marginBottom: '14px',
                           padding: '10px 12px',
-                          backgroundColor: 'var(--bg-primary)',
+                          backgroundColor: 'var(--bg-subtle)',
                           borderRadius: 'var(--radius-sm)',
+                          border: '1px solid var(--border-color)',
                         }}
                       >
-                        <div>
-                          📅 <strong>Расписание:</strong> {formatDaysOfWeek(grp.daysOfWeek)}{' '}
-                          {grp.startTime}–{grp.endTime}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Calendar size={13} style={{ color: 'var(--text-muted)' }} />
+                          <span><strong>Расписание:</strong> {formatDaysOfWeek(grp.daysOfWeek)} {grp.startTime}–{grp.endTime}</span>
                         </div>
-                        <div>
-                          📍 <strong>Кабинет:</strong> {act.location || 'Школа'}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <MapPin size={13} style={{ color: 'var(--text-muted)' }} />
+                          <span><strong>Кабинет:</strong> {act.location || 'Школа'}</span>
                         </div>
-                        <div>
-                          👨‍🏫 <strong>Педагог:</strong> {enr.teacherName}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <User size={13} style={{ color: 'var(--text-muted)' }} />
+                          <span><strong>Педагог:</strong> {enr.teacherName}</span>
                         </div>
                       </div>
 
@@ -359,21 +398,6 @@ export function ParentDashboard() {
                             onClick={() => openCancelModal(enr)}
                             title="Отменить запись в кружок"
                           >
-                            <svg
-                              width="13"
-                              height="13"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.4"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <circle cx="12" cy="12" r="10" />
-                              <line x1="15" y1="9" x2="9" y2="15" />
-                              <line x1="9" y1="9" x2="15" y2="15" />
-                            </svg>
                             <span>Отменить запись</span>
                           </button>
                         </div>
@@ -389,8 +413,9 @@ export function ParentDashboard() {
           <div>
             <h2
               style={{
-                fontSize: '20px',
-                fontWeight: 700,
+                fontSize: '18px',
+                fontWeight: 600,
+                fontFamily: 'var(--font-heading)',
                 margin: '0 0 16px',
                 color: 'var(--text-primary)',
               }}
@@ -398,7 +423,7 @@ export function ParentDashboard() {
               Статус оплаты
             </h2>
 
-            <Card style={{ borderRadius: 'var(--radius-lg)' }}>
+            <Card style={{ borderRadius: 'var(--radius-md)' }}>
               {payments.length === 0 ? (
                 <div
                   style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-secondary)' }}
@@ -422,8 +447,8 @@ export function ParentDashboard() {
                         key={p.id}
                         style={{
                           padding: '12px 14px',
-                          borderRadius: 'var(--radius-md)',
-                          backgroundColor: 'var(--bg-primary)',
+                          borderRadius: 'var(--radius-sm)',
+                          backgroundColor: 'var(--bg-subtle)',
                           border: '1px solid var(--border-color)',
                         }}
                       >
@@ -434,7 +459,7 @@ export function ParentDashboard() {
                             alignItems: 'center',
                           }}
                         >
-                          <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                             Срок: <strong>{formatDate(p.dueDate)}</strong>
                           </span>
                           {statusBadge}
@@ -452,13 +477,14 @@ export function ParentDashboard() {
                             style={{
                               fontSize: '17px',
                               fontWeight: 700,
+                              fontFamily: 'var(--font-heading)',
                               color: 'var(--text-primary)',
                             }}
                           >
                             {formatCurrency(p.amount)}
                           </span>
                           {p.paidAt && (
-                            <span style={{ fontSize: '11.5px', color: 'var(--success)' }}>
+                            <span style={{ fontSize: '11px', color: 'var(--success)' }}>
                               Оплачено {formatDate(p.paidAt)}
                             </span>
                           )}
@@ -475,15 +501,21 @@ export function ParentDashboard() {
                   marginTop: '18px',
                   padding: '12px 14px',
                   backgroundColor: 'var(--bg-subtle)',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '12.5px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '12px',
                   lineHeight: 1.5,
                   color: 'var(--text-secondary)',
                   borderLeft: '3px solid var(--primary)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '8px',
                 }}
               >
-                ℹ️ <strong>Оплата занятий:</strong> производится офлайн через администрацию школы.
-                После внесения средств координатор обновит статус в системе.
+                <Info size={14} style={{ color: 'var(--primary)', marginTop: '2px', flexShrink: 0 }} />
+                <div>
+                  <strong>Оплата занятий:</strong> производится офлайн через администрацию школы.
+                  После внесения средств координатор обновит статус в системе.
+                </div>
               </div>
             </Card>
           </div>
@@ -500,7 +532,7 @@ export function ParentDashboard() {
         <div>
           <p
             style={{
-              fontSize: '14.5px',
+              fontSize: '14px',
               lineHeight: 1.5,
               color: 'var(--text-primary)',
               margin: '0 0 16px',
@@ -512,15 +544,19 @@ export function ParentDashboard() {
 
           <p
             style={{
-              fontSize: '13.5px',
+              fontSize: '13px',
               color: 'var(--danger)',
               backgroundColor: 'var(--danger-light)',
               padding: '10px 12px',
               borderRadius: 'var(--radius-sm)',
               margin: '0 0 20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}
           >
-            ⚠️ Место сразу перейдёт следующему человеку из листа ожидания.
+            <AlertTriangle size={15} />
+            <span>Место сразу перейдёт следующему человеку из листа ожидания.</span>
           </p>
 
           {cancelError && (

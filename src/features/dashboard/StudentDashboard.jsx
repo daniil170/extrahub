@@ -1,9 +1,26 @@
 import { Link } from 'react-router-dom';
+import {
+  Rocket,
+  CheckCircle2,
+  Clock,
+  ClipboardList,
+  Calendar,
+  MapPin,
+  User,
+  Info,
+  AlertTriangle,
+  Trophy,
+  Award,
+  Star,
+  Medal,
+} from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { useParentDashboard } from './useParentDashboard.js';
 import { Card, Badge, Button, Spinner, Modal, PageHeader, CountdownTimer } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
 import { DEMO_ACHIEVEMENTS } from '../../shared/data/demoData.js';
+
+const ACHIEVEMENT_ICONS = [Trophy, Award, Star, Medal];
 
 export function StudentDashboard() {
   const { user } = useAuth();
@@ -40,14 +57,17 @@ export function StudentDashboard() {
             padding: '12px 18px',
             backgroundColor: 'var(--success-light)',
             color: 'var(--success)',
-            borderRadius: 'var(--radius-md)',
+            borderRadius: 'var(--radius-sm)',
             border: '1px solid var(--success)',
             fontWeight: 600,
-            fontSize: '14px',
-            boxShadow: 'var(--shadow-sm)',
+            fontSize: '13px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          ✅ {toastMessage}
+          <CheckCircle2 size={16} />
+          <span>{toastMessage}</span>
         </div>
       )}
 
@@ -101,12 +121,26 @@ export function StudentDashboard() {
 
             {enrollments.length === 0 ? (
               <Card style={{ textAlign: 'center', padding: '40px 20px' }}>
-                <div style={{ fontSize: '32px', marginBottom: '8px' }}>🚀</div>
-                <h3 style={{ margin: '0 0 6px', color: 'var(--text-primary)', fontSize: '17px' }}>
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--bg-subtle)',
+                    color: 'var(--primary)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '12px',
+                  }}
+                >
+                  <Rocket size={24} />
+                </div>
+                <h3 style={{ margin: '0 0 6px', fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '16px' }}>
                   Вы пока не записаны в кружки
                 </h3>
                 <p
-                  style={{ fontSize: '13.5px', color: 'var(--text-secondary)', margin: '0 0 16px' }}
+                  style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 16px' }}
                 >
                   Откройте каталог кружков и выберите интересное направление для развития!
                 </p>
@@ -128,12 +162,12 @@ export function StudentDashboard() {
                     <Card
                       key={enr.id}
                       style={{
-                        borderRadius: 'var(--radius-lg)',
-                        borderLeft: `4px solid ${
+                        borderRadius: 'var(--radius-md)',
+                        borderLeft: `3px solid ${
                           enr.status === 'active'
                             ? 'var(--success)'
                             : enr.status === 'pending_parent_approval'
-                              ? 'var(--accent-coral)'
+                              ? 'var(--warning)'
                               : enr.status === 'waitlisted'
                                 ? 'var(--warning)'
                                 : 'var(--border-color)'
@@ -166,6 +200,7 @@ export function StudentDashboard() {
                                 style={{
                                   fontSize: '13px',
                                   fontWeight: 600,
+                                  fontFamily: 'var(--font-heading)',
                                   color: 'var(--primary)',
                                 }}
                               >
@@ -175,8 +210,9 @@ export function StudentDashboard() {
                           </div>
                           <h3
                             style={{
-                              fontSize: '18px',
-                              fontWeight: 700,
+                              fontSize: '16px',
+                              fontWeight: 600,
+                              fontFamily: 'var(--font-heading)',
                               margin: 0,
                               color: 'var(--text-primary)',
                             }}
@@ -188,10 +224,10 @@ export function StudentDashboard() {
                         <div>
                           {enr.status === 'active' && <Badge variant="success">Зачислен</Badge>}
                           {enr.status === 'pending_parent_approval' && (
-                            <Badge variant="warning">Бронь (ожидает подтверждения)</Badge>
+                            <Badge variant="warning">Бронь</Badge>
                           )}
                           {enr.status === 'waitlisted' && (
-                            <Badge variant="warning">Лист ожидания (№{enr.queuePosition || 1})</Badge>
+                            <Badge variant="warning">Ожидание #{enr.queuePosition || 1}</Badge>
                           )}
                           {enr.status === 'cancelled' && <Badge variant="default">Отменено</Badge>}
                           {enr.status === 'cancelled_by_timeout' && (
@@ -205,10 +241,11 @@ export function StudentDashboard() {
                         <div
                           style={{
                             padding: '10px 14px',
-                            backgroundColor: 'var(--accent-coral-light)',
-                            color: 'var(--accent-coral)',
+                            backgroundColor: 'var(--warning-light)',
+                            color: 'var(--warning)',
                             borderRadius: 'var(--radius-sm)',
-                            fontSize: '13px',
+                            border: '1px solid rgba(217, 119, 6, 0.25)',
+                            fontSize: '12px',
                             fontWeight: 500,
                             marginBottom: '12px',
                             display: 'flex',
@@ -218,7 +255,10 @@ export function StudentDashboard() {
                             gap: '8px',
                           }}
                         >
-                          <div>⏱ Запись забронирована. Ожидается подтверждение от родителя.</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Clock size={13} />
+                            <span>Запись забронирована. Ожидается подтверждение от родителя.</span>
+                          </div>
                           <CountdownTimer expiresAt={enr.holdExpiresAt} variant="badge" />
                         </div>
                       )}
@@ -231,12 +271,17 @@ export function StudentDashboard() {
                             backgroundColor: 'var(--warning-light)',
                             color: 'var(--warning)',
                             borderRadius: 'var(--radius-sm)',
-                            fontSize: '12.5px',
+                            border: '1px solid rgba(217, 119, 6, 0.25)',
+                            fontSize: '12px',
                             fontWeight: 500,
                             marginBottom: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
                           }}
                         >
-                          📋 Вы в листе ожидания на позиции #{enr.queuePosition || 1}. Как только место освободится, вам придёт уведомление!
+                          <ClipboardList size={13} />
+                          <span>Вы в листе ожидания на позиции #{enr.queuePosition || 1}.</span>
                         </div>
                       )}
 
@@ -245,23 +290,26 @@ export function StudentDashboard() {
                           display: 'grid',
                           gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
                           gap: '8px',
-                          fontSize: '13px',
+                          fontSize: '12px',
                           color: 'var(--text-secondary)',
                           marginBottom: '14px',
                           padding: '10px 12px',
-                          backgroundColor: 'var(--bg-primary)',
+                          backgroundColor: 'var(--bg-subtle)',
                           borderRadius: 'var(--radius-sm)',
+                          border: '1px solid var(--border-color)',
                         }}
                       >
-                        <div>
-                          📅 <strong>Расписание:</strong> {formatDaysOfWeek(grp.daysOfWeek)}{' '}
-                          {grp.startTime}–{grp.endTime}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Calendar size={13} style={{ color: 'var(--text-muted)' }} />
+                          <span><strong>Расписание:</strong> {formatDaysOfWeek(grp.daysOfWeek)} {grp.startTime}–{grp.endTime}</span>
                         </div>
-                        <div>
-                          📍 <strong>Кабинет:</strong> {act.location || 'Школа'}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <MapPin size={13} style={{ color: 'var(--text-muted)' }} />
+                          <span><strong>Кабинет:</strong> {act.location || 'Школа'}</span>
                         </div>
-                        <div>
-                          👨‍🏫 <strong>Педагог:</strong> {enr.teacherName}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <User size={13} style={{ color: 'var(--text-muted)' }} />
+                          <span><strong>Педагог:</strong> {enr.teacherName}</span>
                         </div>
                       </div>
 
@@ -281,21 +329,6 @@ export function StudentDashboard() {
                             onClick={() => openCancelModal(enr)}
                             title="Отменить запись в кружок"
                           >
-                            <svg
-                              width="13"
-                              height="13"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.4"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <circle cx="12" cy="12" r="10" />
-                              <line x1="15" y1="9" x2="9" y2="15" />
-                              <line x1="9" y1="9" x2="15" y2="15" />
-                            </svg>
                             <span>Отменить запись</span>
                           </button>
                         </div>
@@ -313,8 +346,9 @@ export function StudentDashboard() {
             <div>
               <h2
                 style={{
-                  fontSize: '20px',
-                  fontWeight: 700,
+                  fontSize: '17px',
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-heading)',
                   margin: '0 0 16px',
                   color: 'var(--text-primary)',
                 }}
@@ -322,7 +356,7 @@ export function StudentDashboard() {
                 Статус оплаты
               </h2>
 
-              <Card style={{ borderRadius: 'var(--radius-lg)' }}>
+              <Card style={{ borderRadius: 'var(--radius-md)' }}>
                 {payments.length === 0 ? (
                   <div
                     style={{
@@ -351,8 +385,8 @@ export function StudentDashboard() {
                           key={p.id}
                           style={{
                             padding: '10px 12px',
-                            borderRadius: 'var(--radius-md)',
-                            backgroundColor: 'var(--bg-primary)',
+                            borderRadius: 'var(--radius-sm)',
+                            backgroundColor: 'var(--bg-subtle)',
                             border: '1px solid var(--border-color)',
                           }}
                         >
@@ -363,12 +397,12 @@ export function StudentDashboard() {
                               alignItems: 'center',
                             }}
                           >
-                            <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
+                            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                               Срок: <strong>{formatDate(p.dueDate)}</strong>
                             </span>
                             {statusBadge}
                           </div>
-                          <div style={{ marginTop: '4px', fontSize: '16px', fontWeight: 700 }}>
+                          <div style={{ marginTop: '4px', fontSize: '16px', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>
                             {formatCurrency(p.amount)}
                           </div>
                         </div>
@@ -385,9 +419,13 @@ export function StudentDashboard() {
                     fontSize: '12px',
                     color: 'var(--text-secondary)',
                     lineHeight: 1.45,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
                   }}
                 >
-                  ℹ️ Оплата производится родителями в школьной администрации.
+                  <Info size={13} style={{ flexShrink: 0, color: 'var(--text-muted)' }} />
+                  <span>Оплата производится родителями в администрации школы.</span>
                 </div>
               </Card>
             </div>
@@ -396,8 +434,9 @@ export function StudentDashboard() {
             <div>
               <h2
                 style={{
-                  fontSize: '20px',
-                  fontWeight: 700,
+                  fontSize: '17px',
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-heading)',
                   margin: '0 0 16px',
                   color: 'var(--text-primary)',
                 }}
@@ -405,30 +444,48 @@ export function StudentDashboard() {
                 Награды и достижения
               </h2>
 
-              <Card style={{ borderRadius: 'var(--radius-lg)' }}>
+              <Card style={{ borderRadius: 'var(--radius-md)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  {mockAchievements.map((ach) => (
-                    <div
-                      key={ach.id}
-                      style={{ display: 'flex', gap: '12px', alignItems: 'center' }}
-                    >
-                      <span style={{ fontSize: '28px' }}>{ach.icon}</span>
-                      <div>
+                  {mockAchievements.map((ach, idx) => {
+                    const IconComp = ACHIEVEMENT_ICONS[idx % ACHIEVEMENT_ICONS.length];
+                    return (
+                      <div
+                        key={ach.id}
+                        style={{ display: 'flex', gap: '12px', alignItems: 'center' }}
+                      >
                         <div
                           style={{
-                            fontWeight: 600,
-                            fontSize: '14px',
-                            color: 'var(--text-primary)',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: 'var(--radius-sm)',
+                            backgroundColor: 'var(--bg-subtle)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
                           }}
                         >
-                          {ach.title}
+                          <IconComp size={18} />
                         </div>
-                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                          {ach.desc}
+                        <div>
+                          <div
+                            style={{
+                              fontWeight: 600,
+                              fontSize: '13px',
+                              color: 'var(--text-primary)',
+                            }}
+                          >
+                            {ach.title.replace(/\p{Extended_Pictographic}/gu, '').trim()}
+                          </div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                            {ach.desc}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </Card>
             </div>
@@ -446,7 +503,7 @@ export function StudentDashboard() {
         <div>
           <p
             style={{
-              fontSize: '14.5px',
+              fontSize: '14px',
               lineHeight: 1.5,
               color: 'var(--text-primary)',
               margin: '0 0 16px',
@@ -458,15 +515,19 @@ export function StudentDashboard() {
 
           <p
             style={{
-              fontSize: '13.5px',
+              fontSize: '13px',
               color: 'var(--danger)',
               backgroundColor: 'var(--danger-light)',
               padding: '10px 12px',
               borderRadius: 'var(--radius-sm)',
               margin: '0 0 20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}
           >
-            ⚠️ Место сразу перейдёт следующему человеку из листа ожидания.
+            <AlertTriangle size={15} />
+            <span>Место сразу перейдёт следующему человеку из листа ожидания.</span>
           </p>
 
           {cancelError && (

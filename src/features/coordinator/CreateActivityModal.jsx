@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Sparkles, BookOpen, Target, AlertTriangle, Check } from 'lucide-react';
 import { Modal, Button } from '../../shared/ui/index.js';
 
 const CATEGORIES = [
@@ -248,7 +249,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="✨ Создать новый кружок или секцию"
+      title="Создать новый кружок или секцию"
       maxWidth="720px"
     >
       <form onSubmit={handleSubmit}>
@@ -266,16 +267,17 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
           }}
         >
           <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-            💡 Для быстрого показа на школьном демо:
+            Для быстрого показа на школьном демо:
           </span>
           <Button
             type="button"
             size="sm"
             variant="outline"
             onClick={handleFillDemoData}
-            style={{ fontWeight: 600 }}
+            style={{ fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            🚀 Заполнить демо-данными
+            <Sparkles size={14} />
+            <span>Заполнить демо-данными</span>
           </Button>
         </div>
 
@@ -563,8 +565,9 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
               marginBottom: '12px',
             }}
           >
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
-              📚 Программа курса (5 учебных модулей)
+            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <BookOpen size={16} color="var(--primary)" />
+              <span>Программа курса (5 учебных модулей)</span>
             </div>
             <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
               Отобразится в деталях карточки каталога
@@ -666,8 +669,9 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
               marginBottom: '10px',
             }}
           >
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
-              🎯 Результаты обучения (минимум 3 пункта)
+            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Target size={16} color="var(--primary)" />
+              <span>Результаты обучения (минимум 3 пункта)</span>
             </div>
             <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
               Пунктов: {outcomes.length}
@@ -681,9 +685,13 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
                 fontSize: '12px',
                 marginBottom: '10px',
                 fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
               }}
             >
-              ⚠️ {errors.outcomes}
+              <AlertTriangle size={14} />
+              <span>{errors.outcomes}</span>
             </div>
           )}
 
@@ -703,7 +711,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>✓</span>
+                  <Check size={14} color="var(--primary)" />
                   <span>{item}</span>
                 </div>
                 {outcomes.length > 3 && (
@@ -982,8 +990,20 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
           <Button type="button" variant="outline" onClick={onClose} disabled={isCreating}>
             Отмена
           </Button>
-          <Button type="submit" variant="primary" disabled={isCreating}>
-            {isCreating ? 'Создание кружка...' : '✓ Создать и опубликовать кружок'}
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={isCreating}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          >
+            {isCreating ? (
+              'Создание кружка...'
+            ) : (
+              <>
+                <Check size={15} />
+                <span>Создать и опубликовать кружок</span>
+              </>
+            )}
           </Button>
         </div>
       </form>

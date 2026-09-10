@@ -1,3 +1,15 @@
+import {
+  Check,
+  AlertTriangle,
+  Plus,
+  Sparkles,
+  User,
+  MapPin,
+  Calendar,
+  CreditCard,
+  Edit3,
+  School,
+} from 'lucide-react';
 import { useCoordinatorOverview } from './useCoordinatorOverview.js';
 import { Card, Badge, Button, Spinner } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
@@ -54,11 +66,14 @@ export function CapacityOverview() {
             border: '1px solid var(--success)',
             fontWeight: 600,
             fontSize: '14px',
-            boxShadow: 'var(--shadow-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
             animation: 'fadeIn 0.2s ease',
           }}
         >
-          ✅ {actionSuccess}
+          <Check size={16} />
+          <span>{actionSuccess}</span>
         </div>
       )}
 
@@ -72,9 +87,13 @@ export function CapacityOverview() {
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--danger)',
             fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
           }}
         >
-          ⚠️ Ошибка: {error}
+          <AlertTriangle size={16} />
+          <span>Ошибка: {error}</span>
         </div>
       )}
 
@@ -86,46 +105,47 @@ export function CapacityOverview() {
           gap: '16px',
         }}
       >
-        {/* Total Clubs & Groups */}
+        {/* Total Enrolled */}
         <Card>
-          <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Кружки и секции</div>
+          <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+            Всего зачислено учеников
+          </div>
           <div
             style={{
+              fontFamily: 'var(--font-heading)',
               fontSize: '28px',
-              fontWeight: 800,
+              fontWeight: 700,
               color: 'var(--text-primary)',
               margin: '6px 0 4px',
             }}
           >
-            {summary.totalActivities} / {summary.totalGroups}
+            {summary.totalEnrolled} / {summary.totalCapacity}
           </div>
           <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-            кружков / активных групп
+            Общая заполняемость: <strong>{summary.overallFillRate}%</strong>
           </div>
         </Card>
 
-        {/* Overall Occupancy */}
+        {/* Available Spots */}
         <Card>
           <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-            Общая заполненность школы
+            Свободных мест в кружках
           </div>
           <div
             style={{
+              fontFamily: 'var(--font-heading)',
               fontSize: '28px',
-              fontWeight: 800,
-              color: 'var(--primary)',
+              fontWeight: 700,
+              color: 'var(--success)',
               margin: '6px 0 4px',
             }}
           >
-            {summary.occupancyRate}%
+            {summary.totalAvailableSpots}
           </div>
-          <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-            <strong>{summary.totalEnrolled}</strong> из <strong>{summary.totalCapacity}</strong>{' '}
-            мест занято
-          </div>
+          <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>мест готово к записи</div>
         </Card>
 
-        {/* Full Groups Alert Zone */}
+        {/* 100% Full Groups */}
         <Card
           style={{
             borderColor: summary.fullGroupsCount > 0 ? 'var(--danger)' : 'var(--border-color)',
@@ -143,13 +163,14 @@ export function CapacityOverview() {
           </div>
           <div
             style={{
+              fontFamily: 'var(--font-heading)',
               fontSize: '28px',
-              fontWeight: 800,
+              fontWeight: 700,
               color: summary.fullGroupsCount > 0 ? 'var(--danger)' : 'var(--text-primary)',
               margin: '6px 0 4px',
             }}
           >
-            {summary.fullGroupsCount} {summary.fullGroupsCount > 0 ? '🚨' : ''}
+            {summary.fullGroupsCount}
           </div>
           <div
             style={{
@@ -181,8 +202,9 @@ export function CapacityOverview() {
           </div>
           <div
             style={{
+              fontFamily: 'var(--font-heading)',
               fontSize: '28px',
-              fontWeight: 800,
+              fontWeight: 700,
               color: summary.totalWaitlistCount > 0 ? 'var(--accent-coral)' : 'var(--text-primary)',
               margin: '6px 0 4px',
             }}
@@ -231,11 +253,10 @@ export function CapacityOverview() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              fontWeight: 700,
-              boxShadow: 'var(--shadow-sm)',
+              fontWeight: 600,
             }}
           >
-            + Создать кружок
+            <Plus size={15} /> Создать кружок
           </Button>
         </div>
 
@@ -245,23 +266,23 @@ export function CapacityOverview() {
             style={{
               marginBottom: '22px',
               padding: '16px',
-              backgroundColor: 'var(--primary-light)',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px dashed var(--primary)',
+              backgroundColor: 'var(--bg-subtle)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px dashed var(--border-color)',
             }}
           >
             <div
               style={{
-                fontSize: '14px',
-                fontWeight: 700,
-                color: 'var(--primary)',
+                fontSize: '13.5px',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
                 marginBottom: '10px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
               }}
             >
-              <span>✨</span>
+              <Sparkles size={15} color="var(--primary)" />
               <span>Новые кружки без сформированных групп:</span>
             </div>
             <div
@@ -284,7 +305,6 @@ export function CapacityOverview() {
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      boxShadow: 'var(--shadow-sm)',
                     }}
                   >
                     <div>
@@ -299,24 +319,26 @@ export function CapacityOverview() {
                         <Badge variant="info" style={{ fontSize: '11px' }}>
                           {act.category}
                         </Badge>
-                        <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
                           {act.price === 0 ? 'Бесплатно' : formatCurrency(act.price)}
                         </span>
                       </div>
-                      <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '6px' }}>
+                      <div style={{ fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '14px', marginBottom: '6px', color: 'var(--text-primary)' }}>
                         {act.title}
                       </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-                        👨‍🏫 {act.teacherName} &bull; 📍 {act.location}
+                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><User size={12} /> {act.teacherName}</span>
+                        <span>•</span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><MapPin size={12} /> {act.location}</span>
                       </div>
                     </div>
                     <Button
                       size="sm"
                       variant="primary"
                       onClick={() => openCreateGroup(act)}
-                      style={{ width: '100%', justifyContent: 'center', fontSize: '12.5px' }}
+                      style={{ width: '100%', justifyContent: 'center', fontSize: '12.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
                     >
-                      + Открыть первую группу
+                      <Plus size={14} /> Открыть первую группу
                     </Button>
                   </div>
                 ))}
@@ -326,8 +348,8 @@ export function CapacityOverview() {
 
         {groups.length === 0 ? (
           <Card style={{ textAlign: 'center', padding: '48px 24px' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🏫</div>
-            <h3 style={{ margin: '0 0 8px', color: 'var(--text-primary)' }}>
+            <School size={40} color="var(--text-muted)" style={{ margin: '0 auto 12px' }} />
+            <h3 style={{ fontFamily: 'var(--font-heading)', margin: '0 0 8px', color: 'var(--text-primary)' }}>
               Нет активных учебных групп
             </h3>
             <p
@@ -342,8 +364,12 @@ export function CapacityOverview() {
             >
               Создайте новый кружок или откройте учебную группу для существующей школьной секции.
             </p>
-            <Button variant="primary" onClick={openCreateActivity}>
-              + Создать первый кружок
+            <Button
+              variant="primary"
+              onClick={openCreateActivity}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <Plus size={15} /> Создать первый кружок
             </Button>
           </Card>
         ) : (
@@ -367,11 +393,10 @@ export function CapacityOverview() {
               <Card
                 key={group.id}
                 style={{
-                  borderRadius: 'var(--radius-lg)',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  borderTop: `4px solid ${group.statusColor}`,
+                  borderLeft: `3px solid ${group.statusColor}`,
                 }}
               >
                 <div>
@@ -391,19 +416,21 @@ export function CapacityOverview() {
                           backgroundColor: 'var(--accent-coral-light)',
                           color: 'var(--accent-coral)',
                           border: '1px solid var(--accent-coral)',
-                          padding: '2px 8px',
-                          borderRadius: '9999px',
-                          fontSize: '11.5px',
-                          fontWeight: 700,
+                          padding: '2px 6px',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '11px',
+                          fontFamily: 'var(--font-mono)',
+                          fontWeight: 600,
                         }}
                       >
-                        Очередь: {group.waitlistCount} чел.
+                        WAITLIST: {group.waitlistCount}
                       </span>
                     )}
                   </div>
 
                   <h4
                     style={{
+                      fontFamily: 'var(--font-heading)',
                       margin: '0 0 4px',
                       fontSize: '17px',
                       fontWeight: 700,
@@ -433,16 +460,25 @@ export function CapacityOverview() {
                       marginBottom: '14px',
                     }}
                   >
-                    <div>
-                      📅 <strong>Расписание:</strong> {formatDaysOfWeek(group.daysOfWeek)}{' '}
-                      {group.startTime}–{group.endTime}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Calendar size={13} style={{ flexShrink: 0 }} />
+                      <span>
+                        <strong>Расписание:</strong> {formatDaysOfWeek(group.daysOfWeek)}{' '}
+                        {group.startTime}–{group.endTime}
+                      </span>
                     </div>
-                    <div>
-                      📍 <strong>Кабинет:</strong> {group.location}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <MapPin size={13} style={{ flexShrink: 0 }} />
+                      <span>
+                        <strong>Кабинет:</strong> {group.location}
+                      </span>
                     </div>
-                    <div>
-                      💳 <strong>Стоимость:</strong>{' '}
-                      {group.price === 0 ? 'Бесплатно' : formatCurrency(group.price)}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <CreditCard size={13} style={{ flexShrink: 0 }} />
+                      <span>
+                        <strong>Стоимость:</strong>{' '}
+                        {group.price === 0 ? 'Бесплатно' : formatCurrency(group.price)}
+                      </span>
                     </div>
                   </div>
 
@@ -452,23 +488,24 @@ export function CapacityOverview() {
                       style={{
                         display: 'flex',
                         justifyContent: 'space-between',
-                        fontSize: '12.5px',
+                        fontSize: '12px',
+                        fontFamily: 'var(--font-mono)',
                         fontWeight: 600,
                         marginBottom: '6px',
                       }}
                     >
-                      <span style={{ color: 'var(--text-secondary)' }}>Заполненность</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>SEATS</span>
                       <span style={{ color: group.statusColor }}>
-                        {enrolled} / {capacity} мест ({percent}%)
+                        {enrolled} / {capacity} ({percent}%)
                       </span>
                     </div>
 
                     <div
                       style={{
                         width: '100%',
-                        height: '8px',
+                        height: '6px',
                         backgroundColor: 'var(--bg-subtle)',
-                        borderRadius: '9999px',
+                        borderRadius: 'var(--radius-sm)',
                         overflow: 'hidden',
                       }}
                     >
@@ -477,7 +514,7 @@ export function CapacityOverview() {
                           width: `${Math.min(100, percent)}%`,
                           height: '100%',
                           backgroundColor: group.statusColor,
-                          borderRadius: '9999px',
+                          borderRadius: 'var(--radius-sm)',
                           transition: 'width 0.3s ease',
                         }}
                       />
@@ -498,18 +535,18 @@ export function CapacityOverview() {
                     size="sm"
                     variant="outline"
                     onClick={() => openEditCapacity(group)}
-                    style={{ flex: 1, justifyContent: 'center' }}
+                    style={{ flex: 1, justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px' }}
                   >
-                    ✏️ Лимит мест
+                    <Edit3 size={13} /> Лимит мест
                   </Button>
 
                   <Button
                     size="sm"
                     variant="secondary"
                     onClick={() => openCreateGroup(parentActivity)}
-                    style={{ flex: 1, justifyContent: 'center' }}
+                    style={{ flex: 1, justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '6px' }}
                   >
-                    + Новая группа
+                    <Plus size={13} /> Новая группа
                   </Button>
                 </div>
               </Card>
