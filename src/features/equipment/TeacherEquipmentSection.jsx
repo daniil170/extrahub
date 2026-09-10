@@ -4,7 +4,7 @@ import { useEquipmentIssues } from './useEquipmentIssues.js';
 import { EquipmentIssueCard } from './EquipmentIssueCard.jsx';
 import { CreateIssueModal } from './CreateIssueModal.jsx';
 import { IssueDetailsModal } from './IssueDetailsModal.jsx';
-import { Button, Spinner, Card } from '../../shared/ui/index.js';
+import { Button, Spinner, Card, IconPlus, IconWrench, IconClock } from '../../shared/ui/index.js';
 
 /**
  * Teacher equipment section component with list of teacher's issues and creation form
@@ -50,8 +50,8 @@ export function TeacherEquipmentSection() {
         }}
       >
         <div>
-          <h3 style={{ fontSize: '18px', fontWeight: 600, margin: '0 0 4px 0' }}>
-            🛠️ Заявки на ремонт оборудования
+          <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>
+            Заявки на ремонт оборудования
           </h3>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
             Сообщайте о неисправностях мебели, компьютеров, освещения и сантехники в кабинетах
@@ -61,66 +61,93 @@ export function TeacherEquipmentSection() {
         <Button
           variant="primary"
           onClick={() => setCreateModalOpen(true)}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '9px 18px',
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+            fontWeight: 600,
+            fontSize: '14px',
+            borderRadius: 'var(--radius-sm)',
+          }}
         >
-          <span>➕</span>
+          <IconPlus size={17} />
           <span>Подать заявку</span>
         </Button>
       </div>
 
-      {/* Filter Tabs */}
+      {/* Filter Tabs & Retention Notice */}
       <div
         style={{
           display: 'flex',
-          gap: '8px',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
           marginBottom: '20px',
           borderBottom: '1px solid var(--border-color)',
           paddingBottom: '8px',
-          overflowX: 'auto',
+          flexWrap: 'wrap',
         }}
       >
-        {[
-          { id: 'all', label: 'Все мои заявки', count: statusCounts.all },
-          { id: 'new', label: 'Новые', count: statusCounts.new },
-          { id: 'in_progress', label: 'В работе', count: statusCounts.in_progress },
-          { id: 'resolved', label: 'Закрытые', count: statusCounts.resolved },
-        ].map((tab) => {
-          const isActive = filters.status === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setStatusFilter(tab.id)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-sm)',
-                border: 'none',
-                backgroundColor: isActive ? 'var(--primary)' : 'transparent',
-                color: isActive ? '#ffffff' : 'var(--text-secondary)',
-                fontWeight: isActive ? 600 : 500,
-                fontSize: '13px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <span>{tab.label}</span>
-              <span
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto' }}>
+          {[
+            { id: 'all', label: 'Все мои заявки', count: statusCounts.all },
+            { id: 'new', label: 'Новые', count: statusCounts.new },
+            { id: 'in_progress', label: 'В работе', count: statusCounts.in_progress },
+            { id: 'resolved', label: 'Закрытые', count: statusCounts.resolved },
+          ].map((tab) => {
+            const isActive = filters.status === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setStatusFilter(tab.id)}
                 style={{
-                  fontSize: '11px',
-                  padding: '1px 6px',
-                  borderRadius: '999px',
-                  backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'var(--bg-subtle)',
-                  color: isActive ? '#ffffff' : 'var(--text-muted)',
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: 'none',
+                  backgroundColor: isActive ? 'var(--primary)' : 'transparent',
+                  color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                  fontWeight: isActive ? 600 : 500,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease',
                 }}
               >
-                {tab.count}
-              </span>
-            </button>
-          );
-        })}
+                <span>{tab.label}</span>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    padding: '1px 6px',
+                    borderRadius: '999px',
+                    backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'var(--bg-subtle)',
+                    color: isActive ? '#ffffff' : 'var(--text-muted)',
+                  }}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '12px',
+            color: 'var(--text-muted)',
+          }}
+          title="Регламент школы: закрытые заявки остаются на панели 7 дней для контроля, после чего переносятся в архив"
+        >
+          <IconClock size={13} />
+          <span>Срок хранения закрытых: 7 дней</span>
+        </div>
       </div>
 
       {/* Loading state */}
@@ -143,7 +170,21 @@ export function TeacherEquipmentSection() {
             border: '1px dashed var(--border-color)',
           }}
         >
-          <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔧</div>
+          <div
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--primary-light)',
+              color: 'var(--primary)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '14px',
+            }}
+          >
+            <IconWrench size={28} />
+          </div>
           <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px' }}>
             {filters.status === 'all'
               ? 'У вас пока нет активных заявок на ремонт'
@@ -152,8 +193,14 @@ export function TeacherEquipmentSection() {
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', maxWidth: '440px', margin: '0 auto 16px' }}>
             Если в вашем кабинете возникла проблема с проектором, партой, розеткой или сантехникой — создайте заявку, и дежурный завхоз приступит к ремонту.
           </p>
-          <Button variant="primary" size="sm" onClick={() => setCreateModalOpen(true)}>
-            Подать первую заявку
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setCreateModalOpen(true)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+          >
+            <IconPlus size={15} />
+            <span>Подать первую заявку</span>
           </Button>
         </div>
       ) : (
