@@ -28,7 +28,7 @@
 | :---------- | :---------- | :----------- | :----------------------------------------------------------------------------- |
 | `id`        | `string`    | Да           | Идентификатор пользователя (`uid`)                                             |
 | `fullName`  | `string`    | Да           | Полное имя (макс. 100 символов)                                                |
-| `role`      | `string`    | Да           | Роль: `'student'` \| `'parent'` \| `'teacher'` \| `'coordinator'` \| `'admin'` |
+| `role`      | `string`    | Да           | Роль: `'student'` \| `'parent'` \| `'teacher'` \| `'coordinator'` \| `'admin'` \| `'technician'` |
 | `email`     | `string`    | Да           | Электронная почта                                                              |
 | `phone`     | `string`    | Нет          | Номер телефона                                                                 |
 | `status`    | `string`    | Да           | Статус: `'active'` \| `'inactive'` \| `'suspended'`                            |
@@ -211,6 +211,47 @@
 
 ---
 
+### 2.12. `equipmentIssues` (`equipmentIssues/{issueId}`)
+
+Заявки учителей на ремонт и техническое обслуживание школьного оборудования.
+
+| Поле                | Тип         | Обязательное | Описание / Ограничения                                                                |
+| :------------------ | :---------- | :----------- | :------------------------------------------------------------------------------------ |
+| `id`                | `string`    | Да           | Уникальный идентификатор заявки                                                       |
+| `title`             | `string`    | Да           | Краткое название поломки (макс. 150 символов)                                         |
+| `description`       | `string`    | Да           | Подробное описание неисправности                                                      |
+| `location`          | `string`    | Да           | Кабинет или помещение (например, `"Кабинет 304"`, `"Спортзал"`)                       |
+| `category`          | `string`    | Да           | `'furniture'` \| `'hardware'` \| `'plumbing'` \| `'electrical'` \| `'other'`          |
+| `priority`          | `string`    | Да           | Уровень критичности: `'low'` \| `'medium'` \| `'high'` \| `'critical'`                |
+| `status`            | `string`    | Да           | Статус заявки: `'new'` \| `'in_progress'` \| `'resolved'` \| `'cancelled'`            |
+| `reportedBy`        | `string`    | Да           | `userId` учителя, создавшего заявку                                                   |
+| `reportedByName`    | `string`    | Нет          | ФИО учителя (денормализовано для быстрых списков)                                     |
+| `assignedTo`        | `string`    | Нет          | `userId` техника, взявшего заявку в работу (`null` если не назначено)                 |
+| `assignedToName`    | `string`    | Нет          | ФИО техника (денормализовано)                                                         |
+| `photoUrl`          | `string`    | Нет          | URL / base64-превью фото поломки                                                      |
+| `createdAt`         | `timestamp` | Да           | Дата и время создания заявки                                                          |
+| `updatedAt`         | `timestamp` | Да           | Время последнего изменения статуса / данных                                           |
+| `resolvedAt`        | `timestamp` | Нет          | Время закрытия заявки                                                                 |
+| `resolutionComment` | `string`    | Нет          | Комментарий техника о выполненной работе (обязателен при переходе в статус `resolved`)|
+
+---
+
+### 2.13. `issueComments` (`equipmentIssues/{issueId}/comments/{commentId}`)
+
+Переписка и уточнения между учителем и техником по конкретной заявке.
+
+| Поле         | Тип         | Обязательное | Описание / Ограничения                       |
+| :----------- | :---------- | :----------- | :------------------------------------------- |
+| `id`         | `string`    | Да           | Уникальный идентификатор комментария         |
+| `issueId`    | `string`    | Да           | ID заявки на ремонт                          |
+| `authorId`   | `string`    | Да           | `userId` автора комментария                  |
+| `authorName` | `string`    | Да           | ФИО автора сообщения                         |
+| `authorRole` | `string`    | Да           | Роль: `'teacher'` \| `'technician'` \| `'admin'` |
+| `text`       | `string`    | Да           | Текст комментария                            |
+| `createdAt`  | `timestamp` | Да           | Время отправки сообщения                     |
+
+---
+
 ## 3. Составные индексы (Composite Indexes)
 
 Для эффективного выполнения сложных запросов настроены следующие composite indexes:
@@ -230,3 +271,7 @@
    - `studentId` (ASC), `status` (ASC), `dueDate` (ASC) — неоплаченные счета ученика.
 6. **`parentInvites`**:
    - `token` (ASC), `status` (ASC) — поиск и валидация инвайта по токену.
+7. **`equipmentIssues`**:
+   - `status` (ASC), `priority` (ASC), `createdAt` (DESC) — канбан-доска техника с сортировкой по критичности.
+   - `reportedBy` (ASC), `status` (ASC), `createdAt` (DESC) — список заявок конкретного учителя.
+   - `assignedTo` (ASC), `status` (ASC), `updatedAt` (DESC) — заявки в работе у назначенного техника.

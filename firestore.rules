@@ -41,6 +41,10 @@ service cloud.firestore {
       return isAuthenticated() && getUserRole() == 'admin';
     }
 
+    function isTechnician() {
+      return isAuthenticated() && getUserRole() == 'technician';
+    }
+
     function isParentOfStudent(studentId) {
       return isAuthenticated() &&
         exists(/databases/$(database)/documents/students/$(studentId)) &&
@@ -239,6 +243,71 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']);
 
       allow create, delete: if isCoordinator();
+    }
+
+    // ==========================================
+    // EQUIPMENT ISSUES COLLECTION
+    // ==========================================
+    match /equipmentIssues/{issueId} {
+      // Teacher can read only their own issues, technician can read all, admin has full access
+      allow read: if isAuthenticated() && (
+        (isTeacher() && resource.data.reportedBy == request.auth.uid) ||
+        isTechnician() ||
+        isAdmin()
+      );
+
+      // Teacher can create new issues with themselves as reportedBy and status 'new'
+      allow create: if isAuthenticated() && (
+        (
+          isTeacher() &&
+          request.resource.data.reportedBy == request.auth.uid &&
+          request.resource.data.status == 'new'
+        ) ||
+        isAdmin()
+      );
+
+      // Technician can update status, assignedTo, resolutionComment, resolvedAt, updatedAt
+      // Teacher can update status to 'cancelled' on their own issue
+      // Admin has full access
+      allow update: if isAuthenticated() && (
+        (
+          isTechnician() &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['reportedBy', 'createdAt'])
+        ) ||
+        (
+          isTeacher() &&
+          resource.data.reportedBy == request.auth.uid &&
+          request.resource.data.status in ['cancelled'] &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['reportedBy', 'createdAt', 'assignedTo'])
+        ) ||
+        isAdmin()
+      );
+
+      allow delete: if isAdmin();
+
+      // Nested comments on equipment issues
+      match /comments/{commentId} {
+        allow read: if isAuthenticated() && (
+          (isTeacher() && get(/databases/$(database)/documents/equipmentIssues/$(issueId)).data.reportedBy == request.auth.uid) ||
+          isTechnician() ||
+          isAdmin()
+        );
+
+        allow create: if isAuthenticated() && (
+          (
+            isTeacher() &&
+            get(/databases/$(database)/documents/equipmentIssues/$(issueId)).data.reportedBy == request.auth.uid &&
+            request.resource.data.authorId == request.auth.uid
+          ) ||
+          (
+            isTechnician() &&
+            request.resource.data.authorId == request.auth.uid
+          ) ||
+          isAdmin()
+        );
+
+        allow update, delete: if isAdmin();
+      }
     }
   }
 }
