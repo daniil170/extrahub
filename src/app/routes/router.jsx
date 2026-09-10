@@ -13,6 +13,7 @@ import {
   TeacherDashboard,
   CoordinatorDashboard,
 } from '../../features/dashboard/index.js';
+import { TeacherEquipmentPage, TechnicianDashboard } from '../../features/equipment/index.js';
 import { DashboardRedirect } from './DashboardRedirect.jsx';
 
 export const router = createBrowserRouter([
@@ -69,10 +70,26 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'teacher/equipment',
+        element: (
+          <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+            <TeacherEquipmentPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: 'coordinator',
         element: (
           <ProtectedRoute allowedRoles={['coordinator', 'admin']}>
             <CoordinatorDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'technician',
+        element: (
+          <ProtectedRoute allowedRoles={['technician', 'admin']}>
+            <TechnicianDashboard />
           </ProtectedRoute>
         ),
       },
