@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import {
   ISSUE_PRIORITY_META,
   ISSUE_STATUS_META,
   ISSUE_CATEGORY_META,
 } from '../../entities/equipmentIssue/model.js';
-import { Card, Badge, Button } from '../../shared/ui/index.js';
+import { Card, Badge, Button, IconMapPin, IconWrench, IconCheck } from '../../shared/ui/index.js';
 import { formatDate } from '../../shared/utils/date.js';
 
 /**
@@ -26,90 +27,102 @@ export function EquipmentIssueCard({
   onOpenResolveModal,
   onCancelIssue,
 }) {
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
   const priorityMeta = ISSUE_PRIORITY_META[issue.priority] || ISSUE_PRIORITY_META.medium;
   const statusMeta = ISSUE_STATUS_META[issue.status] || ISSUE_STATUS_META.new;
   const categoryMeta = ISSUE_CATEGORY_META[issue.category] || ISSUE_CATEGORY_META.other;
 
   const isCritical = issue.priority === 'critical';
-  const isTechnicianOrAdmin = currentUserRole === 'technician' || currentUserRole === 'admin';
+  const isTechnician = currentUserRole === 'technician';
   const isOwnerTeacher = issue.reportedBy === currentUserId && currentUserRole === 'teacher';
 
-  const cardBorderColor = isCritical
+  const cardBorderColor = isCritical && issue.status !== 'resolved'
     ? 'var(--danger)'
     : issue.status === 'in_progress'
       ? 'var(--warning)'
       : 'var(--border-color)';
 
   const cardBackground = isCritical && issue.status !== 'resolved'
-    ? 'rgba(230, 57, 70, 0.04)'
+    ? 'rgba(230, 57, 70, 0.03)'
     : 'var(--bg-surface)';
 
   return (
     <Card
       style={{
-        border: `1.5px solid ${cardBorderColor}`,
+        border: `1px solid ${cardBorderColor}`,
         backgroundColor: cardBackground,
         boxShadow: isCritical && issue.status !== 'resolved'
-          ? '0 0 12px rgba(230, 57, 70, 0.18)'
+          ? '0 2px 8px rgba(230, 57, 70, 0.12)'
           : 'var(--shadow-sm)',
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
         position: 'relative',
-        transition: 'all 0.2s ease',
+        transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+        padding: '16px 18px',
       }}
     >
-      {/* Priority Banner for Critical */}
-      {isCritical && issue.status !== 'resolved' && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            backgroundColor: 'var(--danger)',
-            color: '#ffffff',
-            padding: '4px 10px',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '0.4px',
-            textTransform: 'uppercase',
-            width: 'fit-content',
-          }}
-        >
-          <span>🚨</span>
-          <span>Требует немедленного внимания</span>
-        </div>
-      )}
+      {/* Top Tag & Badges Row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span
+            style={{
+              fontSize: '11.5px',
+              fontWeight: 600,
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'var(--bg-subtle)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            {categoryMeta.label}
+          </span>
 
-      {/* Header: Title and Badges */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '15px' }} title={categoryMeta.label}>
-              {categoryMeta.icon}
-            </span>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-              {categoryMeta.label}
-            </span>
-            <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>•</span>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-              📍 <b>{issue.location}</b>
-            </span>
-          </div>
-
-          <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0, lineHeight: 1.3 }}>
-            {issue.title}
-          </h4>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '12px',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <IconMapPin size={13} style={{ color: 'var(--text-muted)' }} />
+            <span>{issue.location}</span>
+          </span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }}>
-          <Badge variant={statusMeta.badgeVariant}>{statusMeta.label}</Badge>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Badge variant={priorityMeta.badgeVariant}>
-            {priorityMeta.icon} {priorityMeta.label}
+            <span
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: priorityMeta.color,
+                display: 'inline-block',
+                marginRight: '5px',
+              }}
+            />
+            {priorityMeta.label}
           </Badge>
+          <Badge variant={statusMeta.badgeVariant}>{statusMeta.label}</Badge>
         </div>
       </div>
+
+      {/* Title */}
+      <h4
+        style={{
+          fontSize: '15px',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          margin: 0,
+          lineHeight: 1.35,
+        }}
+      >
+        {issue.title}
+      </h4>
 
       {/* Description */}
       <p
@@ -132,10 +145,10 @@ export function EquipmentIssueCard({
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <img
             src={issue.photoUrl}
-            alt="Превью неисправности"
+            alt="Фото неисправности"
             style={{
-              width: '60px',
-              height: '60px',
+              width: '56px',
+              height: '56px',
               objectFit: 'cover',
               borderRadius: 'var(--radius-sm)',
               border: '1px solid var(--border-color)',
@@ -144,11 +157,11 @@ export function EquipmentIssueCard({
             onClick={() => onOpenDetails && onOpenDetails(issue)}
             title="Нажмите для увеличения"
           />
-          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Прикреплено фото поломки</span>
+          <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>Прикреплено фото</span>
         </div>
       )}
 
-      {/* Resolution Box if resolved */}
+      {/* Resolution Report Box if resolved */}
       {issue.status === 'resolved' && issue.resolutionComment && (
         <div
           style={{
@@ -160,7 +173,7 @@ export function EquipmentIssueCard({
           }}
         >
           <div style={{ fontWeight: 600, color: 'var(--success)', marginBottom: '2px' }}>
-            ✓ Решение техника:
+            Отчёт о решении:
           </div>
           <div style={{ color: 'var(--text-primary)' }}>{issue.resolutionComment}</div>
         </div>
@@ -181,10 +194,10 @@ export function EquipmentIssueCard({
         }}
       >
         <div>
-          <span>Сообщил: <b>{issue.reportedByName || 'Учитель'}</b></span>
+          <span>Заявитель: <b>{issue.reportedByName || 'Учитель'}</b></span>
           {issue.assignedToName && (
             <span style={{ marginLeft: '8px' }}>
-              • Мастер: <b>{issue.assignedToName}</b>
+              • Исполнитель: <b>{issue.assignedToName}</b>
             </span>
           )}
         </div>
@@ -199,7 +212,7 @@ export function EquipmentIssueCard({
           justifyContent: 'flex-end',
           gap: '8px',
           flexWrap: 'wrap',
-          marginTop: '4px',
+          marginTop: '2px',
         }}
       >
         <Button
@@ -210,42 +223,91 @@ export function EquipmentIssueCard({
           Подробнее / Чат
         </Button>
 
-        {/* Technician quick action: Take in work */}
-        {isTechnicianOrAdmin && issue.status === 'new' && (
+        {/* Technician action: Take in work (NOT available for admin) */}
+        {isTechnician && issue.status === 'new' && (
           <Button
             size="sm"
             variant="primary"
             onClick={() => onTakeIntoWork && onTakeIntoWork(issue.id)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            🛠️ Взять в работу
+            <IconWrench size={13} />
+            <span>Взять в работу</span>
           </Button>
         )}
 
-        {/* Technician quick action: Resolve */}
-        {isTechnicianOrAdmin && issue.status === 'in_progress' && (
+        {/* Technician action: Resolve (NOT available for admin) */}
+        {isTechnician && issue.status === 'in_progress' && (
           <Button
             size="sm"
             style={{
               backgroundColor: 'var(--success)',
               color: '#ffffff',
               border: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
             }}
             onClick={() => onOpenResolveModal && onOpenResolveModal(issue)}
           >
-            ✓ Закрыть заявку
+            <IconCheck size={14} />
+            <span>Закрыть заявку</span>
           </Button>
         )}
 
-        {/* Teacher action: Cancel new issue */}
+        {/* Teacher action: Cancel new issue with confirmation */}
         {isOwnerTeacher && issue.status === 'new' && (
-          <Button
-            size="sm"
-            variant="outline"
-            style={{ color: 'var(--danger)', borderColor: 'var(--border-color)' }}
-            onClick={() => onCancelIssue && onCancelIssue(issue.id)}
-          >
-            Отменить
-          </Button>
+          confirmCancel ? (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '11px', color: 'var(--danger)' }}>Отменить?</span>
+              <button
+                type="button"
+                onClick={() => {
+                  onCancelIssue && onCancelIssue(issue.id);
+                  setConfirmCancel(false);
+                }}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: 'none',
+                  backgroundColor: 'var(--danger)',
+                  color: '#ffffff',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Да
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmCancel(false)}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--text-secondary)',
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                }}
+              >
+                Нет
+              </button>
+            </div>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              style={{
+                color: 'var(--text-muted)',
+                borderColor: 'var(--border-color)',
+              }}
+              onClick={() => setConfirmCancel(true)}
+            >
+              Отменить
+            </Button>
+          )
         )}
       </div>
     </Card>
