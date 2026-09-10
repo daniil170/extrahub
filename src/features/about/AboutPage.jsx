@@ -1,526 +1,625 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  ChevronDown,
+  Check,
+  ArrowRight,
+  Clock,
+  Layers,
+  Users,
+  ShieldCheck,
+  Calendar,
+  Wrench,
+  AlertTriangle,
+  BarChart3,
+  Activity,
+  Archive,
+  CreditCard,
+  GraduationCap,
+  UserCheck,
   Code,
   Lightbulb,
   TrendingUp,
-  GraduationCap,
-  Users,
-  UserCheck,
-  ClipboardList,
-  Rocket,
-  Check,
-  ShieldCheck,
+  Sparkles,
 } from 'lucide-react';
-import { Card, Badge, PageHeader } from '../../shared/ui/index.js';
+import { Button } from '../../shared/ui/index.js';
+import './AboutPage.css';
+
+/**
+ * Reusable Apple-style Expandable Card with CSS grid auto-height transition
+ */
+function AppleExpandableCard({
+  id,
+  title,
+  teaser,
+  icon: IconComponent,
+  details = [],
+  tags = [],
+  isExpanded,
+  onToggle,
+}) {
+  return (
+    <div className={`apple-expandable-card ${isExpanded ? 'is-expanded' : ''}`}>
+      <button
+        type="button"
+        className="apple-card-trigger"
+        onClick={() => onToggle(id)}
+        aria-expanded={isExpanded}
+        aria-controls={`card-content-${id}`}
+      >
+        <div className="apple-card-header-left">
+          <div className="apple-card-icon-box">
+            <IconComponent size={22} strokeWidth={1.8} />
+          </div>
+          <div className="apple-card-titles">
+            <h3 className="apple-card-title">{title}</h3>
+            <p className="apple-card-teaser">{teaser}</p>
+          </div>
+        </div>
+
+        <div className="apple-card-chevron-btn" aria-hidden="true">
+          <ChevronDown size={18} strokeWidth={2} />
+        </div>
+      </button>
+
+      <div
+        id={`card-content-${id}`}
+        className="apple-card-content"
+        role="region"
+        aria-label={title}
+      >
+        <div className="apple-card-inner">
+          <div className="apple-card-divider" />
+          <ul className="apple-card-details-list">
+            {details.map((detail, idx) => (
+              <li key={idx} className="apple-card-detail-item">
+                <Check size={16} strokeWidth={2.2} className="apple-card-detail-icon" />
+                <span>{detail}</span>
+              </li>
+            ))}
+          </ul>
+
+          {tags.length > 0 && (
+            <div className="apple-card-tags">
+              {tags.map((tag, tIdx) => (
+                <span key={tIdx} className="apple-card-tag">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function AboutPage() {
-  const teamMembers = [
+  // Track open card IDs (supports opening multiple cards cleanly)
+  const [expandedCards, setExpandedCards] = useState(() => ({
+    'club-hold': true,
+    'tech-kanban': true,
+    'role-student': true,
+  }));
+
+  const handleToggleCard = (cardId) => {
+    setExpandedCards((prev) => ({
+      ...prev,
+      [cardId]: !prev[cardId],
+    }));
+  };
+
+  // Scroll reveal setup: Single-shot entrance observer
+  useEffect(() => {
+    const revealElements = document.querySelectorAll('.about-reveal');
+    if (!revealElements.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      revealElements.forEach((el) => el.classList.add('is-visible'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            obs.unobserve(entry.target); // Reveal once only
+          }
+        });
+      },
+      {
+        rootMargin: '0px 0px -60px 0px',
+        threshold: 0.1,
+      }
+    );
+
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Module 1: Clubs & Extracurricular Activities features
+  const clubFeatures = [
     {
-      id: 'daniil',
-      name: 'Ivakin Daniil (Даниил Ивакин)',
-      role: 'Lead Software Engineer & System Architect',
-      tag: 'Разработка всей платформы',
-      tagVariant: 'info',
-      avatarIcon: Code,
-      bio: 'Архитектор и ведущий разработчик программного комплекса ExtraHub. Спроектировал и реализовал систему с нуля, объединив передовые инженерные практики веб-разработки.',
-      achievements: [
-        'Архитектура и FSD: спроектировал модульную клиентскую архитектуру по методологии Feature-Sliced Design (FSD) на React 19 и Vite с полной изоляцией слоёв (shared, features, entities, app).',
-        'Backend & Cloud Engine: спроектировал схему данных Google Cloud Firestore, Security Rules с разграничением прав на уровне коллекций и Cloud Functions для обработки транзакций.',
-        'Движок удержания мест и очередей (Hold & Waitlist Engine): реализовал алгоритм 24-часового бронирования мест с защитой от двойной записи (race condition) и автоматическим продвижением листа ожидания.',
-        '5 специализированных интерфейсов: создал личные кабинеты ученика, родителя, журнал преподавателя, панель координатора и панель администратора.',
-        'Биллинг в тенге (₸): разработал модуль автоматического и пакетного выставления счетов по группам и подтверждения офлайн-платежей наличными.',
-        'UX, Тёмная тема и мобильность: создал адаптивную тему на CSS-переменных без мерцания (zero FOUT), динамический векторный брендинг и удобную вёрстку для смартфонов.',
-        'Качество кода: покрыл ключевые сценарии 25 модульными тестами (Vitest, 100% pass), настроил линтинг ESLint и написал скрипт сидирования реалистичных данных школы.',
+      id: 'club-hold',
+      title: '24-часовой холд места',
+      teaser: 'Интеллектуальное резервирование с защитой от двойной записи и таймером для родителя.',
+      icon: Clock,
+      details: [
+        'Изолированная Cloud Function транзакция исключает переполнение группы (race conditions).',
+        'Персональная ссылка и динамический QR-код для моментального подтверждения в WhatsApp или Telegram.',
+        'Обратный отсчёт времени синхронизирован с сервером с точностью до секунды.',
       ],
+      tags: ['HOLD ENGINE', 'CLOUD TRANSACTION', 'ZERO RACE-CONDITION'],
     },
     {
-      id: 'amir',
-      name: 'Amir Timurbulat (Амир Тимурбулат)',
-      role: 'Product Idea & Lead UX/Market Researcher',
-      tag: 'Идея продукта и исследования',
-      tagVariant: 'success',
-      avatarIcon: Lightbulb,
-      bio: 'Инициатор создания ExtraHub и руководитель продуктовых исследований. Сформулировал фундаментальную идею единого хаба внеурочной школьной деятельности.',
-      achievements: [
-        'Исследование потребностей школ (CustDev): провёл серию глубинных интервью с администрацией школ, завучами по воспитательной работе, родителями и школьниками.',
-        'Формулирование продуктовой концепции: выявил ключевые «боли» традиционной системы — потерю заявлений на бумаге, путаницу в очередях на популярные кружки и срывы сбора оплат.',
-        'Проектирование пользовательских путей (CJM): разработал сценарии взаимодействия для каждого участника школьного процесса, включая безопасную авторизацию родителей по токенам приглашения без регистрации.',
-        'Механика геймификации: заложил систему поощрения школьников бейджами («100% дисциплина», «Хакатон-мастер») для повышения вовлечённости и посещаемости.',
+      id: 'club-waitlist',
+      title: 'Автоматический Waitlist',
+      teaser: 'Динамическая очередь ожидания с моментальным переходом при освобождении мест.',
+      icon: Layers,
+      details: [
+        'При отмене брони место мгновенно передается первому кандидату в очереди с запуском нового 24ч окна.',
+        'Ученик и родители всегда видят точный номер своей позиции в очереди без звонков завучу.',
+        'Аналитика спроса подсказывает координатору, когда необходимо открыть параллельную секцию.',
       ],
+      tags: ['FIFO QUEUE', 'AUTO PROMOTION', 'CAPACITY PLANNING'],
     },
     {
-      id: 'maulen',
-      name: 'Maulen Stanbaev (Маулен Станбаев)',
-      role: 'Head of Marketing & Business Development',
-      tag: 'Маркетинг и переговоры',
-      tagVariant: 'warning',
-      avatarIcon: TrendingUp,
-      bio: 'Директор по маркетингу и развитию партнёрских отношений. Отвечает за стратегию вывода ExtraHub на рынок, переговоры со школами и презентацию ценности продукта.',
-      achievements: [
-        'Переговоры с администрацией школ: организует встречи с директорами и завучами учебных заведений, проводит демонстрации возможностей платформы ExtraHub.',
-        'Маркетинговая стратегия: разработал позиционирование платформы как передового инструмента цифровой трансформации внеучебной работы школы.',
-        'Презентация ценности и метрик: наглядно демонстрирует администрации сокращение времени координатора на 80% и 100% прозрачность сборов денежных средств.',
-        'Партнёрская сеть и пилотные запуски: формирует воронку пилотных внедрений ExtraHub в государственных и частных школах Республики Казахстан.',
+      id: 'club-journal',
+      title: 'Электронный журнал в 1 клик',
+      teaser: 'Фиксация посещаемости за 30 секунд с поддержкой 4 статусов и автосводкой.',
+      icon: Calendar,
+      details: [
+        'Удобный интерфейс выбора: «Присутствовал», «Отсутствовал», «Опоздал», «Уважительная причина».',
+        'Кнопка «Отметить всех присутствующими» экономит до 90% рутинного времени педагога.',
+        'Мгновенное сохранение в журнал с подтверждающими уведомлениями и историей по датам.',
       ],
+      tags: ['1-CLICK JOURNAL', 'ATTENDANCE TRACKING', 'FAST SAVE'],
+    },
+    {
+      id: 'club-billing',
+      title: 'Школьный биллинг в тенге (₸)',
+      teaser: 'Пакетная выписка счетов, отслеживание оплаты и квитанции офлайн-расчётов.',
+      icon: CreditCard,
+      details: [
+        'Пакетная генерация счетов на всю группу за текущий учебный месяц в один клик.',
+        'Раздельный учёт онлайн-платежей и регистрация наличного расчёта через координатора.',
+        'Автоматические напоминания родителям и строгий контроль задолженностей.',
+      ],
+      tags: ['BILLING KZT (₸)', 'BATCH INVOICES', 'OFFLINE RECEIPTS'],
     },
   ];
 
-  const capabilities = [
+  // Module 2: Equipment Maintenance & Repair features
+  const equipmentFeatures = [
     {
-      role: 'Для учеников',
-      iconComponent: GraduationCap,
-      color: 'var(--primary)',
-      items: [
-        'Интерактивный каталог секций и кружков с фильтрами по категориям (Спорт, IT, Языки, Творчество, Наука)',
-        'Бронирование места с 24-часовым таймером удержания (Hold) до подтверждения родителями',
-        'Прозрачный лист ожидания с отображением позиции в очереди при 100% заполненности кружка',
-        'Личный кабинет с персональным расписанием занятий и контактами педагогов',
-        'Геймификация и бейджи достижений за успехи, дисциплину и активность',
+      id: 'tech-quick-report',
+      title: 'Экспресс-подача заявки',
+      teaser: 'Регистрация поломки учителем за 30 секунд без бумажных служебных записок.',
+      icon: AlertTriangle,
+      details: [
+        'Автоматическая подстановка кабинета и ответственного педагога из сессии.',
+        '5 категорий поломок: Компьютеры, Электрика, Мебель, Сантехника, Другое.',
+        'Двухшаговое подтверждение отмены («Точно отменить?») предотвращает случайный сброс.',
       ],
+      tags: ['INCIDENT REPORT', 'PRIORITY MATRIX', 'CONFIRM CANCEL'],
     },
     {
-      role: 'Для родителей',
-      iconComponent: Users,
-      color: 'var(--accent-coral)',
-      items: [
-        'Подтверждение бронирования ребёнка в один клик через веб-кабинет или защищённую ссылку',
-        'Прозрачный финансовый биллинг с фиксированными суммами в казахстанских тенге (₸)',
-        'Оплата онлайн картой/Kaspi или регистрация наличного расчёта через координатора',
-        'Контроль посещаемости занятий ребёнком с уведомлениями об отметках в журнале',
-        'Управление несколькими секциями в одном окне без бумажных квитанций',
+      id: 'tech-kanban',
+      title: 'Канбан технической службы',
+      teaser: 'Доска задач со строгими SLA-нормативами и фиксацией каждого действия мастера.',
+      icon: Wrench,
+      details: [
+        '3 прозрачные колонки: «Новые», «В работе», «Решено» с моноширинными счётчиками.',
+        'Взятие в работу и закрытие закреплены исключительно за ролью сертифицированного техника.',
+        'Обязательный комментарий выполненного решения для приёмки и контроля качества.',
       ],
+      tags: ['KANBAN BOARD', 'SLA MONITORING', 'TECH WORKFLOW'],
     },
     {
-      role: 'Для преподавателей',
-      iconComponent: UserCheck,
-      color: 'var(--success)',
-      items: [
-        'Электронный журнал посещаемости в один клик с поддержкой 4 статусов («Был», «Опоздал», «Уважительная», «Не был»)',
-        'Мгновенное автосохранение результатов урока с подтверждающими уведомлениями',
-        'Всегда актуальный список учащихся без риска двойных списков или потерянных учеников',
-        'Быстрый доступ к контактам родителей каждого ребёнка для оперативной связи',
-        'История посещаемости по датам для отчётности в учебную часть',
+      id: 'tech-health-index',
+      title: 'Equipment Health Index',
+      teaser: 'Оперативный процент исправности школьного фонда и аналитика уязвимых зон.',
+      icon: Activity,
+      details: [
+        'Расчёт соотношения открытых инцидентов к общему парку оборудования школы в реальном времени.',
+        'Контроль нормативов обслуживания: время первого отклика < 30 минут, соблюдение SLA 98.2%.',
+        'Горизонтальные диаграммы распределения поломок по категориям для закупки запчастей.',
       ],
+      tags: ['HEALTH INDEX', 'SLA STATS', 'ANALYTICS KPI'],
     },
     {
-      role: 'Для координаторов и администрации',
-      iconComponent: ClipboardList,
-      color: 'var(--warning)',
-      items: [
-        'Мониторинг загрузки групп в реальном времени с автоматическими алертами о 100% заполнении',
-        'Автоматическое и ручное продвижение кандидатов из листа ожидания при освобождении мест',
-        'Пакетное выставление счетов по группам и подтверждение офлайн-платежей',
-        'Конструктор добавления новых кружков с автогенерацией программы обучения и результатов',
-        'Гибкое управление вместимостью учебных кабинетов и расписанием секций',
+      id: 'tech-retention',
+      title: 'Регламент архивации 7 дней',
+      teaser: 'Завершённые ремонты остаются на активной доске неделю для контроля приёмки.',
+      icon: Archive,
+      details: [
+        'Преподаватель видит статус и комментарий техника в течение 7 дней после завершения.',
+        'Автоматическая архивация старых заявок предотвращает захламление рабочей доски.',
+        'Удобный переключатель вкладок: «Активные (< 7 дн.)», «Архив» и «Все заявки».',
       ],
+      tags: ['7-DAY RETENTION', 'AUDIT TRAIL', 'ARCHIVE FILTER'],
+    },
+  ];
+
+  // Section 3: Roles
+  const roles = [
+    {
+      id: 'role-student',
+      title: 'Ученик',
+      teaser: 'Каталог секций, бронь с 24-часовым таймером и геймификация.',
+      icon: GraduationCap,
+      details: [
+        'Интерактивный каталог с фильтрацией по направлениям (IT, Спорт, Языки, Наука, Арт).',
+        'Бронирование места с наглядным таймером и отслеживанием очереди в листе ожидания.',
+        'Персональное расписание занятий, кабинет и контакты преподавателя в одном экране.',
+        'Система бейджей за посещаемость и дисциплину («100% дисциплина», «Хакатон-мастер»).',
+      ],
+      tags: ['КАТАЛОГ СЕКЦИЙ', 'ХОЛД 24 ЧАСА', 'ДОСТИЖЕНИЯ'],
+    },
+    {
+      id: 'role-parent',
+      title: 'Родитель',
+      teaser: 'Подтверждение в один клик, онлайн-биллинг и контроль посещаемости.',
+      icon: Users,
+      details: [
+        'Подтверждение бронирования ребёнка по защищённой ссылке без обязательной регистрации.',
+        'Прозрачный школьный биллинг с фиксированными суммами в казахстанских тенге (₸).',
+        'Оплата картой или регистрация наличных через координатора с мгновенным чеком.',
+        'Контроль посещаемости с детализацией отметок в электронном журнале.',
+      ],
+      tags: ['БЕЗ ПАРОЛЕЙ', 'БИЛЛИНГ ₸', 'ПОСЕЩАЕМОСТЬ'],
+    },
+    {
+      id: 'role-teacher',
+      title: 'Преподаватель',
+      teaser: 'Журнал в 1 клик, контакты родителей и экспресс-заявки на ремонт.',
+      icon: UserCheck,
+      details: [
+        'Электронный журнал с быстрой отметкой присутствия и автосохранением.',
+        'Прямой доступ к контактам родителей учащихся для оперативной связи.',
+        'Быстрая подача заявки о неисправности в кабинете (проектор, проводка, мебель).',
+      ],
+      tags: ['ЖУРНАЛ В 1 КЛИК', 'КОНТАКТЫ РОДИТЕЛЕЙ', 'РЕПОРТ ПОЛОМОК'],
+    },
+    {
+      id: 'role-coordinator',
+      title: 'Координатор',
+      teaser: 'Мониторинг вместимости групп, очереди и выставление счетов.',
+      icon: BarChart3,
+      details: [
+        'Контроль загрузки кабинетов с автоматическими алертами о 100% заполнении.',
+        'Пакетное выставление счетов по группам и подтверждение оплаты наличными.',
+        'Конструктор добавления кружков с программой из 5 модулей и ожидаемыми результатами.',
+      ],
+      tags: ['МОНИТОРИНГ МЕСТ', 'ПАКЕТНЫЙ БИЛЛИНГ', 'КОНСТРУКТОР КРУЖКОВ'],
+    },
+    {
+      id: 'role-technician',
+      title: 'Техник',
+      teaser: 'Канбан-доска ремонтов, соблюдение SLA и отчеты о решении проблем.',
+      icon: Wrench,
+      details: [
+        'Канбан-доска инцидентов школы с распределением по срочности и кабинетам.',
+        'Исключительное право на принятие задач в работу и фиксацию закрытия ремонта.',
+        'Виджеты Equipment Health Index и нормативы времени первого отклика.',
+      ],
+      tags: ['КАНБАН СЛУЖБЫ', 'SLA РЕМОНТА', 'ОТЧЁТ МАСТЕРА'],
+    },
+    {
+      id: 'role-admin',
+      title: 'Администратор школы',
+      teaser: 'Сквозной аудит, аналитика безопасности и централизованный контроль.',
+      icon: ShieldCheck,
+      details: [
+        'Режим сквозного мониторинга всех кружков, оплат и заявок на ремонт школы.',
+        'Полная изоляция прав доступа на уровне правил Cloud Firestore Security Rules.',
+        'Сводная финансовая отчётность и аудит соблюдения нормативов обслуживания.',
+      ],
+      tags: ['СКВОЗНОЙ АУДИТ', 'CLOUD SECURITY', 'ФИНАНСОВЫЙ ОТЧЁТ'],
+    },
+  ];
+
+  // Section 4: Creators & Architecture
+  const teamMembers = [
+    {
+      id: 'team-daniil',
+      name: 'Ivakin Daniil (Даниил Ивакин)',
+      role: 'Lead Software Engineer & System Architect',
+      teaser: 'Архитектура всей платформы, Cloud Engine, FSD, движок холдов и модуль ремонта.',
+      icon: Code,
+      details: [
+        'Спроектировал модульную клиентскую архитектуру Feature-Sliced Design на React 19 и Vite с полной изоляцией слоёв.',
+        'Реализовал схему Google Cloud Firestore, Security Rules с изоляцией прав и Cloud Functions для транзакций.',
+        'Разработал движок удержания мест (Hold & Waitlist Engine) с защитой от двойной записи и 24-часовым окном.',
+        'Создал модуль заявок на ремонт: канбан-доска техника, SLA-виджеты, Health Index и 7-дневный регламент хранения.',
+        'Покрыл ключевую логику 35 модульными тестами с 100% pass rate и внедрил строгий линтинг ESLint.',
+      ],
+      tags: ['FSD ARCHITECTURE', 'REACT 19', 'HOLD & WAITLIST', '35 UNIT TESTS'],
+    },
+    {
+      id: 'team-amir',
+      name: 'Amir Timurbulat (Амир Тимурбулат)',
+      role: 'Product Idea & Lead UX/Market Researcher',
+      teaser: 'Идея хаба, CustDev-исследование школ, проектирование CJM и геймификация.',
+      icon: Lightbulb,
+      details: [
+        'Инициатор создания ExtraHub и руководитель глубинных продуктовых исследований школьной среды.',
+        'Провёл серию CustDev-интервью с директорами, завучами, классными руководителями и родителями.',
+        'Спроектировал пользовательские сценарии (CJM), включая вход родителей по токенам без регистрации.',
+        'Заложил игровую механику бейджей достижений («100% дисциплина») для вовлечения учащихся.',
+      ],
+      tags: ['PRODUCT CONCEPT', 'CUSTDEV', 'CJM DESIGN', 'GAMIFICATION'],
+    },
+    {
+      id: 'team-maulen',
+      name: 'Maulen Stanbaev (Маулен Станбаев)',
+      role: 'Head of Marketing & Business Development',
+      teaser: 'Позиционирование продукта, переговоры с учебными заведениями и метрики ценности.',
+      icon: TrendingUp,
+      details: [
+        'Разработал стратегию позиционирования ExtraHub как флагманской платформы цифровизации внеучебки.',
+        'Организует презентации для администрации школ, наглядно доказывая сокращение рутины координатора на 80%.',
+        'Формирует воронку пилотных внедрений в государственных и частных образовательных учреждениях РК.',
+        'Курирует адаптацию платформы под регламенты и требования школ Республики Казахстан.',
+      ],
+      tags: ['BIZDEV', 'SCHOOL PILOTS', 'VALUE METRICS', 'KZ REGULATIONS'],
     },
   ];
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '60px' }}>
-      <PageHeader
-        title="О платформе ExtraHub и команде проекта"
-        subtitle="Инновационная цифровая экосистема дополнительного образования для школ Республики Казахстан"
-      />
-
-      {/* Hero Mission Card */}
-      <Card
-        style={{
-          marginBottom: '32px',
-          background:
-            'linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-subtle) 100%)',
-          border: '1px solid var(--border-color)',
-        }}
-      >
-        <div style={{ padding: '8px 4px' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '4px 10px',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--bg-subtle)',
-              border: '1px solid var(--border-color)',
-              color: 'var(--primary)',
-              fontSize: '11px',
-              fontFamily: 'var(--font-mono)',
-              fontWeight: 600,
-              marginBottom: '14px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-            }}
-          >
-            <Rocket size={13} />
-            <span>НАША МИССИЯ</span>
-          </div>
-          <h2
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: '24px',
-              fontWeight: 700,
-              margin: '0 0 12px',
-              color: 'var(--text-primary)',
-              lineHeight: 1.3,
-            }}
-          >
-            Сделать внеучебную деятельность школы прозрачной, удобной и вдохновляющей
-          </h2>
-          <p
-            style={{
-              fontSize: '15.5px',
-              lineHeight: 1.7,
-              color: 'var(--text-secondary)',
-              margin: 0,
-              maxWidth: '920px',
-            }}
-          >
-            ExtraHub решает ключевые проблемы школьного досуга: бумажную волокиту, очереди в секции,
-            непрозрачность оплат и потерю посещаемости. Мы объединяем школьников, родителей,
-            преподавателей и руководство в едином цифровом пространстве.
-          </p>
-        </div>
-      </Card>
-
-      {/* Team Section */}
-      <div style={{ marginBottom: '48px' }}>
-        <div style={{ marginBottom: '20px' }}>
-          <h3
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: '22px',
-              fontWeight: 700,
-              margin: '0 0 6px',
-              color: 'var(--text-primary)',
-            }}
-          >
-            Команда проекта ExtraHub
-          </h3>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
-            Специалисты, создавшие идею, архитектуру, продукт и стратегию развития платформы
-          </p>
+    <div className="about-apple-page">
+      {/* 1. HERO SECTION */}
+      <section className="about-section about-hero about-reveal">
+        <div className="about-eyebrow">
+          <Sparkles size={14} />
+          <span>EXTRAHUB PLATFORM • DIGITAL SCHOOL ECOSYSTEM</span>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '24px',
-          }}
-        >
-          {teamMembers.map((member) => (
-            <Card
-              key={member.id}
-              className="interactive-card"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-                borderTop: '3px solid var(--primary)',
-              }}
-            >
-              {/* Header */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '14px',
-                  marginBottom: '14px',
-                }}
-              >
-                <div
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: 'var(--radius-md)',
-                    backgroundColor: 'var(--bg-subtle)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    border: '1px solid var(--border-color)',
-                    color: 'var(--primary)',
-                  }}
-                >
-                  <member.avatarIcon size={24} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <Badge variant={member.tagVariant} style={{ marginBottom: '6px' }}>
-                    {member.tag}
-                  </Badge>
-                  <h4
-                    style={{
-                      fontSize: '17px',
-                      fontWeight: 700,
-                      margin: '0 0 4px',
-                      color: 'var(--text-primary)',
-                    }}
-                  >
-                    {member.name}
-                  </h4>
-                  <div
-                    style={{
-                      fontSize: '12.5px',
-                      fontWeight: 600,
-                      color: 'var(--primary)',
-                    }}
-                  >
-                    {member.role}
-                  </div>
-                </div>
-              </div>
+        <h1 className="about-headline-display">
+          Вся жизнь школы.
+          <br />
+          В едином ритме.
+        </h1>
 
-              {/* Bio */}
-              <p
-                style={{
-                  fontSize: '13.5px',
-                  lineHeight: 1.6,
-                  color: 'var(--text-secondary)',
-                  marginBottom: '16px',
-                }}
-              >
-                {member.bio}
-              </p>
+        <p className="about-subheading">
+          Единая цифровая экосистема для записи в секции, прозрачного биллинга в тенге
+          и оперативного обслуживания школьного оборудования.
+        </p>
 
-              {/* Achievements / What was done */}
-              <div
-                style={{
-                  marginTop: 'auto',
-                  borderTop: '1px solid var(--border-color)',
-                  paddingTop: '14px',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    marginBottom: '10px',
-                  }}
-                >
-                  Вклад и ключевые результаты:
-                </div>
-                <ul
-                  style={{
-                    paddingLeft: '18px',
-                    margin: 0,
-                    fontSize: '12.5px',
-                    lineHeight: 1.6,
-                    color: 'var(--text-secondary)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px',
-                  }}
-                >
-                  {member.achievements.map((item, idx) => (
-                    <li key={idx}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Platform Capabilities Showcase */}
-      <div style={{ marginBottom: '48px' }}>
-        <div style={{ marginBottom: '20px' }}>
-          <h3
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: '22px',
-              fontWeight: 700,
-              margin: '0 0 6px',
-              color: 'var(--text-primary)',
-            }}
-          >
-            Возможности платформы ExtraHub
-          </h3>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0 }}>
-            Инструменты, закрывающие полный цикл управления внеучебной деятельностью школы
-          </p>
-        </div>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
-            gap: '20px',
-          }}
-        >
-          {capabilities.map((cap, idx) => (
-            <Card
-              key={idx}
-              className="interactive-card"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  marginBottom: '14px',
-                  paddingBottom: '10px',
-                  borderBottom: '1px solid var(--border-color)',
-                }}
-              >
-                <div
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: 'var(--bg-subtle)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--primary)',
-                  }}
-                >
-                  <cap.iconComponent size={18} />
-                </div>
-                <h4
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: '15px',
-                    fontWeight: 700,
-                    color: 'var(--text-primary)',
-                    margin: 0,
-                  }}
-                >
-                  {cap.role}
-                </h4>
-              </div>
-
-              <ul
-                style={{
-                  listStyle: 'none',
-                  padding: 0,
-                  margin: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '10px',
-                  fontSize: '13px',
-                  color: 'var(--text-secondary)',
-                  lineHeight: 1.5,
-                }}
-              >
-                {cap.items.map((it, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                    <Check size={14} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                    <span>{it}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Platform Technical Highlights & Legal Notice */}
-      <Card
-        style={{
-          border: '1px solid var(--border-color)',
-          backgroundColor: 'var(--bg-surface)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '16px',
-            marginBottom: '16px',
-            paddingBottom: '16px',
-            borderBottom: '1px solid var(--border-color)',
-          }}
-        >
-          <div>
-            <h4
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '16px',
-                fontWeight: 700,
-                margin: '0 0 4px',
-                color: 'var(--text-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              <ShieldCheck size={18} color="var(--primary)" />
-              <span>Защита прав и стандарты качества</span>
-            </h4>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              ExtraHub Platform • Зарегистрированная интеллектуальная собственность команды
-            </div>
-          </div>
-
-          <div
-            style={{
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--bg-subtle)',
-              border: '1px solid var(--border-color)',
-              fontSize: '12px',
-              fontFamily: 'var(--font-mono)',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-            }}
-          >
-            © 2026 EXTRAHUB. ALL RIGHTS RESERVED.
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '16px',
-            fontSize: '13px',
-            color: 'var(--text-secondary)',
-          }}
-        >
-          <div>
-            <strong>Стек разработки:</strong> React 19, Vite, Firebase, Cloud Security Rules,
-            Feature-Sliced Design (FSD).
-          </div>
-          <div>
-            <strong>Региональный контекст:</strong> Поддержка национальной валюты (тенге ₸),
-            школ Казахстана и языковых стандартов.
-          </div>
-          <div>
-            <strong>Готовность к внедрению:</strong> Платформа оптимизирована для запуска как в
-            муниципальных, так и в частных школах и лицеях.
-          </div>
-        </div>
-
-        <div style={{ marginTop: '20px', textAlign: 'center' }}>
-          <Link
-            to="/catalog"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 24px',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--primary)',
-              color: '#ffffff',
-              fontWeight: 600,
-              fontSize: '14px',
-              textDecoration: 'none',
-            }}
-          >
-            Перейти к каталогу кружков →
+        <div className="about-hero-actions">
+          <Link to="/catalog">
+            <Button variant="primary" size="lg" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <span>Исследовать каталог секций</span>
+              <ArrowRight size={16} />
+            </Button>
+          </Link>
+          <Link to="/teacher">
+            <Button variant="outline" size="lg" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <Wrench size={16} />
+              <span>Заявки на ремонт</span>
+            </Button>
           </Link>
         </div>
-      </Card>
+
+        {/* Floating Apple-style Trust / Stats Bar */}
+        <div className="about-hero-stats">
+          <div className="about-stat-item">
+            <div className="about-stat-number">2</div>
+            <div className="about-stat-label">независимых модуля: кружки и ремонт оборудования</div>
+          </div>
+          <div className="about-stat-item">
+            <div className="about-stat-number">6</div>
+            <div className="about-stat-label">ролевых профилей с индивидуальным интерфейсом</div>
+          </div>
+          <div className="about-stat-item">
+            <div className="about-stat-number">24 ч</div>
+            <div className="about-stat-label">холд места с защитой от двойного бронирования</div>
+          </div>
+          <div className="about-stat-item">
+            <div className="about-stat-number">0</div>
+            <div className="about-stat-label">потерянных бумажных списков и хаоса в чатах</div>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. MODULE 1: CLUBS & EXTRACURRICULAR ACTIVITIES */}
+      <section className="about-section about-reveal">
+        <div className="about-eyebrow">
+          <GraduationCap size={14} />
+          <span>МОДУЛЬ 1 • ДОПОЛНИТЕЛЬНОЕ ОБРАЗОВАНИЕ</span>
+        </div>
+
+        <h2 className="about-headline-section">
+          Кружки и секции.
+          <br />
+          Запись без очередей и волокиты.
+        </h2>
+
+        <p className="about-subheading">
+          Полная автоматизация внеурочной траектории: интерактивный каталог, бронь с таймером,
+          умный лист ожидания, электронный журнал и прозрачный биллинг.
+        </p>
+
+        <div className="about-cards-grid">
+          {clubFeatures.map((item) => (
+            <AppleExpandableCard
+              key={item.id}
+              id={item.id}
+              title={item.title}
+              teaser={item.teaser}
+              icon={item.icon}
+              details={item.details}
+              tags={item.tags}
+              isExpanded={!!expandedCards[item.id]}
+              onToggle={handleToggleCard}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* 3. MODULE 2: EQUIPMENT MAINTENANCE & REPAIR */}
+      <section className="about-section about-reveal">
+        <div className="about-eyebrow">
+          <Wrench size={14} />
+          <span>МОДУЛЬ 2 • ТЕХНИЧЕСКИЙ СЕРВИС</span>
+        </div>
+
+        <h2 className="about-headline-section">
+          Сервисная служба школы.
+          <br />
+          Нулевой простой оборудования.
+        </h2>
+
+        <p className="about-subheading">
+          От сломанного проектора до короткого замыкания в щитке — сквозной цикл ремонта
+          с канбаном, контролем SLA и регламентом хранения инцидентов.
+        </p>
+
+        <div className="about-cards-grid">
+          {equipmentFeatures.map((item) => (
+            <AppleExpandableCard
+              key={item.id}
+              id={item.id}
+              title={item.title}
+              teaser={item.teaser}
+              icon={item.icon}
+              details={item.details}
+              tags={item.tags}
+              isExpanded={!!expandedCards[item.id]}
+              onToggle={handleToggleCard}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* 4. ECOSYSTEM OF ROLES */}
+      <section className="about-section about-reveal">
+        <div className="about-eyebrow">
+          <Users size={14} />
+          <span>РОЛЕВАЯ МОДЕЛЬ</span>
+        </div>
+
+        <h2 className="about-headline-section">
+          Шесть ролей.
+          <br />
+          Один слаженный школьный механизм.
+        </h2>
+
+        <p className="about-subheading">
+          Каждый участник образовательного процесса получает сфокусированный инструмент,
+          созданный специально под его ежедневные задачи.
+        </p>
+
+        <div className="about-cards-grid">
+          {roles.map((item) => (
+            <AppleExpandableCard
+              key={item.id}
+              id={item.id}
+              title={item.title}
+              teaser={item.teaser}
+              icon={item.icon}
+              details={item.details}
+              tags={item.tags}
+              isExpanded={!!expandedCards[item.id]}
+              onToggle={handleToggleCard}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* 5. CREATORS & ENGINEERING ARCHITECTURE */}
+      <section className="about-section about-reveal">
+        <div className="about-eyebrow">
+          <Code size={14} />
+          <span>СОЗДАТЕЛИ И СТАНДАРТЫ</span>
+        </div>
+
+        <h2 className="about-headline-section">
+          Инженерная основа.
+          <br />
+          Спроектировано с нуля.
+        </h2>
+
+        <p className="about-subheading">
+          ExtraHub создан командой разработчиков, исследователей и маркетологов
+          на базе реальных интервью и регламентов школ Республики Казахстан.
+        </p>
+
+        <div className="about-cards-grid">
+          {teamMembers.map((member) => (
+            <AppleExpandableCard
+              key={member.id}
+              id={member.id}
+              title={member.name}
+              teaser={`${member.role} — ${member.teaser}`}
+              icon={member.icon}
+              details={member.details}
+              tags={member.tags}
+              isExpanded={!!expandedCards[member.id]}
+              onToggle={handleToggleCard}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* 6. FINAL CTA & TRUST SECTION */}
+      <section className="about-section about-reveal">
+        <div className="about-cta-box">
+          <div className="about-eyebrow" style={{ marginBottom: '16px' }}>
+            <ShieldCheck size={14} />
+            <span>ГОТОВО К ВНЕДРЕНИЮ В ШКОЛАХ РК</span>
+          </div>
+
+          <h2 className="about-headline-section" style={{ maxWidth: '780px' }}>
+            Переведите внеучебную жизнь школы на новый технологичный уровень.
+          </h2>
+
+          <p className="about-subheading" style={{ textAlign: 'center' }}>
+            Исследуйте открытый каталог кружков, запишитесь на демо-сессию или протестируйте
+            любую из шести ролей платформы ExtraHub прямо сейчас.
+          </p>
+
+          <div className="about-cta-buttons">
+            <Link to="/catalog">
+              <Button variant="primary" size="lg" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <span>Открыть каталог секций</span>
+                <ArrowRight size={16} />
+              </Button>
+            </Link>
+            <Link to="/login">
+              <Button variant="outline" size="lg">
+                Войти в личный кабинет
+              </Button>
+            </Link>
+          </div>
+
+          <div
+            style={{
+              marginTop: '40px',
+              paddingTop: '20px',
+              borderTop: '1px solid var(--border-color)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              fontSize: '12.5px',
+              color: 'var(--text-muted)',
+              flexWrap: 'wrap',
+            }}
+          >
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <ShieldCheck size={14} color="var(--primary)" />
+              100% изоляция данных Cloud Security Rules
+            </span>
+            <span>•</span>
+            <span>Стандарты школ Республики Казахстан</span>
+            <span>•</span>
+            <span>Релиз 2026 ExtraHub Platform</span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
