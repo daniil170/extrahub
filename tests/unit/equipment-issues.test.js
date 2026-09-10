@@ -12,7 +12,6 @@ import {
   createEquipmentIssue,
   createIssueComment,
   ISSUE_PRIORITIES,
-  ISSUE_STATUSES,
   ISSUE_CATEGORIES,
 } from '../../src/entities/equipmentIssue/model.js';
 import {

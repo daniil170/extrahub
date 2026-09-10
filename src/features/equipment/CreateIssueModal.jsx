@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import {
+  AlertCircle,
+  Monitor,
+  Zap,
+  LayoutGrid,
+  Wrench,
+  Settings,
+  Plus,
+  X,
+} from 'lucide-react';
+import {
   Modal,
   Button,
-  IconAlertCircle,
-  IconMonitor,
-  IconZap,
-  IconLayoutGrid,
-  IconWrench,
-  IconSettings,
-  IconPlus,
 } from '../../shared/ui/index.js';
 import {
   ISSUE_CATEGORIES,
@@ -27,11 +30,11 @@ const QUICK_LOCATIONS = [
 ];
 
 const CATEGORY_ICONS = {
-  hardware: IconMonitor,
-  electrical: IconZap,
-  furniture: IconLayoutGrid,
-  plumbing: IconWrench,
-  other: IconSettings,
+  hardware: Monitor,
+  electrical: Zap,
+  furniture: LayoutGrid,
+  plumbing: Wrench,
+  other: Settings,
 };
 
 /**
@@ -136,7 +139,7 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
               gap: '8px',
             }}
           >
-            <IconAlertCircle size={16} />
+            <AlertCircle size={16} />
             <span>{formError}</span>
           </div>
         )}
@@ -228,7 +231,7 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
             {Object.values(ISSUE_CATEGORIES).map((catKey) => {
               const meta = ISSUE_CATEGORY_META[catKey];
               const isSelected = category === catKey;
-              const IconComp = CATEGORY_ICONS[catKey] || IconSettings;
+              const IconComp = CATEGORY_ICONS[catKey] || Settings;
               return (
                 <button
                   key={catKey}
@@ -241,7 +244,7 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
                     justifyContent: 'center',
                     padding: '10px 8px',
                     borderRadius: 'var(--radius-sm)',
-                    border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                    border: isSelected ? '1.5px solid var(--primary)' : '1px solid var(--border-color)',
                     backgroundColor: isSelected ? 'var(--primary-light)' : 'transparent',
                     color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
                     cursor: 'pointer',
@@ -276,30 +279,32 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '6px',
-                    padding: '10px 6px',
+                    padding: '8px 6px',
                     borderRadius: 'var(--radius-sm)',
-                    border: isSelected ? `2px solid ${meta.color}` : '1px solid var(--border-color)',
+                    border: isSelected ? `1.5px solid ${meta.color}` : '1px solid var(--border-color)',
                     backgroundColor: isSelected
                       ? pKey === 'critical'
                         ? 'rgba(230, 57, 70, 0.12)'
                         : 'var(--bg-subtle)'
                       : 'transparent',
                     color: isSelected && pKey === 'critical' ? 'var(--danger)' : 'var(--text-primary)',
-                    fontWeight: isSelected ? 700 : 500,
+                    fontWeight: isSelected ? 600 : 400,
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                   }}
                 >
                   <span
                     style={{
-                      width: 8,
-                      height: 8,
+                      width: 6,
+                      height: 6,
                       borderRadius: '50%',
                       backgroundColor: meta.color,
                       flexShrink: 0,
                     }}
                   />
-                  <span style={{ fontSize: '12px' }}>{meta.label}</span>
+                  <span>{meta.label.toUpperCase()}</span>
                 </button>
               );
             })}
@@ -319,7 +324,7 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
                 gap: '8px',
               }}
             >
-              <IconAlertCircle size={16} />
+              <AlertCircle size={15} />
               <span>
                 <b>Критический приоритет:</b> дежурному технику и администрации школы будет немедленно отправлено срочное уведомление!
               </span>
@@ -387,7 +392,6 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
                   borderRadius: '50%',
                   width: '20px',
                   height: '20px',
-                  fontSize: '12px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -395,7 +399,7 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
                 }}
                 title="Удалить фото"
               >
-                ✕
+                <X size={12} />
               </button>
             </div>
           ) : (
@@ -419,7 +423,7 @@ export function CreateIssueModal({ isOpen, onClose, onSubmit }) {
             disabled={loading}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            <IconPlus size={16} />
+            <Plus size={16} />
             <span>{loading ? 'Отправка...' : 'Подать заявку'}</span>
           </Button>
         </div>

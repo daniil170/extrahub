@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { Plus, Wrench, Clock } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { useEquipmentIssues } from './useEquipmentIssues.js';
 import { EquipmentIssueCard } from './EquipmentIssueCard.jsx';
 import { CreateIssueModal } from './CreateIssueModal.jsx';
 import { IssueDetailsModal } from './IssueDetailsModal.jsx';
-import { Button, Spinner, Card, IconPlus, IconWrench, IconClock } from '../../shared/ui/index.js';
+import { Button, Spinner, Card } from '../../shared/ui/index.js';
 
 /**
  * Teacher equipment section component with list of teacher's issues and creation form
@@ -50,7 +51,7 @@ export function TeacherEquipmentSection() {
         }}
       >
         <div>
-          <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 4px 0' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, fontFamily: 'var(--font-heading)', margin: '0 0 4px 0' }}>
             Заявки на ремонт оборудования
           </h3>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
@@ -65,14 +66,12 @@ export function TeacherEquipmentSection() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '9px 18px',
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+            padding: '8px 16px',
             fontWeight: 600,
-            fontSize: '14px',
-            borderRadius: 'var(--radius-sm)',
+            fontSize: '13px',
           }}
         >
-          <IconPlus size={17} />
+          <Plus size={16} />
           <span>Подать заявку</span>
         </Button>
       </div>
@@ -122,10 +121,12 @@ export function TeacherEquipmentSection() {
                 <span
                   style={{
                     fontSize: '11px',
+                    fontFamily: 'var(--font-mono)',
                     padding: '1px 6px',
-                    borderRadius: '999px',
-                    backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'var(--bg-subtle)',
-                    color: isActive ? '#ffffff' : 'var(--text-muted)',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: isActive ? 'var(--bg-surface)' : 'transparent',
+                    color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
                   }}
                 >
                   {tab.count}
@@ -145,7 +146,7 @@ export function TeacherEquipmentSection() {
           }}
           title="Регламент школы: закрытые заявки остаются на панели 7 дней для контроля, после чего переносятся в архив"
         >
-          <IconClock size={13} />
+          <Clock size={13} />
           <span>Срок хранения закрытых: 7 дней</span>
         </div>
       </div>
@@ -172,10 +173,11 @@ export function TeacherEquipmentSection() {
         >
           <div
             style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--primary-light)',
+              width: '48px',
+              height: '48px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-color)',
               color: 'var(--primary)',
               display: 'inline-flex',
               alignItems: 'center',
@@ -183,9 +185,9 @@ export function TeacherEquipmentSection() {
               marginBottom: '14px',
             }}
           >
-            <IconWrench size={28} />
+            <Wrench size={22} />
           </div>
-          <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '6px' }}>
+          <h4 style={{ fontSize: '15px', fontWeight: 600, fontFamily: 'var(--font-heading)', marginBottom: '6px' }}>
             {filters.status === 'all'
               ? 'У вас пока нет активных заявок на ремонт'
               : 'В выбранном статусе заявок не найдено'}
@@ -199,7 +201,7 @@ export function TeacherEquipmentSection() {
             onClick={() => setCreateModalOpen(true)}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
           >
-            <IconPlus size={15} />
+            <Plus size={15} />
             <span>Подать первую заявку</span>
           </Button>
         </div>

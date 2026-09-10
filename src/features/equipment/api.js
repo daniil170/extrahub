@@ -4,8 +4,6 @@ import {
   COLLECTIONS,
   getDocuments,
   getDocument,
-  setDocument,
-  updateDocument,
 } from '../../shared/api/firebaseUtils.js';
 import {
   DEMO_EQUIPMENT_ISSUES,
@@ -184,7 +182,7 @@ export async function createEquipmentIssueRecord(issueData) {
   addNotification({
     role: 'technician',
     type: isUrgent ? 'equipment_critical' : 'equipment_issue_created',
-    title: isUrgent ? `🚨 СРОЧНО: Поломка [${newIssue.title}]` : `Новая заявка: ${newIssue.title}`,
+    title: isUrgent ? `СРОЧНО: Поломка [${newIssue.title}]` : `Новая заявка: ${newIssue.title}`,
     text: `Кабинет: ${newIssue.location} | Приоритет: ${newIssue.priority}. Автор: ${newIssue.reportedByName || 'Преподаватель'}`,
     sentAt: now,
   });
@@ -192,7 +190,7 @@ export async function createEquipmentIssueRecord(issueData) {
   addNotification({
     role: 'admin',
     type: isUrgent ? 'equipment_critical' : 'equipment_issue_created',
-    title: isUrgent ? `🚨 СРОЧНО: Поломка оборудования` : `Новая заявка на ремонт`,
+    title: isUrgent ? `СРОЧНО: Поломка оборудования` : `Новая заявка на ремонт`,
     text: `Подана заявка «${newIssue.title}» в ${newIssue.location}.`,
     sentAt: now,
   });
@@ -265,9 +263,9 @@ export async function updateIssueStatusRecord({
   // Notify issue author (teacher)
   if (updatedIssue) {
     const statusTitles = {
-      in_progress: 'Заявка взята в работу 🛠️',
-      resolved: 'Заявка успешно закрыта ✅',
-      cancelled: 'Заявка отменена ❌',
+      in_progress: 'Заявка взята в работу',
+      resolved: 'Заявка успешно закрыта',
+      cancelled: 'Заявка отменена',
     };
 
     const statusTexts = {

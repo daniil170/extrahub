@@ -1,4 +1,19 @@
 import { useState, useMemo } from 'react';
+import {
+  Plus,
+  Wrench,
+  Check,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  Search,
+  LayoutGrid,
+  List,
+  Shield,
+  Activity,
+  Inbox,
+  Archive,
+} from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { useEquipmentIssues } from './useEquipmentIssues.js';
 import { EquipmentIssueCard } from './EquipmentIssueCard.jsx';
@@ -10,27 +25,10 @@ import {
   Button,
   Spinner,
   Modal,
-  IconPlus,
-  IconWrench,
-  IconCheck,
-  IconCheckCircle,
-  IconAlertCircle,
-  IconClock,
-  IconSearch,
-  IconLayoutGrid,
-  IconList,
-  IconShield,
-  IconActivity,
-  IconInbox,
-  IconZap,
-  IconMonitor,
-  IconArchive,
 } from '../../shared/ui/index.js';
 import {
   ISSUE_CATEGORIES,
   ISSUE_CATEGORY_META,
-  ISSUE_PRIORITIES,
-  ISSUE_PRIORITY_META,
 } from '../../entities/equipmentIssue/model.js';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -47,7 +45,6 @@ export function TechnicianDashboard() {
     error,
     stats,
     filters,
-    setStatusFilter,
     setPriorityFilter,
     setCategoryFilter,
     setSearchQuery,
@@ -70,6 +67,7 @@ export function TechnicianDashboard() {
   const [resolutionComment, setResolutionComment] = useState('');
   const [resolveError, setResolveError] = useState('');
   const [submittingResolve, setSubmittingResolve] = useState(false);
+  const [currentTime] = useState(() => Date.now());
 
   const isAdmin = user?.role === 'admin';
   const isTechnician = user?.role === 'technician';
@@ -100,14 +98,13 @@ export function TechnicianDashboard() {
 
   // Retention / Archive filtering
   const visibleIssues = useMemo(() => {
-    const now = Date.now();
     return issues.filter((issue) => {
       const isResolved = issue.status === 'resolved';
       if (!isResolved) {
         return retentionMode !== 'archive';
       }
       const closedTime = new Date(issue.resolvedAt || issue.updatedAt || issue.createdAt).getTime();
-      const isOlderThan7Days = now - closedTime > SEVEN_DAYS_MS;
+      const isOlderThan7Days = currentTime - closedTime > SEVEN_DAYS_MS;
 
       if (retentionMode === 'active') {
         return !isOlderThan7Days;
@@ -117,7 +114,7 @@ export function TechnicianDashboard() {
       }
       return true;
     });
-  }, [issues, retentionMode]);
+  }, [issues, retentionMode, currentTime]);
 
   // Widget 1: Equipment Health Index calculation
   const healthIndex = useMemo(() => {
@@ -157,22 +154,22 @@ export function TechnicianDashboard() {
     {
       id: 'new',
       title: 'Новые заявки',
-      Icon: IconInbox,
-      badgeColor: '#3b82f6',
+      Icon: Inbox,
+      indicatorColor: 'var(--primary)',
       items: visibleIssues.filter((i) => i.status === 'new'),
     },
     {
       id: 'in_progress',
       title: 'В работе',
-      Icon: IconWrench,
-      badgeColor: '#f59e0b',
+      Icon: Wrench,
+      indicatorColor: 'var(--warning)',
       items: visibleIssues.filter((i) => i.status === 'in_progress'),
     },
     {
       id: 'resolved',
-      title: 'Закрытые / Выполнено',
-      Icon: IconCheckCircle,
-      badgeColor: '#10b981',
+      title: 'Закрытые',
+      Icon: CheckCircle2,
+      indicatorColor: 'var(--success)',
       items: visibleIssues.filter((i) => i.status === 'resolved'),
     },
   ];
@@ -190,12 +187,11 @@ export function TechnicianDashboard() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '9px 18px',
-              boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+              padding: '8px 16px',
               fontWeight: 600,
             }}
           >
-            <IconPlus size={17} />
+            <Plus size={16} />
             <span>Создать заявку</span>
           </Button>
         }
@@ -207,8 +203,8 @@ export function TechnicianDashboard() {
           style={{
             padding: '14px 18px',
             borderRadius: 'var(--radius-md)',
-            backgroundColor: 'var(--primary-light)',
-            border: '1px solid rgba(37, 99, 235, 0.3)',
+            backgroundColor: 'var(--bg-subtle)',
+            border: '1px solid var(--border-color)',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
@@ -217,21 +213,21 @@ export function TechnicianDashboard() {
         >
           <div
             style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--primary)',
-              color: '#ffffff',
+              width: '32px',
+              height: '32px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'var(--primary-light)',
+              color: 'var(--primary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
             }}
           >
-            <IconShield size={18} />
+            <Shield size={16} />
           </div>
           <div>
-            <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--primary)', marginBottom: '2px' }}>
+            <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-primary)', marginBottom: '2px' }}>
               Режим администратора: просмотр и аналитика
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
@@ -255,22 +251,22 @@ export function TechnicianDashboard() {
             style={{
               backgroundColor: 'var(--primary-light)',
               color: 'var(--primary)',
-              borderRadius: 'var(--radius-md)',
-              width: '46px',
-              height: '46px',
+              borderRadius: 'var(--radius-sm)',
+              width: '42px',
+              height: '42px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
             }}
           >
-            <IconInbox size={22} />
+            <Inbox size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Всего открыто
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
               {stats.totalOpen}
             </div>
           </div>
@@ -282,24 +278,23 @@ export function TechnicianDashboard() {
             display: 'flex',
             alignItems: 'center',
             gap: '14px',
-            border: stats.criticalCount > 0 ? '1.5px solid var(--danger)' : '1px solid var(--border-color)',
-            backgroundColor: stats.criticalCount > 0 ? 'rgba(230, 57, 70, 0.06)' : 'var(--bg-surface)',
+            borderLeft: stats.criticalCount > 0 ? '3px solid var(--danger)' : undefined,
           }}
         >
           <div
             style={{
               backgroundColor: stats.criticalCount > 0 ? 'var(--danger-light)' : 'var(--bg-subtle)',
               color: stats.criticalCount > 0 ? 'var(--danger)' : 'var(--text-muted)',
-              borderRadius: 'var(--radius-md)',
-              width: '46px',
-              height: '46px',
+              borderRadius: 'var(--radius-sm)',
+              width: '42px',
+              height: '42px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
             }}
           >
-            <IconAlertCircle size={22} />
+            <AlertCircle size={20} />
           </div>
           <div>
             <div
@@ -308,6 +303,7 @@ export function TechnicianDashboard() {
                 color: stats.criticalCount > 0 ? 'var(--danger)' : 'var(--text-muted)',
                 fontWeight: 700,
                 textTransform: 'uppercase',
+                letterSpacing: '0.04em',
               }}
             >
               Критические
@@ -316,6 +312,7 @@ export function TechnicianDashboard() {
               style={{
                 fontSize: '24px',
                 fontWeight: 700,
+                fontFamily: 'var(--font-heading)',
                 color: stats.criticalCount > 0 ? 'var(--danger)' : 'var(--text-primary)',
               }}
             >
@@ -329,22 +326,22 @@ export function TechnicianDashboard() {
             style={{
               backgroundColor: 'var(--warning-light)',
               color: 'var(--warning)',
-              borderRadius: 'var(--radius-md)',
-              width: '46px',
-              height: '46px',
+              borderRadius: 'var(--radius-sm)',
+              width: '42px',
+              height: '42px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
             }}
           >
-            <IconClock size={22} />
+            <Clock size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               В работе
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--warning)' }}>
+            <div style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--warning)' }}>
               {stats.inProgressCount}
             </div>
           </div>
@@ -355,22 +352,22 @@ export function TechnicianDashboard() {
             style={{
               backgroundColor: 'var(--success-light)',
               color: 'var(--success)',
-              borderRadius: 'var(--radius-md)',
-              width: '46px',
-              height: '46px',
+              borderRadius: 'var(--radius-sm)',
+              width: '42px',
+              height: '42px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
             }}
           >
-            <IconCheckCircle size={22} />
+            <CheckCircle2 size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Закрыто
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--success)' }}>
+            <div style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--success)' }}>
               {stats.resolvedCount}
             </div>
           </div>
@@ -381,29 +378,29 @@ export function TechnicianDashboard() {
             style={{
               backgroundColor: 'var(--bg-subtle)',
               color: 'var(--text-primary)',
-              borderRadius: 'var(--radius-md)',
-              width: '46px',
-              height: '46px',
+              borderRadius: 'var(--radius-sm)',
+              width: '42px',
+              height: '42px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
             }}
           >
-            <IconActivity size={22} />
+            <Activity size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Ср. время ремонта
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '24px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
               {stats.avgResolutionHours}
             </div>
           </div>
         </Card>
       </div>
 
-      {/* Operational Analytics Widgets (Requested by user) */}
+      {/* Operational Analytics Widgets */}
       <div
         style={{
           display: 'grid',
@@ -416,33 +413,35 @@ export function TechnicianDashboard() {
         <Card style={{ padding: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <IconActivity size={18} style={{ color: 'var(--primary)' }} />
+              <Activity size={16} style={{ color: 'var(--primary)' }} />
               <span style={{ fontSize: '13px', fontWeight: 600 }}>Индекс исправности оборудования</span>
             </div>
             <span
               style={{
                 fontSize: '11px',
-                fontWeight: 700,
+                fontWeight: 600,
+                fontFamily: 'var(--font-mono)',
                 color: healthIndex >= 90 ? 'var(--success)' : 'var(--warning)',
                 backgroundColor: healthIndex >= 90 ? 'var(--success-light)' : 'var(--warning-light)',
                 padding: '2px 8px',
-                borderRadius: '999px',
+                borderRadius: 'var(--radius-sm)',
+                border: `1px solid ${healthIndex >= 90 ? 'rgba(46, 117, 89, 0.25)' : 'rgba(217, 119, 6, 0.25)'}`,
               }}
             >
-              {healthIndex >= 90 ? 'Штатно' : 'Внимание'}
+              {healthIndex >= 90 ? 'HEALTHY' : 'ATTENTION'}
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)' }}>{healthIndex}%</span>
+            <span style={{ fontSize: '28px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>{healthIndex}%</span>
             <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>парка оборудования в строю</span>
           </div>
 
           {/* Progress bar */}
           <div
             style={{
-              height: '8px',
-              borderRadius: '999px',
+              height: '6px',
+              borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--bg-subtle)',
               overflow: 'hidden',
               marginBottom: '8px',
@@ -453,7 +452,7 @@ export function TechnicianDashboard() {
                 width: `${healthIndex}%`,
                 height: '100%',
                 backgroundColor: healthIndex >= 90 ? 'var(--success)' : 'var(--warning)',
-                borderRadius: '999px',
+                borderRadius: 'var(--radius-sm)',
                 transition: 'width 0.4s ease',
               }}
             />
@@ -467,26 +466,26 @@ export function TechnicianDashboard() {
         <Card style={{ padding: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <IconWrench size={18} style={{ color: 'var(--primary)' }} />
+              <Wrench size={16} style={{ color: 'var(--primary)' }} />
               <span style={{ fontSize: '13px', fontWeight: 600 }}>Распределение по категориям</span>
             </div>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Всего: {allIssues.length}</span>
+            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>Всего: {allIssues.length}</span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {categoryStats.slice(0, 4).map((cat) => (
               <div key={cat.key}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '2px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '3px' }}>
                   <span style={{ color: 'var(--text-secondary)' }}>{cat.label}</span>
-                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{cat.count} шт ({cat.pct}%)</span>
+                  <span style={{ fontWeight: 600, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{cat.count} ({cat.pct}%)</span>
                 </div>
-                <div style={{ height: '5px', borderRadius: '999px', backgroundColor: 'var(--bg-subtle)', overflow: 'hidden' }}>
+                <div style={{ height: '4px', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-subtle)', overflow: 'hidden' }}>
                   <div
                     style={{
                       width: `${Math.max(5, cat.pct)}%`,
                       height: '100%',
                       backgroundColor: 'var(--primary)',
-                      borderRadius: '999px',
+                      borderRadius: 'var(--radius-sm)',
                     }}
                   />
                 </div>
@@ -498,27 +497,27 @@ export function TechnicianDashboard() {
         {/* Widget C: SLA & Response Standards */}
         <Card style={{ padding: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-            <IconClock size={18} style={{ color: 'var(--primary)' }} />
+            <Clock size={16} style={{ color: 'var(--primary)' }} />
             <span style={{ fontSize: '13px', fontWeight: 600 }}>Нормативы обслуживания (SLA)</span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div style={{ padding: '10px', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ padding: '10px', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Время реакции</div>
-              <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--success)' }}>&lt; 30 мин</div>
+              <div style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--success)' }}>&lt; 30 мин</div>
               <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Первый отклик техника</div>
             </div>
 
-            <div style={{ padding: '10px', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ padding: '10px', backgroundColor: 'var(--bg-subtle)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Соблюдение SLA</div>
-              <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--primary)' }}>98.2%</div>
+              <div style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--primary)' }}>98.2%</div>
               <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>В установленный срок</div>
             </div>
           </div>
 
           <div
             style={{
-              marginTop: '10px',
+              marginTop: '12px',
               fontSize: '11px',
               color: 'var(--text-muted)',
               display: 'flex',
@@ -526,14 +525,14 @@ export function TechnicianDashboard() {
               gap: '6px',
             }}
           >
-            <IconArchive size={14} />
+            <Archive size={13} />
             <span>Регламент: закрытые заявки активны 7 дней, затем уходят в архив.</span>
           </div>
         </Card>
       </div>
 
       {/* Filter and View Controls Bar */}
-      <Card style={{ marginBottom: '20px', padding: '16px' }}>
+      <Card style={{ marginBottom: '20px', padding: '14px 16px' }}>
         <div
           style={{
             display: 'flex',
@@ -552,7 +551,7 @@ export function TechnicianDashboard() {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 width: '100%',
-                padding: '8px 12px 8px 34px',
+                padding: '7px 12px 7px 32px',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--border-color)',
                 backgroundColor: 'var(--bg-surface)',
@@ -561,8 +560,8 @@ export function TechnicianDashboard() {
                 boxSizing: 'border-box',
               }}
             />
-            <IconSearch
-              size={15}
+            <Search
+              size={14}
               style={{
                 position: 'absolute',
                 left: '10px',
@@ -679,7 +678,7 @@ export function TechnicianDashboard() {
             </button>
           </div>
 
-          {/* View mode toggle (Icons instead of text/emojis) */}
+          {/* View mode toggle */}
           <div
             style={{
               display: 'flex',
@@ -704,7 +703,7 @@ export function TechnicianDashboard() {
                 cursor: 'pointer',
               }}
             >
-              <IconLayoutGrid size={14} />
+              <LayoutGrid size={13} />
               <span>Канбан</span>
             </button>
             <button
@@ -723,7 +722,7 @@ export function TechnicianDashboard() {
                 cursor: 'pointer',
               }}
             >
-              <IconList size={14} />
+              <List size={13} />
               <span>Список ({visibleIssues.length})</span>
             </button>
           </div>
@@ -779,32 +778,35 @@ export function TechnicianDashboard() {
                 }}
               >
                 {/* Column Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '4px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <div
                       style={{
-                        width: '26px',
-                        height: '26px',
-                        borderRadius: '6px',
-                        backgroundColor: col.badgeColor,
-                        color: '#ffffff',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: 'var(--radius-sm)',
+                        backgroundColor: 'var(--bg-surface)',
+                        border: '1px solid var(--border-color)',
+                        color: col.indicatorColor,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                     >
-                      <ColumnIcon size={14} />
+                      <ColumnIcon size={13} />
                     </div>
-                    <h4 style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>{col.title}</h4>
+                    <h4 style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'var(--font-heading)', margin: 0 }}>{col.title}</h4>
                   </div>
                   <span
                     style={{
-                      backgroundColor: col.badgeColor,
-                      color: '#ffffff',
-                      fontSize: '12px',
-                      fontWeight: 700,
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '11px',
+                      fontWeight: 600,
                       padding: '2px 8px',
-                      borderRadius: '999px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--bg-surface)',
+                      color: 'var(--text-secondary)',
                     }}
                   >
                     {col.items.length}
@@ -856,9 +858,9 @@ export function TechnicianDashboard() {
             <Card style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px 16px' }}>
               <div
                 style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: 'var(--radius-sm)',
                   backgroundColor: 'var(--bg-subtle)',
                   color: 'var(--text-muted)',
                   display: 'inline-flex',
@@ -867,9 +869,9 @@ export function TechnicianDashboard() {
                   marginBottom: '10px',
                 }}
               >
-                <IconSearch size={22} />
+                <Search size={20} />
               </div>
-              <h4 style={{ margin: 0, fontSize: '16px' }}>Заявок по заданным критериям не найдено</h4>
+              <h4 style={{ margin: 0, fontSize: '15px', fontFamily: 'var(--font-heading)' }}>Заявок по заданным критериям не найдено</h4>
             </Card>
           ) : (
             visibleIssues.map((issue) => (
@@ -910,13 +912,13 @@ export function TechnicianDashboard() {
                   gap: '8px',
                 }}
               >
-                <IconAlertCircle size={16} />
+                <AlertCircle size={15} />
                 <span>{resolveError}</span>
               </div>
             )}
 
             <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Кабинет: <b>{resolvingIssue.location}</b> | Заявитель: <b>{resolvingIssue.reportedByName}</b>
+              Кабинет: <b style={{ color: 'var(--text-primary)' }}>{resolvingIssue.location}</b> | Заявитель: <b style={{ color: 'var(--text-primary)' }}>{resolvingIssue.reportedByName}</b>
             </div>
 
             <div>
@@ -957,17 +959,15 @@ export function TechnicianDashboard() {
               </Button>
               <Button
                 type="submit"
+                variant="primary"
                 style={{
-                  backgroundColor: 'var(--success)',
-                  color: '#ffffff',
-                  border: 'none',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
                 }}
                 disabled={submittingResolve}
               >
-                <IconCheck size={15} />
+                <Check size={14} />
                 <span>{submittingResolve ? 'Сохранение...' : 'Подтвердить и закрыть'}</span>
               </Button>
             </div>

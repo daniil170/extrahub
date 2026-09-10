@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import {
+  MapPin,
+  AlertCircle,
+  Check,
+  CheckCircle2,
+  Wrench,
+} from 'lucide-react';
+import {
   Modal,
   Badge,
   Button,
-  IconMapPin,
-  IconAlertCircle,
-  IconCheck,
-  IconCheckCircle,
-  IconWrench,
 } from '../../shared/ui/index.js';
 import {
   ISSUE_PRIORITY_META,
@@ -155,7 +157,7 @@ export function IssueDetailsModal({
               gap: '8px',
             }}
           >
-            <IconAlertCircle size={16} />
+            <AlertCircle size={16} />
             <span>{actionError}</span>
           </div>
         )}
@@ -169,14 +171,15 @@ export function IssueDetailsModal({
             padding: '12px 16px',
             backgroundColor: 'var(--bg-subtle)',
             borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--border-color)',
           }}
         >
           <div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Статус</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Статус</div>
             <Badge variant={statusMeta.badgeVariant}>{statusMeta.label}</Badge>
           </div>
           <div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Приоритет</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Приоритет</div>
             <Badge variant={priorityMeta.badgeVariant}>
               <span
                 style={{
@@ -192,14 +195,14 @@ export function IssueDetailsModal({
             </Badge>
           </div>
           <div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Локация</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Локация</div>
             <div style={{ fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <IconMapPin size={14} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+              <MapPin size={14} style={{ color: 'var(--primary)', flexShrink: 0 }} />
               <span>{issue.location}</span>
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Категория</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Категория</div>
             <div style={{ fontSize: '13px', fontWeight: 600 }}>{categoryMeta.label}</div>
           </div>
         </div>
@@ -250,23 +253,25 @@ export function IssueDetailsModal({
         {issue.status === 'resolved' && (
           <div
             style={{
-              backgroundColor: 'var(--success-light)',
-              border: '1px solid var(--success)',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-color)',
+              borderLeft: '3px solid var(--success)',
               borderRadius: 'var(--radius-md)',
               padding: '14px 16px',
             }}
           >
             <div
               style={{
-                fontWeight: 700,
+                fontWeight: 600,
                 color: 'var(--success)',
                 marginBottom: '4px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
+                fontSize: '13px',
               }}
             >
-              <IconCheckCircle size={16} />
+              <CheckCircle2 size={16} />
               <span>Выполненные работы по ремонту:</span>
             </div>
             <div style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: '6px' }}>
@@ -304,7 +309,7 @@ export function IssueDetailsModal({
                 onClick={handleExecuteTakeIntoWork}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                <IconWrench size={15} />
+                <Wrench size={14} />
                 <span>Взять заявку в работу</span>
               </Button>
             )}
@@ -312,17 +317,15 @@ export function IssueDetailsModal({
             {isTechnician && issue.status === 'in_progress' && !isResolving && (
               <Button
                 size="sm"
+                variant="primary"
                 style={{
-                  backgroundColor: 'var(--success)',
-                  color: '#ffffff',
-                  border: 'none',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
                 }}
                 onClick={() => setIsResolving(true)}
               >
-                <IconCheck size={15} />
+                <Check size={14} />
                 <span>Закрыть с отчётом</span>
               </Button>
             )}
@@ -420,17 +423,15 @@ export function IssueDetailsModal({
               <Button
                 type="submit"
                 size="sm"
+                variant="primary"
                 style={{
-                  backgroundColor: 'var(--success)',
-                  color: '#ffffff',
-                  border: 'none',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
                 }}
                 disabled={submittingResolution}
               >
-                <IconCheck size={14} />
+                <Check size={14} />
                 <span>{submittingResolution ? 'Сохранение...' : 'Подтвердить и закрыть'}</span>
               </Button>
             </div>
