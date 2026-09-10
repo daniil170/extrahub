@@ -15,6 +15,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+code,
+pre,
+kbd,
+samp,
+.font-mono {
+  font-family: var(--font-mono);
+}
+
 #root {
   min-height: 100vh;
   display: flex;
@@ -191,87 +212,84 @@ html, body {
   }
 }
 
-/* Smooth Card Hover Interactions (150-250ms) */
+/* Minimalist Card Interactions (1px subtle border, elevation on hover only) */
 .app-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: none;
 }
 
 .interactive-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  box-shadow: none;
 }
 
 .interactive-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
 }
 
-/* Cancel Enrollment Action Button */
+/* Monospace Status Tag (Linear/Vercel style - no heavy pills) */
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-color);
+  background-color: transparent;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
+.status-tag-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+/* Cancel Enrollment Action Button (Restrained Minimalist) */
 .btn-cancel-enrollment {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 500;
   line-height: 1.4;
-  border-radius: 9999px;
-  border: 1px solid rgba(230, 57, 70, 0.25);
-  background-color: var(--danger-light);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  background-color: transparent;
   color: var(--danger);
   cursor: pointer;
   outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease;
 }
 
 .btn-cancel-enrollment:hover {
-  background-color: var(--danger);
+  background-color: var(--danger-light);
   border-color: var(--danger);
-  color: #ffffff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
 }
 
 .btn-cancel-enrollment:active {
   transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.btn-cancel-enrollment svg {
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
-
-.btn-cancel-enrollment:hover svg {
-  transform: scale(1.12);
-}
-
-[data-theme='dark'] .btn-cancel-enrollment {
-  border-color: rgba(248, 113, 113, 0.28);
-  background-color: rgba(248, 113, 113, 0.12);
-  color: #f87171;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme='dark'] .btn-cancel-enrollment:hover {
-  background-color: #ef4444;
-  border-color: #ef4444;
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
 }
 
 /* Footer Link Enhancements */
 .footer-link {
-  transition: color 0.15s ease, transform 0.15s ease;
+  transition: color 0.15s ease;
   display: inline-block;
 }
 
 .footer-link:hover {
   color: var(--primary) !important;
-  transform: translateX(2px);
 }
 
 
