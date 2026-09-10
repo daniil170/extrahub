@@ -14,6 +14,7 @@ const ROLE_CABINETS = {
   teacher: { to: '/teacher', label: 'Кабинет преподавателя' },
   coordinator: { to: '/coordinator', label: 'Панель координатора' },
   admin: { to: '/coordinator', label: 'Панель администратора' },
+  technician: { to: '/technician', label: 'Заявки на ремонт' },
 };
 
 function ThemeToggleButton({ isDark, onToggle }) {
@@ -187,20 +188,38 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
           </NavLink>
 
           <nav className="nav-desktop-links">
-            <NavLink to="/catalog" style={navLinkStyle}>
-              Каталог
-            </NavLink>
-
-            {/* Dynamic cabinet link only visible for authorized users */}
-            {currentUser && userCabinet && (
-              <NavLink to={userCabinet.to} style={navLinkStyle}>
-                {userCabinet.label}
+            {currentUser?.role === 'technician' ? (
+              <NavLink to="/technician" style={navLinkStyle}>
+                Заявки на ремонт
               </NavLink>
-            )}
+            ) : (
+              <>
+                <NavLink to="/catalog" style={navLinkStyle}>
+                  Каталог
+                </NavLink>
 
-            <NavLink to="/about" style={navLinkStyle}>
-              О платформе
-            </NavLink>
+                {/* Dynamic cabinet link only visible for authorized users */}
+                {currentUser && userCabinet && (
+                  <NavLink to={userCabinet.to} style={navLinkStyle}>
+                    {userCabinet.label}
+                  </NavLink>
+                )}
+
+                {/* Equipment maintenance access for teacher and admin */}
+                {currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin') && (
+                  <NavLink
+                    to={currentUser.role === 'teacher' ? '/teacher/equipment' : '/technician'}
+                    style={navLinkStyle}
+                  >
+                    Заявки на ремонт
+                  </NavLink>
+                )}
+
+                <NavLink to="/about" style={navLinkStyle}>
+                  О платформе
+                </NavLink>
+              </>
+            )}
           </nav>
         </div>
 
@@ -217,7 +236,20 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '13px', fontWeight: 600 }}>{currentUser.fullName}</div>
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                  Роль: <b>{currentUser.role === 'admin' ? 'Администратор ⚙️' : currentUser.role === 'coordinator' ? 'Координатор 📋' : currentUser.role}</b>
+                  Роль:{' '}
+                  <b>
+                    {currentUser.role === 'admin'
+                      ? 'Администратор ⚙️'
+                      : currentUser.role === 'coordinator'
+                        ? 'Координатор 📋'
+                        : currentUser.role === 'technician'
+                          ? 'Техник 🛠️'
+                          : currentUser.role === 'teacher'
+                            ? 'Преподаватель 👨‍🏫'
+                            : currentUser.role === 'parent'
+                              ? 'Родитель 👨‍👩‍👦'
+                              : 'Ученик 🎓'}
+                  </b>
                 </div>
               </div>
 
@@ -240,6 +272,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                 <option value="parent">Родитель</option>
                 <option value="teacher">Преподаватель</option>
                 <option value="coordinator">Координатор</option>
+                <option value="technician">Техник / Завхоз</option>
                 <option value="admin">Администратор</option>
               </select>
 
@@ -376,6 +409,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                     { role: 'parent', label: 'Родитель', icon: '👨‍👩‍👦' },
                     { role: 'teacher', label: 'Преподаватель', icon: '👨‍🏫' },
                     { role: 'coordinator', label: 'Координатор', icon: '📋' },
+                    { role: 'technician', label: 'Техник', icon: '🛠️' },
                     { role: 'admin', label: 'Администратор', icon: '⚙️' },
                   ].map((r) => {
                     const isSelected = currentUser.role === r.role;
@@ -418,19 +452,37 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
 
           {/* Navigation Links */}
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <NavLink to="/catalog" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-              📚 Каталог кружков
-            </NavLink>
-
-            {currentUser && userCabinet && (
-              <NavLink to={userCabinet.to} style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-                🏛️ {userCabinet.label}
+            {currentUser?.role === 'technician' ? (
+              <NavLink to="/technician" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
+                🛠️ Заявки на ремонт
               </NavLink>
-            )}
+            ) : (
+              <>
+                <NavLink to="/catalog" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
+                  📚 Каталог кружков
+                </NavLink>
 
-            <NavLink to="/about" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-              ℹ️ О платформе и команде
-            </NavLink>
+                {currentUser && userCabinet && (
+                  <NavLink to={userCabinet.to} style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
+                    🏛️ {userCabinet.label}
+                  </NavLink>
+                )}
+
+                {currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin') && (
+                  <NavLink
+                    to={currentUser.role === 'teacher' ? '/teacher/equipment' : '/technician'}
+                    style={mobileNavLinkStyle}
+                    onClick={handleMobileNavClick}
+                  >
+                    🛠️ Заявки на ремонт
+                  </NavLink>
+                )}
+
+                <NavLink to="/about" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
+                  ℹ️ О платформе и команде
+                </NavLink>
+              </>
+            )}
           </nav>
 
           {/* Bottom Action (Login / Logout) */}

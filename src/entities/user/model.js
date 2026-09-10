@@ -1,5 +1,5 @@
 /**
- * @typedef {'student' | 'parent' | 'teacher' | 'coordinator' | 'admin'} UserRole
+ * @typedef {'student' | 'parent' | 'teacher' | 'coordinator' | 'admin' | 'technician'} UserRole
  */
 
 /**
@@ -40,4 +40,5 @@ export const USER_ROLES = {
   TEACHER: 'teacher',
   COORDINATOR: 'coordinator',
   ADMIN: 'admin',
+  TECHNICIAN: 'technician',
 };

@@ -80,6 +80,11 @@ export function AuthProvider({ children }) {
         fullName: 'Администратор школы',
         email: 'admin@extrahub.school',
       },
+      technician: {
+        id: 'technician-1',
+        fullName: 'Серикбаев Болат Маратович (Техник)',
+        email: 'b.serikbaev@extrahub.school',
+      },
     };
 
     const targetProfile = roleProfiles[newRole] || {

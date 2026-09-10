@@ -18,6 +18,10 @@ export function DashboardRedirect() {
       return <Navigate to="/teacher" replace />;
     case 'coordinator':
       return <Navigate to="/coordinator" replace />;
+    case 'technician':
+      return <Navigate to="/technician" replace />;
+    case 'admin':
+      return <Navigate to="/coordinator" replace />;
     case 'student':
     default:
       return <Navigate to="/student" replace />;

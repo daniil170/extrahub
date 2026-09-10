@@ -40,6 +40,20 @@ export function LoginPage() {
       path: '/coordinator',
       icon: '📊',
     },
+    {
+      role: 'technician',
+      title: 'Техник / Завхоз',
+      desc: 'Обслуживание оборудования, ремонт и исполнение заявок',
+      path: '/technician',
+      icon: '🛠️',
+    },
+    {
+      role: 'admin',
+      title: 'Администратор',
+      desc: 'Полный доступ к системе, мониторинг заявок и координация',
+      path: '/coordinator',
+      icon: '⚙️',
+    },
   ];
 
   return (
