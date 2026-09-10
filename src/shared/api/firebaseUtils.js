@@ -22,6 +22,8 @@ export const COLLECTIONS = {
   PARENT_INVITES: 'parentInvites',
   ACHIEVEMENTS: 'achievements',
   NOTIFICATIONS: 'notifications',
+  EQUIPMENT_ISSUES: 'equipmentIssues',
+  ISSUE_COMMENTS: 'issueComments',
 };
 
 /**

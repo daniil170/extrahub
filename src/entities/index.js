@@ -8,3 +8,4 @@ export * from './payment/model.js';
 export * from './invite/model.js';
 export * from './achievement/model.js';
 export * from './notification/model.js';
+export * from './equipmentIssue/model.js';
