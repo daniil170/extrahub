@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
 import { NotificationCenter } from '../../features/notifications/index.js';
 import { useTheme } from '../hooks/index.js';
+import { IconChevronDown, IconLogout, IconUser } from './Icons.jsx';
 
 /**
  * Role to personal cabinet link mapping
@@ -17,6 +18,24 @@ const ROLE_CABINETS = {
   technician: { to: '/technician', label: 'Заявки на ремонт' },
 };
 
+const ROLE_LABELS = {
+  student: 'Ученик',
+  parent: 'Родитель',
+  teacher: 'Преподаватель',
+  coordinator: 'Координатор',
+  technician: 'Техник',
+  admin: 'Администратор',
+};
+
+const AVAILABLE_ROLES = [
+  { role: 'student', label: 'Ученик' },
+  { role: 'parent', label: 'Родитель' },
+  { role: 'teacher', label: 'Преподаватель' },
+  { role: 'coordinator', label: 'Координатор' },
+  { role: 'technician', label: 'Техник' },
+  { role: 'admin', label: 'Администратор' },
+];
+
 function ThemeToggleButton({ isDark, onToggle }) {
   return (
     <button
@@ -28,8 +47,8 @@ function ThemeToggleButton({ isDark, onToggle }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '36px',
-        height: '36px',
+        width: '32px',
+        height: '32px',
         borderRadius: 'var(--radius-sm)',
         border: '1px solid var(--border-color)',
         backgroundColor: 'transparent',
@@ -49,15 +68,14 @@ function ThemeToggleButton({ isDark, onToggle }) {
     >
       {isDark ? (
         <svg
-          width="18"
-          height="18"
+          width="16"
+          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          aria-hidden="true"
         >
           <circle cx="12" cy="12" r="5" />
           <line x1="12" y1="1" x2="12" y2="3" />
@@ -71,15 +89,14 @@ function ThemeToggleButton({ isDark, onToggle }) {
         </svg>
       ) : (
         <svg
-          width="18"
-          height="18"
+          width="16"
+          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          aria-hidden="true"
         >
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
@@ -88,7 +105,17 @@ function ThemeToggleButton({ isDark, onToggle }) {
   );
 }
 
+function getInitials(fullName = '') {
+  if (!fullName) return 'U';
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return parts[0].slice(0, 2).toUpperCase();
+}
+
 /**
+ * Modern compact navigation bar
  * @param {Object} props
  * @param {import('../../entities/user/model.js').User|null} props.currentUser
  * @param {(role: string) => void} props.onSwitchRole
@@ -96,15 +123,27 @@ function ThemeToggleButton({ isDark, onToggle }) {
  */
 export function Navbar({ currentUser, onSwitchRole, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
   const { toggleTheme, isDark } = useTheme();
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const navLinkStyle = ({ isActive }) => ({
     display: 'inline-flex',
     alignItems: 'center',
-    height: '64px',
+    height: '56px',
     padding: '0 4px',
-    margin: '0 12px',
-    fontSize: '14px',
+    margin: '0 10px',
+    fontSize: '13.5px',
     fontWeight: isActive ? 600 : 500,
     color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
     backgroundColor: 'transparent',
@@ -116,9 +155,9 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
   const mobileNavLinkStyle = ({ isActive }) => ({
     display: 'flex',
     alignItems: 'center',
-    padding: '12px 16px',
-    fontSize: '15px',
-    fontWeight: isActive ? 700 : 500,
+    padding: '10px 14px',
+    fontSize: '14px',
+    fontWeight: isActive ? 600 : 500,
     color: isActive ? 'var(--primary)' : 'var(--text-primary)',
     backgroundColor: isActive ? 'var(--primary-light)' : 'transparent',
     borderRadius: 'var(--radius-md)',
@@ -134,6 +173,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
 
   const handleRoleChange = (newRole) => {
     onSwitchRole(newRole);
+    setProfileDropdownOpen(false);
     setMobileMenuOpen(false);
   };
 
@@ -152,33 +192,33 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          height: '64px',
+          height: '56px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
       >
-        {/* Brand logo and desktop navigation */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        {/* Left: Brand logo & Desktop Links */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
           <NavLink
-            to="/catalog"
+            to={currentUser?.role === 'technician' ? '/technician' : '/catalog'}
             onClick={() => setMobileMenuOpen(false)}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '10px',
+              gap: '8px',
               textDecoration: 'none',
             }}
           >
             <img
               src={isDark ? logoDarkImg : logoImg}
-              alt="ExtraHub Logo"
-              style={{ width: '28px', height: '28px', objectFit: 'contain' }}
+              alt="ExtraHub"
+              style={{ width: '26px', height: '26px', objectFit: 'contain' }}
             />
             <span
               style={{
                 fontWeight: 700,
-                fontSize: '18px',
+                fontSize: '17px',
                 color: 'var(--primary)',
                 letterSpacing: '-0.3px',
               }}
@@ -187,7 +227,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
             </span>
           </NavLink>
 
-          <nav className="nav-desktop-links">
+          <nav className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center' }}>
             {currentUser?.role === 'technician' ? (
               <NavLink to="/technician" style={navLinkStyle}>
                 Заявки на ремонт
@@ -198,14 +238,12 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                   Каталог
                 </NavLink>
 
-                {/* Dynamic cabinet link only visible for authorized users */}
                 {currentUser && userCabinet && (
                   <NavLink to={userCabinet.to} style={navLinkStyle}>
                     {userCabinet.label}
                   </NavLink>
                 )}
 
-                {/* Equipment maintenance access for teacher and admin */}
                 {currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin') && (
                   <NavLink
                     to={currentUser.role === 'teacher' ? '/teacher/equipment' : '/technician'}
@@ -223,101 +261,208 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
           </nav>
         </div>
 
-        {/* Desktop user profile & role switcher */}
-        <div className="nav-desktop-user">
-          {/* Theme switcher on desktop (always available) */}
+        {/* Right: Controls & Compact Profile */}
+        <div className="nav-desktop-user" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ThemeToggleButton isDark={isDark} onToggle={toggleTheme} />
 
           {currentUser ? (
             <>
-              {/* Notification Center */}
               <NotificationCenter currentUser={currentUser} />
 
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600 }}>{currentUser.fullName}</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                  Роль:{' '}
-                  <b>
-                    {currentUser.role === 'admin'
-                      ? 'Администратор ⚙️'
-                      : currentUser.role === 'coordinator'
-                        ? 'Координатор 📋'
-                        : currentUser.role === 'technician'
-                          ? 'Техник 🛠️'
-                          : currentUser.role === 'teacher'
-                            ? 'Преподаватель 👨‍🏫'
-                            : currentUser.role === 'parent'
-                              ? 'Родитель 👨‍👩‍👦'
-                              : 'Ученик 🎓'}
-                  </b>
-                </div>
+              {/* Compact User Menu Button */}
+              <div style={{ position: 'relative' }} ref={profileDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setProfileDropdownOpen((prev) => !prev)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '4px 10px 4px 6px',
+                    borderRadius: '999px',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: profileDropdownOpen ? 'var(--bg-subtle)' : 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
+                  onMouseLeave={(e) => {
+                    if (!profileDropdownOpen) e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                  aria-expanded={profileDropdownOpen}
+                >
+                  <div
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--primary-light)',
+                      color: 'var(--primary)',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {getInitials(currentUser.fullName)}
+                  </div>
+
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                      maxWidth: '120px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {currentUser.fullName}
+                  </span>
+
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: 'var(--bg-subtle)',
+                      color: 'var(--text-secondary)',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {ROLE_LABELS[currentUser.role] || currentUser.role}
+                  </span>
+
+                  <IconChevronDown size={12} style={{ color: 'var(--text-muted)' }} />
+                </button>
+
+                {/* Dropdown Popover */}
+                {profileDropdownOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 8px)',
+                      right: 0,
+                      width: '240px',
+                      backgroundColor: 'var(--bg-surface)',
+                      borderRadius: 'var(--radius-md)',
+                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)',
+                      border: '1px solid var(--border-color)',
+                      padding: '8px 0',
+                      zIndex: 100,
+                      animation: 'fadeIn 0.15s ease',
+                    }}
+                  >
+                    {/* User info */}
+                    <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--border-color)' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        {currentUser.fullName}
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', wordBreak: 'break-all' }}>
+                        {currentUser.email}
+                      </div>
+                    </div>
+
+                    {/* Role switcher list */}
+                    <div style={{ padding: '6px 14px' }}>
+                      <div
+                        style={{
+                          fontSize: '10.5px',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.4px',
+                          color: 'var(--text-muted)',
+                          marginBottom: '6px',
+                        }}
+                      >
+                        Демонстрационная роль:
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        {AVAILABLE_ROLES.map((r) => {
+                          const isSelected = currentUser.role === r.role;
+                          return (
+                            <button
+                              key={r.role}
+                              type="button"
+                              onClick={() => handleRoleChange(r.role)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                width: '100%',
+                                padding: '6px 8px',
+                                borderRadius: 'var(--radius-sm)',
+                                border: 'none',
+                                backgroundColor: isSelected ? 'var(--primary-light)' : 'transparent',
+                                color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
+                                fontSize: '12px',
+                                fontWeight: isSelected ? 600 : 400,
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                transition: 'background-color 0.1s ease',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
+                            >
+                              <span>{r.label}</span>
+                              {isSelected && <span style={{ fontSize: '12px' }}>✓</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Logout */}
+                    <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '4px', paddingTop: '4px' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          onLogout();
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          width: '100%',
+                          padding: '8px 14px',
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                          color: 'var(--danger)',
+                          fontSize: '12px',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      >
+                        <IconLogout size={14} />
+                        <span>Выйти из аккаунта</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {/* Dev role switcher */}
-              <select
-                value={currentUser.role}
-                onChange={(e) => onSwitchRole(e.target.value)}
-                style={{
-                  padding: '6px 10px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border-color)',
-                  fontSize: '12px',
-                  backgroundColor: 'var(--bg-surface)',
-                  color: 'var(--text-primary)',
-                  cursor: 'pointer',
-                }}
-                aria-label="Сменить демонстрационную роль"
-              >
-                <option value="student">Студент</option>
-                <option value="parent">Родитель</option>
-                <option value="teacher">Преподаватель</option>
-                <option value="coordinator">Координатор</option>
-                <option value="technician">Техник / Завхоз</option>
-                <option value="admin">Администратор</option>
-              </select>
-
-              <button
-                type="button"
-                onClick={onLogout}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'transparent',
-                  color: 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  transition: 'background-color 0.15s ease, color 0.15s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
-                  e.currentTarget.style.color = 'var(--text-primary)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--text-secondary)';
-                }}
-              >
-                Выйти
-              </button>
             </>
           ) : (
             <NavLink
               to="/login"
               style={{
-                padding: '7px 16px',
+                padding: '6px 14px',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--primary)',
                 color: '#ffffff',
                 fontSize: '13px',
                 fontWeight: 500,
-                transition: 'background-color 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--primary)';
+                textDecoration: 'none',
               }}
             >
               Войти
@@ -325,7 +470,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
           )}
         </div>
 
-        {/* Mobile Actions: Theme Toggle + Notification Bell + Hamburger */}
+        {/* Mobile Actions: Theme + Bell + Hamburger */}
         <div className="nav-mobile-actions">
           <ThemeToggleButton isDark={isDark} onToggle={toggleTheme} />
           {currentUser && <NotificationCenter currentUser={currentUser} />}
@@ -342,7 +487,7 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
         </div>
       </div>
 
-      {/* Mobile Drawer / Slide-down Menu */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div
           style={{
@@ -355,7 +500,6 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
             gap: '14px',
           }}
         >
-          {/* User Profile Card on mobile */}
           {currentUser && (
             <div
               style={{
@@ -364,54 +508,33 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                 borderRadius: 'var(--radius-md)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '8px',
+                gap: '10px',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  👤 {currentUser.fullName}
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  {currentUser.fullName}
                 </div>
                 <span
                   style={{
                     fontSize: '11px',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
+                    fontWeight: 600,
                     padding: '2px 8px',
                     borderRadius: 'var(--radius-sm)',
                     backgroundColor: 'var(--primary-light)',
                     color: 'var(--primary)',
                   }}
                 >
-                  {currentUser.role}
+                  {ROLE_LABELS[currentUser.role] || currentUser.role}
                 </span>
               </div>
 
               <div>
-                <div
-                  style={{
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    color: 'var(--text-secondary)',
-                    marginBottom: '8px',
-                  }}
-                >
-                  Переключить демонстрационную роль:
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '6px' }}>
+                  Сменить роль:
                 </div>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    gap: '8px',
-                  }}
-                >
-                  {[
-                    { role: 'student', label: 'Ученик', icon: '🎓' },
-                    { role: 'parent', label: 'Родитель', icon: '👨‍👩‍👦' },
-                    { role: 'teacher', label: 'Преподаватель', icon: '👨‍🏫' },
-                    { role: 'coordinator', label: 'Координатор', icon: '📋' },
-                    { role: 'technician', label: 'Техник', icon: '🛠️' },
-                    { role: 'admin', label: 'Администратор', icon: '⚙️' },
-                  ].map((r) => {
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
+                  {AVAILABLE_ROLES.map((r) => {
                     const isSelected = currentUser.role === r.role;
                     return (
                       <button
@@ -419,29 +542,18 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                         type="button"
                         onClick={() => handleRoleChange(r.role)}
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '10px 10px',
-                          borderRadius: 'var(--radius-md)',
-                          border: isSelected
-                            ? '2px solid var(--primary)'
-                            : '1px solid var(--border-color)',
-                          backgroundColor: isSelected ? 'var(--primary)' : 'var(--bg-surface)',
-                          color: isSelected ? '#ffffff' : 'var(--text-primary)',
-                          fontWeight: isSelected ? 700 : 600,
-                          fontSize: '13px',
+                          padding: '6px 8px',
+                          borderRadius: 'var(--radius-sm)',
+                          border: isSelected ? '1px solid var(--primary)' : '1px solid var(--border-color)',
+                          backgroundColor: isSelected ? 'var(--primary-light)' : 'var(--bg-surface)',
+                          color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
+                          fontSize: '11px',
+                          fontWeight: isSelected ? 700 : 500,
                           cursor: 'pointer',
-                          boxShadow: isSelected ? '0 2px 4px rgba(30, 58, 95, 0.2)' : 'none',
-                          transition: 'all 0.15s ease',
-                          textAlign: 'left',
+                          textAlign: 'center',
                         }}
                       >
-                        <span style={{ fontSize: '15px' }}>{r.icon}</span>
-                        <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {r.label}
-                        </span>
-                        {isSelected && <span style={{ fontSize: '12px', fontWeight: 800 }}>✓</span>}
+                        {r.label}
                       </button>
                     );
                   })}
@@ -454,17 +566,17 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {currentUser?.role === 'technician' ? (
               <NavLink to="/technician" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-                🛠️ Заявки на ремонт
+                Заявки на ремонт
               </NavLink>
             ) : (
               <>
                 <NavLink to="/catalog" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-                  📚 Каталог кружков
+                  Каталог кружков
                 </NavLink>
 
                 {currentUser && userCabinet && (
                   <NavLink to={userCabinet.to} style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-                    🏛️ {userCabinet.label}
+                    {userCabinet.label}
                   </NavLink>
                 )}
 
@@ -474,18 +586,18 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                     style={mobileNavLinkStyle}
                     onClick={handleMobileNavClick}
                   >
-                    🛠️ Заявки на ремонт
+                    Заявки на ремонт
                   </NavLink>
                 )}
 
                 <NavLink to="/about" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-                  ℹ️ О платформе и команде
+                  О платформе и команде
                 </NavLink>
               </>
             )}
           </nav>
 
-          {/* Bottom Action (Login / Logout) */}
+          {/* Bottom Action */}
           <div style={{ paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
             {currentUser ? (
               <button
@@ -496,18 +608,18 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                 }}
                 style={{
                   width: '100%',
-                  padding: '11px 16px',
-                  borderRadius: 'var(--radius-md)',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-subtle)',
+                  backgroundColor: 'transparent',
                   color: 'var(--danger)',
-                  fontWeight: 600,
-                  fontSize: '14px',
+                  fontWeight: 500,
+                  fontSize: '13px',
                   cursor: 'pointer',
                   textAlign: 'center',
                 }}
               >
-                🚪 Выйти из аккаунта
+                Выйти из аккаунта
               </button>
             ) : (
               <NavLink
@@ -516,12 +628,13 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                 style={{
                   display: 'block',
                   textAlign: 'center',
-                  padding: '11px 16px',
-                  borderRadius: 'var(--radius-md)',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm)',
                   backgroundColor: 'var(--primary)',
                   color: '#ffffff',
                   fontWeight: 600,
-                  fontSize: '14px',
+                  fontSize: '13px',
+                  textDecoration: 'none',
                 }}
               >
                 Войти в систему
