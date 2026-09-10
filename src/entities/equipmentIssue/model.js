@@ -94,11 +94,11 @@ export const ISSUE_CATEGORIES = {
 };
 
 export const ISSUE_CATEGORY_META = {
-  furniture: { label: 'Мебель', icon: '🪑' },
-  hardware: { label: 'Техника и ПК', icon: '💻' },
-  plumbing: { label: 'Сантехника', icon: '🚰' },
-  electrical: { label: 'Электрика', icon: '⚡' },
-  other: { label: 'Прочее', icon: '📦' },
+  furniture: { label: 'Мебель' },
+  hardware: { label: 'Техника и ПК' },
+  plumbing: { label: 'Сантехника' },
+  electrical: { label: 'Электрика' },
+  other: { label: 'Прочее' },
 };
 
 export const ISSUE_PRIORITIES = {
@@ -109,10 +109,10 @@ export const ISSUE_PRIORITIES = {
 };
 
 export const ISSUE_PRIORITY_META = {
-  low: { label: 'Низкий', icon: '🟢', color: '#10b981', badgeVariant: 'default' },
-  medium: { label: 'Средний', icon: '🟡', color: '#f59e0b', badgeVariant: 'warning' },
-  high: { label: 'Высокий', icon: '🟠', color: '#f97316', badgeVariant: 'warning' },
-  critical: { label: 'Критический', icon: '🔴', color: '#ef4444', badgeVariant: 'danger' },
+  low: { label: 'Низкий', color: '#10b981', badgeVariant: 'default' },
+  medium: { label: 'Средний', color: '#f59e0b', badgeVariant: 'warning' },
+  high: { label: 'Высокий', color: '#f97316', badgeVariant: 'warning' },
+  critical: { label: 'Критический', color: '#ef4444', badgeVariant: 'danger' },
 };
 
 export const ISSUE_STATUSES = {
