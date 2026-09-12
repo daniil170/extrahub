@@ -9,4 +9,5 @@ export * from './Modal.jsx';
 export * from './CountdownTimer.jsx';
 export * from './Footer.jsx';
 export * from './Icons.jsx';
+export * from './IntroAnimation.jsx';
 
