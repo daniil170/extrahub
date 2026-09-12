@@ -21,7 +21,7 @@ const WORD_LETTERS = [
  * Features:
  * - Line-drawing SVG contour animation with cubic-bezier easing.
  * - Staggered pop-in for accent blocks.
- * - Gentle letter-by-letter typing for "ExtraHub" (155ms interval) and tagline fade-up.
+ * - Gentle letter-by-letter typing for "ExtraHub" (155ms interval).
  * - Zero layout shift overlay with smooth fade-out into the main application.
  * - Single playback per session (via sessionStorage) with support for dev replay (?intro=replay or window.__replayIntro).
  * - Full prefers-reduced-motion accessibility support.
@@ -29,19 +29,14 @@ const WORD_LETTERS = [
  * @param {Object} props
  * @param {boolean} [props.forcePlay=false] - Force animation to play even if already seen in current session.
  * @param {number} [props.holdDelay=800] - Duration (ms) to keep completed logo visible before starting fade-out.
- * @param {string} [props.taglineText='Запись на кружки и секции'] - Tagline text below the wordmark.
- * @param {boolean} [props.showDevReplay] - Show dev replay button (defaults to true in DEV environment).
  * @param {() => void} [props.onComplete] - Callback fired after fade-out transition completes and overlay unmounts.
  */
 export function IntroAnimation({
   forcePlay = false,
   holdDelay = 800,
-  taglineText = 'Запись на кружки и секции',
-  showDevReplay,
   onComplete,
 }) {
   const isDev = Boolean(import.meta.env.DEV);
-  const allowReplayBtn = showDevReplay ?? isDev;
 
   const shouldInitiallyRun = useCallback(() => {
     if (typeof window === 'undefined') return false;
@@ -60,7 +55,6 @@ export function IntroAnimation({
 
   const [isVisible, setIsVisible] = useState(() => shouldInitiallyRun());
   const [typedCount, setTypedCount] = useState(0);
-  const [showTagline, setShowTagline] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [playCount, setPlayCount] = useState(0);
 
@@ -83,7 +77,6 @@ export function IntroAnimation({
   const startAnimation = useCallback(() => {
     clearAllTimeouts();
     setTypedCount(0);
-    setShowTagline(false);
     setIsFadingOut(false);
     setIsVisible(true);
     markSessionShown();
@@ -94,7 +87,6 @@ export function IntroAnimation({
 
     if (prefersReducedMotion) {
       setTypedCount(WORD_LETTERS.length);
-      setShowTagline(true);
       const timerId = setTimeout(() => {
         setIsFadingOut(true);
         const finishTimer = setTimeout(() => {
@@ -133,24 +125,18 @@ export function IntroAnimation({
           const nextLetterTimer = setTimeout(typeNextLetter, 155);
           timeoutsRef.current.push(nextLetterTimer);
         } else {
-          // Step 6: 450ms after the last letter, reveal tagline
-          const taglineTimer = setTimeout(() => {
-            setShowTagline(true);
+          // After last letter, wait holdDelay then trigger fade-out
+          const fadeOutTimer = setTimeout(() => {
+            setIsFadingOut(true);
 
-            // Step 7 & 8: After hold delay, trigger fade-out
-            const fadeOutTimer = setTimeout(() => {
-              setIsFadingOut(true);
-
-              // Finish and unmount after 500ms fade transition
-              const completeTimer = setTimeout(() => {
-                setIsVisible(false);
-                onComplete?.();
-              }, 500);
-              timeoutsRef.current.push(completeTimer);
-            }, holdDelay);
-            timeoutsRef.current.push(fadeOutTimer);
-          }, 450);
-          timeoutsRef.current.push(taglineTimer);
+            // Finish and unmount after 500ms fade transition
+            const completeTimer = setTimeout(() => {
+              setIsVisible(false);
+              onComplete?.();
+            }, 500);
+            timeoutsRef.current.push(completeTimer);
+          }, holdDelay);
+          timeoutsRef.current.push(fadeOutTimer);
         }
       };
       typeNextLetter();
@@ -159,7 +145,7 @@ export function IntroAnimation({
     timeoutsRef.current.push(typeStartTimer);
   }, [clearAllTimeouts, holdDelay, markSessionShown, onComplete]);
 
-  // Dev helper to trigger replay from window console or buttons
+  // Dev helper to trigger replay from window console
   const replay = useCallback(() => {
     setPlayCount((c) => c + 1);
   }, []);
@@ -272,24 +258,7 @@ export function IntroAnimation({
           </span>
           <span className="intro-cursor" />
         </div>
-
-        {/* Tagline */}
-        <p className={`intro-tagline ${showTagline ? 'show' : ''}`}>{taglineText}</p>
       </div>
-
-      {allowReplayBtn && (
-        <button
-          type="button"
-          className="intro-replay-btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            replay();
-          }}
-          title="Replay intro animation (Dev only)"
-        >
-          Повторить
-        </button>
-      )}
     </div>
   );
 }

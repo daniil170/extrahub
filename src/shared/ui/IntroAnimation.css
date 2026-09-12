@@ -140,54 +140,6 @@
   }
 }
 
-.intro-tagline {
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  color: rgba(240, 245, 250, 0.68);
-  opacity: 0;
-  transform: translateY(6px);
-  margin: 0;
-}
-
-.intro-tagline.show {
-  animation: introFadeUp 0.5s ease-out forwards;
-}
-
-@keyframes introFadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Floating replay button for dev testing */
-.intro-replay-btn {
-  position: fixed;
-  bottom: 22px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 8px 18px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.08);
-  color: #eef3f8;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  opacity: 0;
-  animation: introFadeUp 0.4s ease-out forwards;
-  animation-delay: 2.5s;
-  transition: background 0.2s, transform 0.15s;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  z-index: 100000;
-}
-
-.intro-replay-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  transform: translateX(-50%) scale(1.03);
-}
-
 /* Mobile responsive adjustments */
 @media (max-width: 640px) {
   .intro-logo-wrap {
@@ -207,12 +159,6 @@
   .intro-cursor {
     height: 26px;
     width: 2.5px;
-  }
-
-  .intro-tagline {
-    font-size: 13px;
-    text-align: center;
-    padding: 0 16px;
   }
 }
 
@@ -244,11 +190,5 @@
 
   .intro-cursor {
     animation: none;
-  }
-
-  .intro-tagline {
-    animation: none;
-    opacity: 1;
-    transform: none;
   }
 }
