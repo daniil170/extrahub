@@ -5,6 +5,12 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-family: var(--font-sans);
 
+  /* ExtraHub Brand Colors (Logo & Intro) */
+  --eh-navy: #1a345c;
+  --eh-navy-dark: #122442;
+  --eh-orange: #ff734f;
+  --eh-mint: #99d8b9;
+
   /* Single Confident Accent: Deep Teal #0E7C6B */
   --primary: #0e7c6b;
   --primary-hover: #0a5c4f;
