@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { BarChart3, CreditCard, UserPlus, GraduationCap } from 'lucide-react';
+import { BarChart3, CreditCard, UserPlus, GraduationCap, TrendingUp } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { PageHeader } from '../../shared/ui/index.js';
 import { CapacityOverview } from './CapacityOverview.jsx';
 import { PaymentManagement } from './PaymentManagement.jsx';
 import { StaffInvitesTab } from './StaffInvitesTab.jsx';
 import { ExamApplicationsTab } from './ExamApplicationsTab.jsx';
+import { AnalyticsTab } from './AnalyticsTab.jsx';
 
 export function CoordinatorDashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('capacity'); // 'capacity' | 'payments' | 'invites' | 'exams'
+  const [activeTab, setActiveTab] = useState('capacity'); // 'capacity' | 'payments' | 'invites' | 'exams' | 'analytics'
   const isAdmin = user?.role === 'admin';
 
   return (
@@ -130,6 +131,30 @@ export function CoordinatorDashboard() {
           <GraduationCap size={16} />
           <span>Заявки на экзамен</span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('analytics')}
+          style={{
+            padding: '12px 20px',
+            border: 'none',
+            background: 'none',
+            fontSize: '14px',
+            fontWeight: activeTab === 'analytics' ? 600 : 500,
+            color: activeTab === 'analytics' ? 'var(--primary)' : 'var(--text-secondary)',
+            borderBottom: `2px solid ${activeTab === 'analytics' ? 'var(--primary)' : 'transparent'}`,
+            marginBottom: '-2px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <TrendingUp size={16} />
+          <span>Аналитика и статистика</span>
+        </button>
       </div>
 
       {/* Active Tab View */}
@@ -137,6 +162,7 @@ export function CoordinatorDashboard() {
       {activeTab === 'payments' && <PaymentManagement />}
       {activeTab === 'invites' && <StaffInvitesTab />}
       {activeTab === 'exams' && <ExamApplicationsTab />}
+      {activeTab === 'analytics' && <AnalyticsTab />}
     </div>
   );
 }

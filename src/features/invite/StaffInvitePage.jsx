@@ -10,9 +10,10 @@ import {
   Alert,
   Spinner,
 } from '../../shared/ui/index.js';
-import { ShieldCheck, BookOpen, AlertCircle } from 'lucide-react';
+import { ShieldCheck, BookOpen, AlertCircle, Wrench } from 'lucide-react';
 
 const ALLOWED_EMAIL_DOMAIN = import.meta.env.VITE_ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+const DEMO_MASTER_EMAIL = (import.meta.env.VITE_DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
 
 export function StaffInvitePage() {
   const { token } = useParams();
@@ -78,7 +79,8 @@ export function StaffInvitePage() {
       return;
     }
 
-    if (!targetEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`)) {
+    const isMasterEmail = targetEmail === DEMO_MASTER_EMAIL;
+    if (!isMasterEmail && !targetEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`)) {
       setSubmitError(`Требуется корпоративная школьная почта @${ALLOWED_EMAIL_DOMAIN}`);
       return;
     }
@@ -177,6 +179,7 @@ export function StaffInvitePage() {
 
   const role = inviteData.targetRole || inviteData.invite?.targetRole;
   const isCoordinator = role === 'coordinator';
+  const isTechnician = role === 'technician';
   const hasFixedEmail = Boolean(inviteData.invite?.email);
 
   return (
@@ -201,13 +204,23 @@ export function StaffInvitePage() {
             border: '1px solid rgba(14, 124, 107, 0.2)',
           }}
         >
-          {isCoordinator ? <ShieldCheck size={24} /> : <BookOpen size={24} />}
+          {isCoordinator ? (
+            <ShieldCheck size={24} />
+          ) : isTechnician ? (
+            <Wrench size={24} />
+          ) : (
+            <BookOpen size={24} />
+          )}
           <div>
             <div style={{ fontSize: '11px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
               Назначенная роль
             </div>
             <div style={{ fontSize: '15px', fontWeight: 600 }}>
-              {isCoordinator ? 'Координатор школьных программ' : 'Преподаватель кружка'}
+              {isCoordinator
+                ? 'Координатор школьных программ'
+                : isTechnician
+                  ? 'Техник по ремонту оборудования'
+                  : 'Преподаватель кружка'}
             </div>
             {inviteData.activity && (
               <div style={{ fontSize: '13px', marginTop: '2px', opacity: 0.9 }}>

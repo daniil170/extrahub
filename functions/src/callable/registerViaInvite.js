@@ -2,6 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { db, auth } from '../config/firebase.js';
 
 const ALLOWED_EMAIL_DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+const DEMO_MASTER_EMAIL = (process.env.DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
 
 /**
  * Callable Cloud Function to register staff account (Coordinator / Teacher) via invite token
@@ -56,9 +57,10 @@ export const registerViaInvite = onCall(async (request) => {
     );
   }
 
-  // Domain check for school staff (if not explicitly exempted by pre-set invite email)
+  // Domain check for school staff (if not explicitly exempted by pre-set invite email or master email)
+  const isMasterEmail = trimmedEmail === DEMO_MASTER_EMAIL;
   const isSchoolDomain = trimmedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
-  if (!isSchoolDomain && (!invite.email || !invite.email.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`))) {
+  if (!isMasterEmail && !isSchoolDomain && (!invite.email || !invite.email.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`))) {
     throw new HttpsError(
       'invalid-argument',
       `Регистрация сотрудников возможна только с корпоративной почтой @${ALLOWED_EMAIL_DOMAIN}`

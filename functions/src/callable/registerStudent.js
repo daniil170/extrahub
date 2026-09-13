@@ -2,6 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { db, auth } from '../config/firebase.js';
 
 const ALLOWED_EMAIL_DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+const DEMO_MASTER_EMAIL = (process.env.DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
 
 /**
  * Callable Cloud Function for self-registration of students.
@@ -26,8 +27,9 @@ export const registerStudent = onCall(async (request) => {
     throw new HttpsError('invalid-argument', 'Пароль должен содержать не менее 6 символов');
   }
 
-  // Enforce allowed email domain
-  if (!trimmedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`)) {
+  // Enforce allowed email domain, with exception for demo master account
+  const isMasterEmail = trimmedEmail === DEMO_MASTER_EMAIL;
+  if (!isMasterEmail && !trimmedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`)) {
     throw new HttpsError(
       'invalid-argument',
       `Регистрация учеников разрешена только с корпоративной школьной почтой @${ALLOWED_EMAIL_DOMAIN}`

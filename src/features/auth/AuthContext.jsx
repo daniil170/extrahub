@@ -35,6 +35,13 @@ export function AuthProvider({ children }) {
             firebaseUser.email?.split('@')[0] ||
             'Пользователь';
 
+          const isDemoMaster = Boolean(
+            tokenResult.claims?.isDemoMaster ||
+            profile?.isDemoMaster ||
+            firebaseUser.email?.toLowerCase() === 'daniilivakin30@gmail.com'
+          );
+          const isSwitchedDemo = Boolean(tokenResult.claims?.isSwitchedDemo);
+
           const authenticatedUser = createUser({
             id: firebaseUser.uid,
             email: firebaseUser.email || '',
@@ -43,6 +50,8 @@ export function AuthProvider({ children }) {
             status: profile?.status || 'active',
             className: profile?.className || '',
             phone: profile?.phone || '',
+            isDemoMaster,
+            isSwitchedDemo,
           });
 
           if (isSubscribed) {

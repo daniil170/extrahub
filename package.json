@@ -15,6 +15,7 @@
     "seed": "node scripts/seed-demo-data.js",
     "seed:prod": "node scripts/seed-production-data.js",
     "bootstrap:admin": "node scripts/bootstrap-admin.js",
+    "bootstrap:demo-master": "node scripts/bootstrap-demo-master.js",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -23,7 +24,8 @@
     "qrcode.react": "^4.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-router-dom": "^7.18.3"
+    "react-router-dom": "^7.18.3",
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
