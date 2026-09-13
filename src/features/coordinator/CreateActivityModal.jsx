@@ -11,6 +11,17 @@ const CATEGORIES = [
   'Другое',
 ];
 
+const SUBJECTS = [
+  'Информатика',
+  'Математика',
+  'Физика',
+  'Химия',
+  'Биология',
+  'Английский язык',
+  'Робототехника',
+  'География',
+];
+
 const DEFAULT_MODULES = [
   {
     module: 'Модуль 1',
@@ -62,6 +73,11 @@ const DAYS = [
 export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Технологии');
+  const [activityType, setActivityType] = useState('club'); // 'club' | 'olympic_reserve'
+  const [subject, setSubject] = useState('Информатика');
+  const [allowedClasses, setAllowedClasses] = useState([7, 8, 9, 10, 11]);
+  const [allowedShifts, setAllowedShifts] = useState([1, 2]);
+  const [requiresExam, setRequiresExam] = useState(false);
   const [description, setDescription] = useState('');
   const [ageGroup, setAgeGroup] = useState('10–14 лет (5–8 класс)');
   const [price, setPrice] = useState(24000);
@@ -90,57 +106,56 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
   const [errors, setErrors] = useState({});
 
   const handleFillDemoData = () => {
-    setTitle('3D-моделирование и цифровое производство');
+    setTitle('Олимпийский резерв: Олимпиадное программирование');
     setCategory('Технологии');
+    setActivityType('olympic_reserve');
+    setSubject('Информатика');
+    setAllowedClasses([7, 8, 9, 10, 11]);
+    setAllowedShifts([1, 2]);
+    setRequiresExam(true);
     setDescription(
-      'Практический курс проектирования трёхмерных объектов в Blender и Fusion 360 с печатью собственных изделий на школьном 3D-принтере.'
+      'Интенсивная подготовка сборной школы к республиканским и международным олимпиадам по информатике (IOI, Жаутыковская олимпиада). Алгоритмы, структуры данных и олимпиадные контесты.'
     );
-    setAgeGroup('11–16 лет (6–10 класс)');
-    setPrice(28000);
-    setLocation('Кабинет 308 (FabLab)');
-    setTeacherName('Нурлан Бауржанович Садыков');
+    setAgeGroup('7–11 классы');
+    setPrice(0);
+    setLocation('Кабинет 304 (IT-лаборатория)');
+    setTeacherName('Серик Сакенович Нурпеисов');
     setTeacherBio(
-      'Нурлан Бауржанович — инженер-конструктор и сертифицированный тренер по промышленному дизайну со стажем более 7 лет.'
+      'Серик Сакенович — главный тренер олимпиадной сборной школы, призёр Республиканской олимпиады.'
     );
-    setTargetAudience('Для увлечённых ребят, мечтающих создавать инженерные прототипы и объекты виртуальной реальности.');
-    setRequirements('Специальных навыков не требуется. Ноутбуки и 3D-принтеры предоставляются школьной лабораторией.');
+    setTargetAudience('Для призёров школьных этапов и мотивированных учеников 7–11 классов.');
+    setRequirements('Уверенное знание базового синтаксиса Python или C++. Обязательна сдача вступительного экзамена.');
     setSyllabus([
       {
         module: 'Модуль 1',
-        title: 'Основы полигонального и сплайнового 3D-моделирования',
-        description: 'Координатная сетка, примитивы, полигоны, фаски и базовые операции вращения и выдавливания.',
+        title: 'Теория чисел и базовая комбинаторика',
+        description: 'НОД, алгоритм Евклида, решето Эратосфена, бинарное возведение в степень.',
         hours: '6 ак. ч.',
       },
       {
         module: 'Модуль 2',
-        title: 'Параметрическое проектирование в САПР',
-        description: 'Создание точных чертежей, работа с сопряжениями, резьбами и сборочными узлами деталей.',
+        title: 'Линейные структуры данных и сортировки',
+        description: 'Стек, очередь, дек, быстрая сортировка, бинарный поиск по ответу.',
         hours: '8 ак. ч.',
       },
       {
         module: 'Модуль 3',
-        title: 'Подготовка к аддитивному производству и слайсинг',
-        description: 'Знакомство с Cura/PrusaSlicer, выбор плотности заполнения, поддержек и температурных режимов филамента.',
-        hours: '8 ак. ч.',
+        title: 'Графы: поиск в глубину и ширину (DFS, BFS)',
+        description: 'Компоненты связности, топологическая сортировка, поиск циклов.',
+        hours: '10 ак. ч.',
       },
       {
         module: 'Модуль 4',
-        title: 'Печать на 3D-принтерах и пост-обработка',
-        description: 'Калибровка рабочего стола принтера, запуск печати изделий из PLA/PETG и шлифовка моделей.',
+        title: 'Динамическое программирование',
+        description: 'Одномерное и двумерное ДП, рюкзак, наибольшая возрастающая подпоследовательность.',
         hours: '12 ак. ч.',
       },
       {
         module: 'Модуль 5',
-        title: 'Финальный кейс-проект и выставка',
-        description: 'Создание полезного школьного устройства, презентация проекта родителям и вручение напечатанных изделий.',
-        hours: '6 ак. ч.',
+        title: 'Разбор олимпиадных задач прошлых лет',
+        description: 'Решение задач областных и республиканских этапов олимпиад.',
+        hours: '8 ак. ч.',
       },
-    ]);
-    setOutcomes([
-      'Уверенное владение интерфейсом и инструментами 3D-моделирования',
-      'Понимание физики аддитивного производства и настройка слайсеров',
-      'Создание реальных физических деталей и прототипов с нуля',
-      'Защита собственного инженерного проекта перед аудиторией',
     ]);
     setCreateInitialGroup(true);
     setGroupName('Группа FabLab-1');
@@ -219,8 +234,13 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
     const activityData = {
       title: title.trim(),
       category,
+      type: activityType,
+      subject: activityType === 'olympic_reserve' ? subject.trim() : '',
+      allowedClasses: allowedClasses.map(Number),
+      allowedShifts: allowedShifts.map(Number),
+      requiresExam: Boolean(requiresExam),
       description: description.trim(),
-      ageGroup: ageGroup.trim() || '7–17 лет',
+      ageGroup: ageGroup.trim() || `${allowedClasses.join(', ')} классы`,
       price: Number(price) || 0,
       location: location.trim() || 'Школьный корпус',
       teacherName: teacherName.trim(),
@@ -239,6 +259,10 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
         daysOfWeek: groupDays,
         startTime: groupStartTime,
         endTime: groupEndTime,
+        type: activityType,
+        requiresExam: Boolean(requiresExam),
+        allowedClasses: allowedClasses.map(Number),
+        allowedShifts: allowedShifts.map(Number),
       };
     }
 
@@ -290,6 +314,214 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
             marginBottom: '16px',
           }}
         >
+          {/* Activity Type Selection */}
+          <div style={{ gridColumn: '1 / -1', marginBottom: '4px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>
+              Тип школьной программы <span style={{ color: 'var(--danger)' }}>*</span>
+            </label>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setActivityType('club')}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: `1.5px solid ${activityType === 'club' ? 'var(--primary)' : 'var(--border-color)'}`,
+                  backgroundColor: activityType === 'club' ? 'rgba(14, 165, 233, 0.08)' : 'var(--bg-primary)',
+                  color: activityType === 'club' ? 'var(--primary)' : 'var(--text-primary)',
+                  fontWeight: 600,
+                  fontSize: '13.5px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
+                <span>Обычный кружок (секция)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActivityType('olympic_reserve')}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: `1.5px solid ${activityType === 'olympic_reserve' ? 'var(--accent-coral, #f97316)' : 'var(--border-color)'}`,
+                  backgroundColor: activityType === 'olympic_reserve' ? 'rgba(249, 115, 22, 0.08)' : 'var(--bg-primary)',
+                  color: activityType === 'olympic_reserve' ? 'var(--accent-coral, #f97316)' : 'var(--text-primary)',
+                  fontWeight: 600,
+                  fontSize: '13.5px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
+                <span>Олимпийский резерв</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Subject (Only if Olympic Reserve) */}
+          {activityType === 'olympic_reserve' && (
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '5px' }}>
+                Школьный предмет олимпийского резерва <span style={{ color: 'var(--danger)' }}>*</span>
+              </label>
+              <select
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  fontSize: '14px',
+                  backgroundColor: 'var(--bg-primary)',
+                  color: 'var(--text-primary)',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {SUBJECTS.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Allowed Classes (1 - 11) */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                Доступные классы (1–11)
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setAllowedClasses([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                >
+                  Все классы
+                </button>
+                <span style={{ color: 'var(--border-color)' }}>|</span>
+                <button
+                  type="button"
+                  onClick={() => setAllowedClasses([5, 6, 7, 8, 9])}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                >
+                  5–9 кл.
+                </button>
+                <span style={{ color: 'var(--border-color)' }}>|</span>
+                <button
+                  type="button"
+                  onClick={() => setAllowedClasses([10, 11])}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '12px', cursor: 'pointer', padding: 0 }}
+                >
+                  10–11 кл.
+                </button>
+              </div>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((cls) => {
+                const checked = allowedClasses.includes(cls);
+                return (
+                  <label
+                    key={cls}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 10px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: `1px solid ${checked ? 'var(--primary)' : 'var(--border-color)'}`,
+                      backgroundColor: checked ? 'rgba(14, 165, 233, 0.1)' : 'var(--bg-primary)',
+                      color: checked ? 'var(--primary)' : 'var(--text-secondary)',
+                      fontSize: '13px',
+                      fontWeight: checked ? 600 : 400,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => {
+                        setAllowedClasses((prev) =>
+                          prev.includes(cls)
+                            ? prev.filter((c) => c !== cls)
+                            : [...prev, cls].sort((a, b) => a - b)
+                        );
+                      }}
+                      style={{ accentColor: 'var(--primary)' }}
+                    />
+                    <span>{cls} кл.</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Allowed Shifts & Exam Required */}
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+              Доступные смены
+            </label>
+            <div style={{ display: 'flex', gap: '14px', alignItems: 'center', height: '40px' }}>
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13.5px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={allowedShifts.includes(1)}
+                  onChange={() => {
+                    setAllowedShifts((prev) =>
+                      prev.includes(1) ? prev.filter((s) => s !== 1) : [...prev, 1].sort()
+                    );
+                  }}
+                  style={{ accentColor: 'var(--primary)' }}
+                />
+                <span>1 смена</span>
+              </label>
+
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13.5px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={allowedShifts.includes(2)}
+                  onChange={() => {
+                    setAllowedShifts((prev) =>
+                      prev.includes(2) ? prev.filter((s) => s !== 2) : [...prev, 2].sort()
+                    );
+                  }}
+                  style={{ accentColor: 'var(--primary)' }}
+                />
+                <span>2 смена</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+              Вступительный экзамен
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', height: '40px' }}>
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '13.5px' }}>
+                <input
+                  type="checkbox"
+                  checked={requiresExam}
+                  onChange={(e) => setRequiresExam(e.target.checked)}
+                  style={{ width: '17px', height: '17px', accentColor: 'var(--danger)' }}
+                />
+                <span style={{ fontWeight: requiresExam ? 600 : 400, color: requiresExam ? 'var(--danger)' : 'var(--text-primary)' }}>
+                  {requiresExam ? 'Нужен вступительный экзамен' : 'Свободная запись (без экзамена)'}
+                </span>
+              </label>
+            </div>
+          </div>
+
           {/* Title */}
           <div style={{ gridColumn: '1 / -1' }}>
             <label

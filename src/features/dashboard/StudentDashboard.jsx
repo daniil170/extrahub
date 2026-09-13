@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Rocket,
@@ -13,9 +14,11 @@ import {
   Award,
   Star,
   Medal,
+  GraduationCap,
 } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { useParentDashboard } from './useParentDashboard.js';
+import { subscribeStudentExamApplications } from '../exam/api.js';
 import { Card, Badge, Button, Spinner, Modal, PageHeader, CountdownTimer } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
 import { DEMO_ACHIEVEMENTS } from '../../shared/data/demoData.js';
@@ -38,6 +41,18 @@ export function StudentDashboard() {
     closeCancelModal,
     confirmCancel,
   } = useParentDashboard(user?.id);
+
+  const [examApplications, setExamApplications] = useState([]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const unsubscribe = subscribeStudentExamApplications(user.id, (apps) => {
+      setExamApplications(apps || []);
+    });
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user?.id]);
 
   const mockAchievements = DEMO_ACHIEVEMENTS;
 
@@ -119,7 +134,7 @@ export function StudentDashboard() {
               </Link>
             </div>
 
-            {enrollments.length === 0 ? (
+            {enrollments.length === 0 && examApplications.length === 0 ? (
               <Card style={{ textAlign: 'center', padding: '40px 20px' }}>
                 <div
                   style={{
@@ -152,6 +167,92 @@ export function StudentDashboard() {
               </Card>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Exam Applications */}
+                {examApplications.map((app) => (
+                  <Card
+                    key={app.id}
+                    style={{
+                      borderRadius: 'var(--radius-md)',
+                      borderLeft: `3px solid ${
+                        app.status === 'passed'
+                          ? 'var(--success)'
+                          : app.status === 'failed'
+                            ? 'var(--danger)'
+                            : 'var(--warning)'
+                      }`,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        gap: '12px',
+                        marginBottom: '8px',
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '4px' }}>
+                          <Badge variant="warning">Олимпийский резерв</Badge>
+                          <Badge variant="default">
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              <GraduationCap size={13} />
+                              Вступительный экзамен
+                            </span>
+                          </Badge>
+                        </div>
+                        <h3
+                          style={{
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            fontFamily: 'var(--font-heading)',
+                            margin: 0,
+                            color: 'var(--text-primary)',
+                          }}
+                        >
+                          {app.activityTitle || 'Олимпийский резерв'}
+                        </h3>
+                        {app.groupName && (
+                          <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '3px' }}>
+                            Группа: {app.groupName}
+                          </div>
+                        )}
+                      </div>
+
+                      <div>
+                        {app.status === 'pending' && (
+                          <Badge variant="warning">Заявка на экзамен подана</Badge>
+                        )}
+                        {app.status === 'passed' && (
+                          <Badge variant="success">Экзамен сдан</Badge>
+                        )}
+                        {app.status === 'failed' && (
+                          <Badge variant="danger">Экзамен не сдан</Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: '12.5px',
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-sm)',
+                        backgroundColor: 'var(--bg-subtle)',
+                        color: 'var(--text-secondary)',
+                        marginTop: '6px',
+                      }}
+                    >
+                      {app.status === 'pending' &&
+                        'Заявка передана координатору. Ожидайте проведения и проверки вступительного испытания.'}
+                      {app.status === 'passed' &&
+                        'Поздравляем! Вступительный экзамен сдан. Вы зачислены в секцию.'}
+                      {app.status === 'failed' &&
+                        'К сожалению, вступительный экзамен не сдан. Попробуйте выбрать другие направления в каталоге.'}
+                    </div>
+                  </Card>
+                ))}
+
+                {/* Regular Enrollments */}
                 {enrollments.map((enr) => {
                   const act = enr.activity;
                   const grp = enr.group;

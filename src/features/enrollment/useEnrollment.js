@@ -1,6 +1,7 @@
 import { useState, useCallback, useContext } from 'react';
 import { AuthContext } from '../auth/context.js';
 import { createEnrollmentCall } from './api.js';
+import { createExamApplicationRecord } from '../exam/api.js';
 
 // Default mock students for parent or coordinator testing
 export const MOCK_STUDENTS = [
@@ -68,7 +69,7 @@ export function useEnrollment() {
   }, []);
 
   /**
-   * Submit enrollment request to Cloud Functions
+   * Submit enrollment request or exam application
    */
   const submitEnrollment = useCallback(async () => {
     if (!selectedGroupId || !selectedStudentId) {
@@ -81,6 +82,37 @@ export function useEnrollment() {
     setGeneralError(null);
 
     try {
+      if (activeActivity?.requiresExam) {
+        const selectedGroup =
+          (activeActivity.groups || []).find((g) => g.id === selectedGroupId) ||
+          activeActivity.groups?.[0];
+        const studentName =
+          user?.role === 'student'
+            ? user.fullName || user.displayName || 'Ученик'
+            : MOCK_STUDENTS.find((s) => s.id === selectedStudentId)?.fullName || 'Ученик';
+        const studentClass =
+          user?.role === 'student'
+            ? user.className || ''
+            : MOCK_STUDENTS.find((s) => s.id === selectedStudentId)?.className || '';
+
+        const examResult = await createExamApplicationRecord({
+          studentId: selectedStudentId,
+          groupId: selectedGroupId,
+          activityId: activeActivity.id,
+          activityTitle: activeActivity.title,
+          groupName: selectedGroup?.name || 'Основная группа',
+          studentName,
+          className: studentClass,
+        });
+
+        setEnrollmentResult({
+          ...examResult,
+          isExamApplication: true,
+          activityTitle: activeActivity.title,
+        });
+        return;
+      }
+
       const result = await createEnrollmentCall({
         studentId: selectedStudentId,
         groupId: selectedGroupId,
@@ -103,7 +135,7 @@ export function useEnrollment() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedGroupId, selectedStudentId]);
+  }, [activeActivity, selectedGroupId, selectedStudentId, user]);
 
   return {
     isOpen,

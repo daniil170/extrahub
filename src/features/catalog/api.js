@@ -33,6 +33,11 @@ export function combineCatalogData(rawActivities, rawGroups, rawTeachers) {
 
     return {
       ...act,
+      type: act.type || 'club',
+      subject: act.subject || '',
+      allowedClasses: Array.isArray(act.allowedClasses) ? act.allowedClasses.map(Number) : [],
+      allowedShifts: Array.isArray(act.allowedShifts) ? act.allowedShifts.map(Number) : [1, 2],
+      requiresExam: Boolean(act.requiresExam),
       groups,
       teacherName,
       totalCapacity,
@@ -53,6 +58,15 @@ export async function createActivityRecord(activityData) {
     id: newId,
     title: (activityData.title || '').trim(),
     category: activityData.category || 'Общее развитие',
+    type: activityData.type === 'olympic_reserve' ? 'olympic_reserve' : 'club',
+    subject: activityData.subject ? String(activityData.subject).trim() : '',
+    allowedClasses: Array.isArray(activityData.allowedClasses)
+      ? activityData.allowedClasses.map(Number)
+      : [7, 8, 9, 10, 11],
+    allowedShifts: Array.isArray(activityData.allowedShifts)
+      ? activityData.allowedShifts.map(Number)
+      : [1, 2],
+    requiresExam: Boolean(activityData.requiresExam),
     description: (activityData.description || '').trim(),
     teacherId: activityData.teacherId || `teacher-${Date.now()}`,
     teacherName: activityData.teacherName || 'Преподаватель школы',

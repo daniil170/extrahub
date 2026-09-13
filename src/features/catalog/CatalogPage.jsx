@@ -370,6 +370,14 @@ export function CatalogPage() {
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       <Badge variant="info">{act.category}</Badge>
                       <Badge variant="default">{act.ageGroup}</Badge>
+                      {act.type === 'olympic_reserve' && (
+                        <Badge variant="warning">
+                          Резерв{act.subject ? `: ${act.subject}` : ''}
+                        </Badge>
+                      )}
+                      {act.requiresExam && (
+                        <Badge variant="secondary">Экзамен</Badge>
+                      )}
                     </div>
 
                     {/* Capacity Badge */}
@@ -496,7 +504,11 @@ export function CatalogPage() {
                       openEnrollment(act);
                     }}
                   >
-                    {isFull ? 'В лист ожидания' : 'Записаться'}
+                    {act.requiresExam
+                      ? 'Подать заявку на экзамен'
+                      : isFull
+                        ? 'В лист ожидания'
+                        : 'Записаться'}
                   </Button>
                 </div>
               </Card>

@@ -1,5 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../../shared/hooks/useAuth.js';
 import { subscribeCatalog } from './api.js';
+
+function extractGradeNumber(val) {
+  if (val === undefined || val === null) return null;
+  if (typeof val === 'number') return val;
+  const match = String(val).match(/\d+/);
+  return match ? parseInt(match[0], 10) : null;
+}
 
 /**
  * Filter matcher for grade and age groups
@@ -55,6 +63,7 @@ function matchesDayFilter(groups, dayValue) {
 }
 
 export function useCatalog() {
+  const { user } = useAuth();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -136,9 +145,40 @@ export function useCatalog() {
         return false;
       }
 
+      // 6. Student-specific class and shift filtering (only for role === 'student')
+      if (user?.role === 'student') {
+        const studentClass = extractGradeNumber(user.className);
+        const studentShift =
+          user.shift !== undefined && user.shift !== null ? Number(user.shift) : null;
+
+        // If activity specifies allowedClasses, student's grade must match
+        if (
+          studentClass !== null &&
+          Array.isArray(act.allowedClasses) &&
+          act.allowedClasses.length > 0
+        ) {
+          const allowed = act.allowedClasses.map(Number);
+          if (!allowed.includes(studentClass)) {
+            return false;
+          }
+        }
+
+        // If activity specifies allowedShifts, student's shift must match
+        if (
+          studentShift !== null &&
+          Array.isArray(act.allowedShifts) &&
+          act.allowedShifts.length > 0
+        ) {
+          const allowedShifts = act.allowedShifts.map(Number);
+          if (!allowedShifts.includes(studentShift)) {
+            return false;
+          }
+        }
+      }
+
       return true;
     });
-  }, [activities, debouncedSearch, category, dayOfWeek, ageGroup, onlyAvailable]);
+  }, [activities, debouncedSearch, category, dayOfWeek, ageGroup, onlyAvailable, user]);
 
   const hasActiveFilters =
     Boolean(searchQuery.trim()) ||

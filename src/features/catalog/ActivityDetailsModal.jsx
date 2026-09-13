@@ -90,6 +90,14 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               <Badge variant="info">{activity.category}</Badge>
               <Badge variant="default">{activity.ageGroup}</Badge>
+              {activity.type === 'olympic_reserve' && (
+                <Badge variant="warning">
+                  Олимпийский резерв{activity.subject ? `: ${activity.subject}` : ''}
+                </Badge>
+              )}
+              {activity.requiresExam && (
+                <Badge variant="secondary">Экзамен</Badge>
+              )}
             </div>
             <CapacityBadge remaining={remainingSpots} isFull={isFull} />
           </div>
@@ -580,7 +588,11 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
             </Button>
             {onEnroll && (
               <Button variant={isFull ? 'secondary' : 'primary'} onClick={() => onEnroll(null)}>
-                {isFull ? 'Встать в лист ожидания' : 'Записаться в кружок'}
+                {activity.requiresExam
+                  ? 'Подать заявку на экзамен'
+                  : isFull
+                    ? 'В лист ожидания'
+                    : 'Записаться в кружок'}
               </Button>
             )}
           </div>

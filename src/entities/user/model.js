@@ -14,6 +14,8 @@
  * @property {string} email - Email address
  * @property {string} [phone] - Phone number
  * @property {UserStatus} status - Account status
+ * @property {number} [className] - Grade number (1-11)
+ * @property {number} [shift] - Shift number (1 or 2)
  * @property {string} [createdAt] - ISO date string
  */
 
@@ -30,6 +32,8 @@ export function createUser(data = {}) {
     email: data.email || '',
     phone: data.phone || '',
     status: data.status || 'active',
+    className: data.className ? Number(data.className) : undefined,
+    shift: data.shift ? Number(data.shift) : undefined,
     createdAt: data.createdAt || new Date().toISOString(),
   };
 }

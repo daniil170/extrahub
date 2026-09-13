@@ -24,6 +24,7 @@ export const COLLECTIONS = {
   NOTIFICATIONS: 'notifications',
   EQUIPMENT_ISSUES: 'equipmentIssues',
   ISSUE_COMMENTS: 'issueComments',
+  EXAM_APPLICATIONS: 'examApplications',
 };
 
 /**

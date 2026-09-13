@@ -8,6 +8,11 @@
  * @property {string} ageGroup - Target age or grades range (e.g., "10-14" or "5-8 grades")
  * @property {number} price - Monthly or seasonal price (0 if free)
  * @property {string} location - Room number, gym, or facility name
+ * @property {'club' | 'olympic_reserve'} [type='club'] - Type of activity
+ * @property {string} [subject] - Subject if type === 'olympic_reserve' (e.g. "Математика", "Информатика")
+ * @property {number[]} [allowedClasses] - Allowed school grades (e.g. [7, 8, 9])
+ * @property {number[]} [allowedShifts] - Allowed shifts (1 and/or 2)
+ * @property {boolean} [requiresExam=false] - Whether an entrance exam is required
  */
 
 /**
@@ -39,6 +44,13 @@ export function createActivity(data = {}) {
     ageGroup: data.ageGroup || '',
     price: typeof data.price === 'number' ? data.price : 0,
     location: data.location || '',
+    type: data.type === 'olympic_reserve' ? 'olympic_reserve' : 'club',
+    subject: data.subject || '',
+    allowedClasses: Array.isArray(data.allowedClasses) ? data.allowedClasses.map(Number) : [],
+    allowedShifts: Array.isArray(data.allowedShifts)
+      ? data.allowedShifts.map(Number)
+      : [1, 2],
+    requiresExam: Boolean(data.requiresExam),
   };
 }
 

@@ -175,6 +175,22 @@ service cloud.firestore {
     }
 
     // ==========================================
+    // EXAM APPLICATIONS COLLECTION
+    // ==========================================
+    match /examApplications/{applicationId} {
+      allow read: if isAuthenticated() && (
+        resource.data.studentId == request.auth.uid ||
+        isParentOfStudent(resource.data.studentId) ||
+        isCoordinator()
+      );
+      allow create: if isAuthenticated() && (
+        (isStudent() && request.resource.data.studentId == request.auth.uid) ||
+        isCoordinator()
+      );
+      allow update, delete: if isCoordinator();
+    }
+
+    // ==========================================
     // ATTENDANCE COLLECTION
     // ==========================================
     match /attendance/{attendanceId} {

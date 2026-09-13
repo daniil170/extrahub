@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../app/config/firebase.js';
+import { doc, updateDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../app/config/firebase.js';
 import { registerStudentCall } from '../invite/api.js';
 import {
   Card,
@@ -18,7 +19,8 @@ export function RegisterPage() {
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [className, setClassName] = useState('');
+  const [className, setClassName] = useState('7');
+  const [shift, setShift] = useState(1);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -61,18 +63,43 @@ export function RegisterPage() {
     try {
       setLoading(true);
 
+      const parsedClass = Number(className) || 7;
+      const parsedShift = Number(shift) === 2 ? 2 : 1;
+
       // 1. Call Cloud Function for student registration with server-side validation
       await registerStudentCall({
         fullName: fullName.trim(),
         email: trimmedEmail,
-        className: className.trim(),
+        className: parsedClass,
+        shift: parsedShift,
         password,
       });
 
       // 2. Sign in via Firebase Auth
-      await signInWithEmailAndPassword(auth, trimmedEmail, password);
+      const userCred = await signInWithEmailAndPassword(auth, trimmedEmail, password);
 
-      // 3. Redirect to student cabinet
+      // 3. Ensure profile has className and shift in users and students
+      try {
+        await updateDoc(doc(db, 'users', userCred.user.uid), {
+          className: parsedClass,
+          shift: parsedShift,
+        });
+        await setDoc(
+          doc(db, 'students', userCred.user.uid),
+          {
+            id: userCred.user.uid,
+            fullName: fullName.trim(),
+            email: trimmedEmail,
+            className: parsedClass,
+            shift: parsedShift,
+          },
+          { merge: true }
+        );
+      } catch (syncErr) {
+        console.warn('Profile sync fallback:', syncErr);
+      }
+
+      // 4. Redirect to student cabinet
       navigate('/student');
     } catch (err) {
       console.error('Registration failed:', err);
@@ -168,32 +195,70 @@ export function RegisterPage() {
             )}
           </div>
 
-          {/* Class / Grade */}
-          <div>
-            <label
-              htmlFor="reg-class"
-              style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
-            >
-              Класс
-            </label>
-            <input
-              id="reg-class"
-              type="text"
-              placeholder="Например: 8А или 10Б"
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                outline: 'none',
-              }}
-            />
+          {/* Class (Grade) and Shift */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label
+                htmlFor="reg-class"
+                style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
+              >
+                Класс (1–11) <span style={{ color: 'var(--danger)' }}>*</span>
+              </label>
+              <select
+                id="reg-class"
+                required
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((cls) => (
+                  <option key={cls} value={cls}>
+                    {cls} класс
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="reg-shift"
+                style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
+              >
+                Смена <span style={{ color: 'var(--danger)' }}>*</span>
+              </label>
+              <select
+                id="reg-shift"
+                required
+                value={shift}
+                onChange={(e) => setShift(Number(e.target.value))}
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value={1}>1 смена</option>
+                <option value={2}>2 смена</option>
+              </select>
+            </div>
           </div>
 
           {/* Password */}

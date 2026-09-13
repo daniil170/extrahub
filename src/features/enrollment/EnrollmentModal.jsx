@@ -152,6 +152,66 @@ export function EnrollmentModal({
     }
   };
 
+  // 0. Success state for entrance exam application
+  if (enrollmentResult?.isExamApplication) {
+    return (
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Заявка на экзамен принята"
+        maxWidth="500px"
+      >
+        <div style={{ textAlign: 'center', padding: '12px 8px' }}>
+          <div
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--success-light)',
+              color: 'var(--success)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '16px',
+            }}
+          >
+            <Check size={28} />
+          </div>
+
+          <h3
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: '18px',
+              margin: '0 0 8px',
+              color: 'var(--text-primary)',
+            }}
+          >
+            {activity.title}
+          </h3>
+
+          <p
+            style={{
+              fontSize: '14px',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.5,
+              margin: '0 0 20px',
+            }}
+          >
+            Ваша заявка успешно направлена координатору школы. Координатор проверит заявку и внесёт результат сдачи вступительного испытания. Статус отображается в личном кабинете ученика.
+          </p>
+
+          <Button
+            variant="primary"
+            onClick={onClose}
+            style={{ width: '100%', justifyContent: 'center' }}
+          >
+            Понятно
+          </Button>
+        </div>
+      </Modal>
+    );
+  }
+
   // 1. Success state: Spot held for 24 hours (pending_parent_approval)
   if (enrollmentResult && !enrollmentResult.waitlisted) {
     return (
@@ -390,7 +450,13 @@ export function EnrollmentModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isGroupFull ? 'Встать в лист ожидания' : 'Запись в кружок'}
+      title={
+        activity.requiresExam
+          ? 'Подача заявки на экзамен'
+          : isGroupFull
+            ? 'Встать в лист ожидания'
+            : 'Запись в кружок'
+      }
       maxWidth="520px"
     >
       <div>
@@ -595,9 +661,11 @@ export function EnrollmentModal({
           >
             {isSubmitting
               ? 'Обработка...'
-              : isGroupFull
-                ? 'Встать в лист ожидания'
-                : 'Забронировать место'}
+              : activity.requiresExam
+                ? 'Подать заявку на экзамен'
+                : isGroupFull
+                  ? 'Встать в лист ожидания'
+                  : 'Забронировать место'}
           </Button>
         </div>
       </div>

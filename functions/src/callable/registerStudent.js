@@ -9,7 +9,7 @@ const ALLOWED_EMAIL_DOMAIN = process.env.ALLOWED_EMAIL_DOMAIN || 'pifagorschool.
  * and initializes both 'users' and 'students' Firestore records.
  */
 export const registerStudent = onCall(async (request) => {
-  const { email, password, fullName, className } = request.data || {};
+  const { email, password, fullName, className, shift } = request.data || {};
 
   if (!email || !password) {
     throw new HttpsError('invalid-argument', 'Email и пароль обязательны');
@@ -33,6 +33,11 @@ export const registerStudent = onCall(async (request) => {
       `Регистрация учеников разрешена только с корпоративной школьной почтой @${ALLOWED_EMAIL_DOMAIN}`
     );
   }
+
+  const parsedClass = className !== undefined && className !== null && className !== ''
+    ? Number(className)
+    : 7;
+  const parsedShift = Number(shift) === 2 ? 2 : 1;
 
   // 1. Create user in Firebase Auth
   let userRecord;
@@ -61,7 +66,8 @@ export const registerStudent = onCall(async (request) => {
     email: trimmedEmail,
     fullName: trimmedName,
     role: 'student',
-    className: className ? String(className).trim() : '',
+    className: parsedClass,
+    shift: parsedShift,
     status: 'active',
     createdAt: now,
     updatedAt: now,
@@ -71,7 +77,8 @@ export const registerStudent = onCall(async (request) => {
   await db.collection('students').doc(userRecord.uid).set({
     id: userRecord.uid,
     fullName: trimmedName,
-    className: className ? String(className).trim() : '',
+    className: parsedClass,
+    shift: parsedShift,
     email: trimmedEmail,
     parentIds: [],
     status: 'active',
