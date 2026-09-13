@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   User,
@@ -7,15 +8,17 @@ import {
   Users,
   BookOpen,
   ArrowRight,
+  Lock,
 } from 'lucide-react';
 import { useCatalog } from './useCatalog.js';
 import { useEnrollment } from '../enrollment/useEnrollment.js';
 import { EnrollmentModal } from '../enrollment/EnrollmentModal.jsx';
 import { ActivityDetailsModal } from './ActivityDetailsModal.jsx';
-import { Card, Badge, Button, Spinner, PageHeader, CapacityBadge } from '../../shared/ui/index.js';
+import { Card, Badge, Button, Spinner, PageHeader, CapacityBadge, Modal } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 
 export function CatalogPage() {
+  const navigate = useNavigate();
   const {
     filteredActivities,
     categories,
@@ -37,6 +40,9 @@ export function CatalogPage() {
 
   const {
     isOpen: isEnrollmentOpen,
+    authRequiredModalOpen,
+    authRequiredActivity,
+    closeAuthRequiredModal,
     activeActivity,
     selectedGroupId,
     setSelectedGroupId,
@@ -540,6 +546,87 @@ export function CatalogPage() {
         onSubmit={submitEnrollment}
         userRole={userRole}
       />
+
+      {/* Auth Required Modal for Guests */}
+      <Modal
+        isOpen={authRequiredModalOpen}
+        onClose={closeAuthRequiredModal}
+        title="Требуется авторизация"
+      >
+        <div style={{ textAlign: 'center', padding: '12px 8px' }}>
+          <div
+            style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--primary-light)',
+              color: 'var(--primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+            }}
+          >
+            <Lock size={30} />
+          </div>
+
+          <h3
+            style={{
+              fontSize: '18px',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              margin: '0 0 8px',
+            }}
+          >
+            Войдите в систему для записи
+          </h3>
+
+          <p
+            style={{
+              fontSize: '14px',
+              color: 'var(--text-secondary)',
+              lineHeight: 1.5,
+              margin: '0 0 24px',
+            }}
+          >
+            Запись на направление{' '}
+            <strong>«{authRequiredActivity?.title || 'Кружок'}»</strong> доступна только
+            авторизованным ученикам и родителям школы.
+          </p>
+
+          <div
+            style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Button
+              variant="outline"
+              onClick={() => {
+                closeAuthRequiredModal();
+                navigate('/register');
+              }}
+              style={{ flex: 1, minWidth: '130px', justifyContent: 'center' }}
+            >
+              Регистрация
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                closeAuthRequiredModal();
+                navigate('/login', {
+                  state: { from: '/catalog', activityId: authRequiredActivity?.id },
+                });
+              }}
+              style={{ flex: 1, minWidth: '130px', justifyContent: 'center' }}
+            >
+              Войти в аккаунт
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

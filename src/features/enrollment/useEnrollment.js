@@ -14,6 +14,8 @@ export function useEnrollment() {
   const { user } = useContext(AuthContext) || {};
 
   const [isOpen, setIsOpen] = useState(false);
+  const [authRequiredModalOpen, setAuthRequiredModalOpen] = useState(false);
+  const [authRequiredActivity, setAuthRequiredActivity] = useState(null);
   const [activeActivity, setActiveActivity] = useState(null);
   const [selectedGroupId, setSelectedGroupId] = useState('');
   const [selectedStudentId, setSelectedStudentId] = useState('');
@@ -22,11 +24,23 @@ export function useEnrollment() {
   const [conflictError, setConflictError] = useState(null);
   const [generalError, setGeneralError] = useState(null);
 
+  const closeAuthRequiredModal = useCallback(() => {
+    setAuthRequiredModalOpen(false);
+    setAuthRequiredActivity(null);
+  }, []);
+
   /**
    * Open the enrollment modal for a selected activity
    */
   const openEnrollment = useCallback(
     (activity, preferredGroupId = null) => {
+      // 1. Guard against unauthenticated visitors: prompt to login/register
+      if (!user) {
+        setAuthRequiredActivity(activity);
+        setAuthRequiredModalOpen(true);
+        return;
+      }
+
       setActiveActivity(activity);
       setConflictError(null);
       setGeneralError(null);
@@ -44,12 +58,12 @@ export function useEnrollment() {
       }
 
       // Pick default student based on current user role
-      if (user?.role === 'student') {
+      if (user.role === 'student') {
         setSelectedStudentId(user.id);
-      } else if (user?.role === 'parent') {
+      } else if (user.role === 'parent') {
         setSelectedStudentId(MOCK_STUDENTS[0].id);
       } else {
-        setSelectedStudentId(user?.id || MOCK_STUDENTS[0].id);
+        setSelectedStudentId(user.id || MOCK_STUDENTS[0].id);
       }
 
       setIsOpen(true);
@@ -141,6 +155,9 @@ export function useEnrollment() {
 
   return {
     isOpen,
+    authRequiredModalOpen,
+    authRequiredActivity,
+    closeAuthRequiredModal,
     activeActivity,
     selectedGroupId,
     setSelectedGroupId,
