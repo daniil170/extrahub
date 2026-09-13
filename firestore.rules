@@ -216,18 +216,18 @@ service cloud.firestore {
       allow read: if isAuthenticated() && (
         resource.data.studentId == request.auth.uid ||
         isParentOfStudent(resource.data.studentId) ||
-        isTeacherOfGroup(resource.data.groupId) ||
+        isTeacher() ||
         isCoordinator()
       );
 
-      // Teacher can only mark attendance for their assigned group
+      // Teacher or coordinator can create or update attendance
       allow create: if isAuthenticated() && (
-        (isTeacher() && isTeacherOfGroup(request.resource.data.groupId) && request.resource.data.markedBy == request.auth.uid) ||
+        isTeacher() ||
         isCoordinator()
       );
 
       allow update: if isAuthenticated() && (
-        (isTeacher() && isTeacherOfGroup(resource.data.groupId) && isTeacherOfGroup(request.resource.data.groupId)) ||
+        isTeacher() ||
         isCoordinator()
       );
 

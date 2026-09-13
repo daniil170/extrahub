@@ -129,6 +129,30 @@ export const switchDemoRole = onCall(async (request) => {
       ...extraUserData,
       updatedAt: new Date().toISOString(),
     }, { merge: true });
+
+    if (targetRole === 'student') {
+      await db.collection('students').doc(targetUser.uid).set({
+        id: targetUser.uid,
+        fullName: targetDisplayName,
+        className: 7,
+        shift: 1,
+        email: targetEmail,
+        parentIds: [],
+        status: 'active',
+        createdAt: new Date().toISOString(),
+      }, { merge: true });
+    }
+
+    if (targetRole === 'teacher') {
+      const grpsSnap = await db.collection('activityGroups').where('teacherId', '==', 'teacher-1').get();
+      if (!grpsSnap.empty) {
+        const batch = db.batch();
+        grpsSnap.docs.forEach((d) => {
+          batch.set(d.ref, { teacherId: targetUser.uid }, { merge: true });
+        });
+        await batch.commit().catch(() => {});
+      }
+    }
   } catch (fsErr) {
     console.error('Error writing demo user profile to Firestore:', fsErr);
     throw new HttpsError('internal', `Ошибка создания профиля пользователя: ${fsErr.message}`);

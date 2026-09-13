@@ -28,14 +28,33 @@ export const createEnrollment = onCall(async (request) => {
 
   const [studentDoc, groupDoc] = await Promise.all([studentRef.get(), groupRef.get()]);
 
+  let studentData;
   if (!studentDoc.exists) {
-    throw new HttpsError('not-found', 'Ученик не найден');
+    const userDoc = await db.collection('users').doc(studentId).get();
+    if (userDoc.exists) {
+      const uData = userDoc.data();
+      studentData = {
+        id: studentId,
+        fullName: uData.fullName || 'Ученик',
+        className: uData.className || 7,
+        shift: uData.shift || 1,
+        email: uData.email || '',
+        parentIds: [],
+        status: 'active',
+        createdAt: new Date().toISOString(),
+      };
+      await studentRef.set(studentData);
+    } else {
+      throw new HttpsError('not-found', 'Ученик не найден');
+    }
+  } else {
+    studentData = studentDoc.data();
   }
+
   if (!groupDoc.exists) {
     throw new HttpsError('not-found', 'Группа активности не найдена');
   }
 
-  const studentData = studentDoc.data();
   const groupData = groupDoc.data();
 
   // Check authorization: caller is the student, parent, or coordinator/admin
