@@ -14,6 +14,7 @@
     "test:watch": "vitest",
     "seed": "node scripts/seed-demo-data.js",
     "seed:prod": "node scripts/seed-production-data.js",
+    "bootstrap:admin": "node scripts/bootstrap-admin.js",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -37,6 +38,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.4",
+    "firebase-admin": "^14.4.0",
     "globals": "^17.11.0",
     "prettier": "^3.9.6",
     "vite": "^8.2.2",

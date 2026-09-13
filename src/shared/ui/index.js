@@ -11,4 +11,5 @@ export * from './Footer.jsx';
 export * from './Icons.jsx';
 export * from './IntroAnimation.jsx';
 export * from './CapacityBadge.jsx';
+export * from './Alert.jsx';
 

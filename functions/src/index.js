@@ -14,5 +14,9 @@ export { createEquipmentIssue } from './callable/createEquipmentIssue.js';
 export { updateIssueStatus } from './callable/updateIssueStatus.js';
 export { addIssueComment } from './callable/addIssueComment.js';
 
+export { createStaffInvite } from './callable/createStaffInvite.js';
+export { registerViaInvite } from './callable/registerViaInvite.js';
+export { registerStudent } from './callable/registerStudent.js';
+
 export { promoteFromWaitlist } from './shared/waitlist.js';
 export { findScheduleConflict, doIntervalsOverlap } from './shared/scheduleConflict.js';

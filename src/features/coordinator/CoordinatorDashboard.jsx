@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { BarChart3, CreditCard } from 'lucide-react';
+import { BarChart3, CreditCard, UserPlus } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { PageHeader } from '../../shared/ui/index.js';
 import { CapacityOverview } from './CapacityOverview.jsx';
 import { PaymentManagement } from './PaymentManagement.jsx';
+import { StaffInvitesTab } from './StaffInvitesTab.jsx';
 
 export function CoordinatorDashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('capacity'); // 'capacity' | 'payments'
+  const [activeTab, setActiveTab] = useState('capacity'); // 'capacity' | 'payments' | 'invites'
   const isAdmin = user?.role === 'admin';
 
   return (
@@ -18,8 +19,8 @@ export function CoordinatorDashboard() {
         }`}
         subtitle={
           isAdmin
-            ? 'Администрирование школьных программ, мониторинг заполняемости групп и финансовый аудит'
-            : 'Мониторинг загрузки кружков, управление вместимостью групп и биллинг школьных оплат'
+            ? 'Администрирование школьных программ, мониторинг заполняемости групп и управление сотрудниками'
+            : 'Мониторинг загрузки кружков, управление вместимостью групп и приглашение преподавателей'
         }
       />
 
@@ -30,6 +31,7 @@ export function CoordinatorDashboard() {
           gap: '8px',
           borderBottom: '2px solid var(--border-color)',
           marginBottom: '24px',
+          overflowX: 'auto',
         }}
       >
         <button
@@ -49,6 +51,7 @@ export function CoordinatorDashboard() {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
+            whiteSpace: 'nowrap',
           }}
         >
           <BarChart3 size={16} />
@@ -72,15 +75,42 @@ export function CoordinatorDashboard() {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
+            whiteSpace: 'nowrap',
           }}
         >
           <CreditCard size={16} />
           <span>Выставление и учёт оплаты</span>
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('invites')}
+          style={{
+            padding: '12px 20px',
+            border: 'none',
+            background: 'none',
+            fontSize: '14px',
+            fontWeight: activeTab === 'invites' ? 600 : 500,
+            color: activeTab === 'invites' ? 'var(--primary)' : 'var(--text-secondary)',
+            borderBottom: `2px solid ${activeTab === 'invites' ? 'var(--primary)' : 'transparent'}`,
+            marginBottom: '-2px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <UserPlus size={16} />
+          <span>Приглашения сотрудников</span>
+        </button>
       </div>
 
       {/* Active Tab View */}
-      {activeTab === 'capacity' ? <CapacityOverview /> : <PaymentManagement />}
+      {activeTab === 'capacity' && <CapacityOverview />}
+      {activeTab === 'payments' && <PaymentManagement />}
+      {activeTab === 'invites' && <StaffInvitesTab />}
     </div>
   );
 }

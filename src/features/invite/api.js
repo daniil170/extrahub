@@ -1,5 +1,6 @@
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '../../app/config/firebase.js';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { functions, db } from '../../app/config/firebase.js';
 
 export const MOCK_FALLBACK_INVITE = {
   valid: true,
@@ -38,7 +39,7 @@ export const MOCK_FALLBACK_INVITE = {
 };
 
 /**
- * Fetch parent invite details using secure callable Cloud Function
+ * Fetch invite details (staff or parent) using secure callable Cloud Function
  * @param {string} token
  */
 export async function fetchInviteDetails(token) {
@@ -53,7 +54,7 @@ export async function fetchInviteDetails(token) {
 }
 
 /**
- * Approve enrollment via token
+ * Approve enrollment via parent invite token
  * @param {string} token
  */
 export async function approveInviteCall(token) {
@@ -68,7 +69,7 @@ export async function approveInviteCall(token) {
 }
 
 /**
- * Reject enrollment via token
+ * Reject enrollment via parent invite token
  * @param {string} token
  */
 export async function rejectInviteCall(token) {
@@ -82,3 +83,74 @@ export async function rejectInviteCall(token) {
   }
 }
 
+/**
+ * Create a staff invite (Coordinator or Teacher)
+ * @param {Object} params
+ * @param {'coordinator' | 'teacher'} params.targetRole
+ * @param {string} [params.email]
+ * @param {string} [params.activityId]
+ */
+export async function createStaffInviteCall({ targetRole, email, activityId }) {
+  try {
+    const callable = httpsCallable(functions, 'createStaffInvite');
+    const res = await callable({ targetRole, email, activityId });
+    return res.data;
+  } catch (err) {
+    console.error('createStaffInvite error:', err);
+    throw err;
+  }
+}
+
+/**
+ * Register a staff account using an invite token
+ * @param {Object} params
+ * @param {string} params.inviteToken
+ * @param {string} params.email
+ * @param {string} params.password
+ * @param {string} params.fullName
+ */
+export async function registerViaInviteCall({ inviteToken, email, password, fullName }) {
+  try {
+    const callable = httpsCallable(functions, 'registerViaInvite');
+    const res = await callable({ inviteToken, email, password, fullName });
+    return res.data;
+  } catch (err) {
+    console.error('registerViaInvite error:', err);
+    throw err;
+  }
+}
+
+/**
+ * Register a student account with @pifagorschool.kz domain check
+ * @param {Object} params
+ * @param {string} params.email
+ * @param {string} params.password
+ * @param {string} params.fullName
+ * @param {string} [params.className]
+ */
+export async function registerStudentCall({ email, password, fullName, className }) {
+  try {
+    const callable = httpsCallable(functions, 'registerStudent');
+    const res = await callable({ email, password, fullName, className });
+    return res.data;
+  } catch (err) {
+    console.error('registerStudent error:', err);
+    throw err;
+  }
+}
+
+/**
+ * Fetch list of staff invites from Firestore
+ */
+export async function fetchStaffInvites() {
+  try {
+    const q = query(collection(db, 'invites'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    if (err.code !== 'permission-denied') {
+      console.error('fetchStaffInvites error:', err);
+    }
+    return [];
+  }
+}

@@ -33,7 +33,7 @@ export function ProtectedRoute({ children, allowedRoles }) {
             роль: <b>{user.role}</b>.
           </p>
           <p style={{ marginTop: '12px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-            Вы можете переключить роль в правом верхнем углу (для демонстрации).
+            Пожалуйста, выполните вход с учётной записью, обладающей необходимыми правами доступа.
           </p>
         </Card>
       </div>

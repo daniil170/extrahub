@@ -2,8 +2,9 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { db } from '../config/firebase.js';
 
 /**
- * Callable Cloud Function to safely fetch invite details for parent landing page
- * Does not require parent authentication, but validates token and prevents leaking extraneous data.
+ * Callable Cloud Function to safely fetch invite details.
+ * Supports both staff invitations ('invites' collection) and parent invitations ('parentInvites' collection).
+ * Does not require authentication, but validates token and prevents leaking private info.
  */
 export const getInviteDetails = onCall(async (request) => {
   const inviteToken = request.data?.inviteToken || request.data?.token;
@@ -12,17 +13,72 @@ export const getInviteDetails = onCall(async (request) => {
     throw new HttpsError('invalid-argument', 'Параметр inviteToken или token обязателен');
   }
 
-  const inviteQuery = await db
+  // 1. First check staff invites collection
+  const staffInviteQuery = await db
+    .collection('invites')
+    .where('token', '==', inviteToken)
+    .limit(1)
+    .get();
+
+  if (!staffInviteQuery.empty) {
+    const staffDoc = staffInviteQuery.docs[0];
+    const staffInvite = staffDoc.data();
+
+    if (staffInvite.status !== 'active') {
+      throw new HttpsError(
+        'failed-precondition',
+        `Приглашение не активно (статус: ${staffInvite.status})`
+      );
+    }
+
+    if (new Date(staffInvite.expiresAt) <= new Date()) {
+      throw new HttpsError('failed-precondition', 'Срок действия приглашения истёк');
+    }
+
+    let activity = null;
+    if (staffInvite.relatedEntityId) {
+      const actDoc = await db.collection('activities').doc(staffInvite.relatedEntityId).get();
+      if (actDoc.exists) {
+        const ad = actDoc.data();
+        activity = {
+          id: actDoc.id,
+          title: ad.title || 'Кружок',
+          description: ad.description || '',
+          location: ad.location || '',
+          category: ad.category || '',
+        };
+      }
+    }
+
+    return {
+      valid: true,
+      type: 'staff',
+      targetRole: staffInvite.targetRole,
+      invite: {
+        id: staffDoc.id,
+        token: inviteToken,
+        targetRole: staffInvite.targetRole,
+        email: staffInvite.email || null,
+        relatedEntityId: staffInvite.relatedEntityId || null,
+        status: staffInvite.status,
+        expiresAt: staffInvite.expiresAt,
+      },
+      activity,
+    };
+  }
+
+  // 2. Fallback to parent invites collection
+  const parentInviteQuery = await db
     .collection('parentInvites')
     .where('token', '==', inviteToken)
     .limit(1)
     .get();
 
-  if (inviteQuery.empty) {
+  if (parentInviteQuery.empty) {
     throw new HttpsError('not-found', 'Приглашение не найдено');
   }
 
-  const inviteDoc = inviteQuery.docs[0];
+  const inviteDoc = parentInviteQuery.docs[0];
   const invite = inviteDoc.data();
 
   if (invite.status !== 'active') {
@@ -74,6 +130,8 @@ export const getInviteDetails = onCall(async (request) => {
 
   return {
     valid: true,
+    type: 'parent',
+    targetRole: 'parent',
     invite: {
       id: inviteDoc.id,
       token: inviteToken,

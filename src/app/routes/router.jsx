@@ -5,7 +5,9 @@ import { NotFoundPage } from './NotFoundPage.jsx';
 
 import { CatalogPage } from '../../features/catalog/CatalogPage.jsx';
 import { LoginPage } from '../../features/auth/LoginPage.jsx';
+import { RegisterPage } from '../../features/auth/RegisterPage.jsx';
 import { ParentInvitePage } from '../../features/invite/ParentInvitePage.jsx';
+import { StaffInvitePage } from '../../features/invite/StaffInvitePage.jsx';
 import { AboutPage } from '../../features/about/AboutPage.jsx';
 import {
   StudentDashboard,
@@ -42,8 +44,16 @@ export const router = createBrowserRouter([
         element: <LoginPage />,
       },
       {
+        path: 'register',
+        element: <RegisterPage />,
+      },
+      {
         path: 'invite/:token',
         element: <ParentInvitePage />,
+      },
+      {
+        path: 'staff-invite/:token',
+        element: <StaffInvitePage />,
       },
       {
         path: 'student',

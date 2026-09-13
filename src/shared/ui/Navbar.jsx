@@ -5,7 +5,6 @@ import {
   LogOut,
   Sun,
   Moon,
-  Check,
   Menu,
   X,
 } from 'lucide-react';
@@ -34,15 +33,6 @@ const ROLE_LABELS = {
   technician: 'Техник',
   admin: 'Администратор',
 };
-
-const AVAILABLE_ROLES = [
-  { role: 'student', label: 'Ученик' },
-  { role: 'parent', label: 'Родитель' },
-  { role: 'teacher', label: 'Преподаватель' },
-  { role: 'coordinator', label: 'Координатор' },
-  { role: 'technician', label: 'Техник' },
-  { role: 'admin', label: 'Администратор' },
-];
 
 function ThemeToggleButton({ isDark, onToggle }) {
   return (
@@ -92,10 +82,9 @@ function getInitials(fullName = '') {
  * Modern compact navigation bar
  * @param {Object} props
  * @param {import('../../entities/user/model.js').User|null} props.currentUser
- * @param {(role: string) => void} props.onSwitchRole
  * @param {() => void} props.onLogout
  */
-export function Navbar({ currentUser, onSwitchRole, onLogout }) {
+export function Navbar({ currentUser, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
@@ -142,12 +131,6 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
   const userCabinet = currentUser?.role ? ROLE_CABINETS[currentUser.role] : null;
 
   const handleMobileNavClick = () => {
-    setMobileMenuOpen(false);
-  };
-
-  const handleRoleChange = (newRole) => {
-    onSwitchRole(newRole);
-    setProfileDropdownOpen(false);
     setMobileMenuOpen(false);
   };
 
@@ -346,61 +329,32 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                       </div>
                     </div>
 
-                    {/* Role switcher list */}
-                    <div style={{ padding: '6px 8px' }}>
-                      <div
-                        style={{
-                          fontSize: '10px',
-                          fontWeight: 600,
-                          fontFamily: 'var(--font-mono)',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.06em',
-                          color: 'var(--text-muted)',
-                          padding: '4px 6px',
-                          marginBottom: '2px',
-                        }}
-                      >
-                        Демонстрационная роль:
+                    {/* Cabinet shortcut */}
+                    {userCabinet && (
+                      <div style={{ padding: '6px 8px' }}>
+                        <NavLink
+                          to={userCabinet.to}
+                          onClick={() => setProfileDropdownOpen(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            padding: '8px 10px',
+                            borderRadius: 'var(--radius-xs)',
+                            backgroundColor: 'var(--primary-light)',
+                            color: 'var(--primary)',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            textDecoration: 'none',
+                            transition: 'opacity 0.15s ease',
+                          }}
+                        >
+                          <span>{userCabinet.label}</span>
+                          <span style={{ fontSize: '11px', opacity: 0.8 }}>→</span>
+                        </NavLink>
                       </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                        {AVAILABLE_ROLES.map((r) => {
-                          const isSelected = currentUser.role === r.role;
-                          return (
-                            <button
-                              key={r.role}
-                              type="button"
-                              onClick={() => handleRoleChange(r.role)}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                width: '100%',
-                                padding: '6px 8px',
-                                borderRadius: 'var(--radius-xs)',
-                                border: 'none',
-                                backgroundColor: isSelected ? 'var(--primary-light)' : 'transparent',
-                                color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
-                                fontSize: '12.5px',
-                                fontWeight: isSelected ? 600 : 400,
-                                cursor: 'pointer',
-                                textAlign: 'left',
-                                transition: 'background-color 0.1s ease',
-                              }}
-                              onMouseEnter={(e) => {
-                                if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
-                              }}
-                              onMouseLeave={(e) => {
-                                if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
-                              }}
-                            >
-                              <span>{r.label}</span>
-                              {isSelected && <Check size={13} strokeWidth={2.5} />}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                    )}
 
                     {/* Logout */}
                     <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '4px', paddingTop: '4px' }}>
@@ -436,20 +390,37 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
               </div>
             </>
           ) : (
-            <NavLink
-              to="/login"
-              style={{
-                padding: '5px 12px',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--primary)',
-                color: '#ffffff',
-                fontSize: '13px',
-                fontWeight: 500,
-                textDecoration: 'none',
-              }}
-            >
-              Войти
-            </NavLink>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <NavLink
+                to="/login"
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'transparent',
+                  color: 'var(--text-primary)',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                }}
+              >
+                Войти
+              </NavLink>
+              <NavLink
+                to="/register"
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: 'var(--primary)',
+                  color: '#ffffff',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                }}
+              >
+                Регистрация
+              </NavLink>
+            </div>
           )}
         </div>
 
@@ -510,37 +481,6 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                 >
                   {ROLE_LABELS[currentUser.role] || currentUser.role}
                 </span>
-              </div>
-
-              <div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '6px' }}>
-                  Сменить роль:
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
-                  {AVAILABLE_ROLES.map((r) => {
-                    const isSelected = currentUser.role === r.role;
-                    return (
-                      <button
-                        key={r.role}
-                        type="button"
-                        onClick={() => handleRoleChange(r.role)}
-                        style={{
-                          padding: '6px 8px',
-                          borderRadius: 'var(--radius-sm)',
-                          border: isSelected ? '1px solid var(--primary)' : '1px solid var(--border-color)',
-                          backgroundColor: isSelected ? 'var(--primary-light)' : 'var(--bg-surface)',
-                          color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
-                          fontSize: '11px',
-                          fontWeight: isSelected ? 700 : 500,
-                          cursor: 'pointer',
-                          textAlign: 'center',
-                        }}
-                      >
-                        {r.label}
-                      </button>
-                    );
-                  })}
-                </div>
               </div>
             </div>
           )}
@@ -605,23 +545,43 @@ export function Navbar({ currentUser, onSwitchRole, onLogout }) {
                 Выйти из аккаунта
               </button>
             ) : (
-              <NavLink
-                to="/login"
-                onClick={handleMobileNavClick}
-                style={{
-                  display: 'block',
-                  textAlign: 'center',
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: 'var(--primary)',
-                  color: '#ffffff',
-                  fontWeight: 600,
-                  fontSize: '13px',
-                  textDecoration: 'none',
-                }}
-              >
-                Войти в систему
-              </NavLink>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <NavLink
+                  to="/login"
+                  onClick={handleMobileNavClick}
+                  style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    padding: '10px 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'transparent',
+                    color: 'var(--text-primary)',
+                    fontWeight: 500,
+                    fontSize: '13px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Войти в систему
+                </NavLink>
+                <NavLink
+                  to="/register"
+                  onClick={handleMobileNavClick}
+                  style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    padding: '10px 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--primary)',
+                    color: '#ffffff',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Регистрация ученика
+                </NavLink>
+              </div>
             )}
           </div>
         </div>
