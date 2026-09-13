@@ -95,14 +95,18 @@ export const approveEnrollment = onCall(async (request) => {
         const userRef = db.collection('users').doc(callerUid);
         const userDoc = await userRef.get();
         if (userDoc.exists) {
-          const currentRole = userDoc.data().role;
-          if (!currentRole || currentRole === 'student') {
-            await userRef.update({ role: 'parent' });
-            await auth.setCustomUserClaims(callerUid, { role: 'parent' });
+          const userData = userDoc.data();
+          const isMaster = userData.isDemoMaster || callerUid === 'daniilivakin30@gmail.com';
+          if (!isMaster) {
+            const currentRole = userData.role;
+            if (!currentRole) {
+              await userRef.update({ role: 'parent' });
+              await auth.setCustomUserClaims(callerUid, { role: 'parent' });
+            }
           }
         }
       } catch (e) {
-        console.warn('Could not set parent custom claims:', e.message);
+        console.warn('Could not check parent user profile:', e.message);
       }
     }
   }

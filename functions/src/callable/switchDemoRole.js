@@ -158,7 +158,18 @@ export const switchDemoRole = onCall(async (request) => {
     throw new HttpsError('internal', `Ошибка создания профиля пользователя: ${fsErr.message}`);
   }
 
-  // 3. Build custom token if possible, or provide password fallback
+  // 3. Ensure custom claims on target user account
+  try {
+    await auth.setCustomUserClaims(targetUser.uid, {
+      role: targetRoleName,
+      isDemoMaster: true,
+      isSwitchedDemo: targetRole !== 'master',
+    });
+  } catch (claimErr) {
+    console.warn('Could not setCustomUserClaims in switchDemoRole:', claimErr.message);
+  }
+
+  // 4. Build custom token if possible, or provide password fallback
   let customToken = null;
   try {
     const customClaims = {

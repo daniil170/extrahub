@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   Check,
@@ -10,10 +11,14 @@ import {
   Clock,
   AlertTriangle,
   Calendar,
+  Sparkles,
 } from 'lucide-react';
 import { Modal, Button, Badge, CapacityBadge } from '../../shared/ui/index.js';
 import { formatDaysOfWeek, formatCurrency } from '../../shared/utils/index.js';
 import { MOCK_STUDENTS } from './useEnrollment.js';
+import { useAuth } from '../../shared/hooks/useAuth.js';
+import { approveInviteCall } from '../invite/api.js';
+import { switchDemoRoleAndSignIn } from '../auth/api.js';
 
 function calculateTimeLeft(expiresAt) {
   if (!expiresAt) {
@@ -100,8 +105,30 @@ export function EnrollmentModal({
   onSubmit,
   userRole,
 }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
+  const [approvingDemo, setApprovingDemo] = useState(false);
+
+  const handleDemoParentApproval = async () => {
+    if (!enrollmentResult?.inviteToken || approvingDemo) return;
+    try {
+      setApprovingDemo(true);
+      await approveInviteCall(enrollmentResult.inviteToken);
+      if (user?.role !== 'parent' && (user?.isDemoMaster || user?.isDemoAccount)) {
+        await switchDemoRoleAndSignIn('parent');
+      }
+      onClose();
+      navigate('/parent');
+    } catch (err) {
+      console.error('Demo auto approval error:', err);
+      onClose();
+      navigate('/parent');
+    } finally {
+      setApprovingDemo(false);
+    }
+  };
 
   if (!activity) return null;
 
@@ -269,6 +296,30 @@ export function EnrollmentModal({
                 </>
               )}
             </Button>
+
+            {enrollmentResult?.inviteToken && (
+              <Button
+                variant="secondary"
+                onClick={handleDemoParentApproval}
+                disabled={approvingDemo}
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                  color: 'var(--success)',
+                  border: '1.5px solid var(--success)',
+                  fontWeight: 700,
+                  fontSize: '13.5px',
+                  padding: '10px 16px',
+                }}
+              >
+                <Sparkles size={16} color="var(--success)" />
+                {approvingDemo ? 'Подтверждаем запись...' : '⚡ Подтвердить от лица родителя (Демо)'}
+              </Button>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               <a

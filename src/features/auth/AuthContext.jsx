@@ -28,7 +28,17 @@ export function AuthProvider({ children }) {
             console.warn('Could not read user profile from Firestore:', docErr.message);
           }
 
-          const resolvedRole = claimRole || profile?.role || 'student';
+          const emailLower = (firebaseUser.email || '').toLowerCase().trim();
+          let resolvedRole = claimRole || profile?.role || 'student';
+
+          // Strictly guarantee explicit demo accounts always resolve to their designated role
+          if (emailLower === 'demo.student@pifagorschool.kz') resolvedRole = 'student';
+          else if (emailLower === 'demo.parent@pifagorschool.kz') resolvedRole = 'parent';
+          else if (emailLower === 'demo.teacher@pifagorschool.kz') resolvedRole = 'teacher';
+          else if (emailLower === 'demo.coordinator@pifagorschool.kz') resolvedRole = 'coordinator';
+          else if (emailLower === 'demo.technician@pifagorschool.kz') resolvedRole = 'technician';
+          else if (emailLower === 'demo.admin@pifagorschool.kz') resolvedRole = 'admin';
+
           const resolvedName =
             profile?.fullName ||
             firebaseUser.displayName ||
@@ -36,14 +46,13 @@ export function AuthProvider({ children }) {
             'Пользователь';
 
           const isDemoEmail = Boolean(
-            firebaseUser.email?.toLowerCase().startsWith('demo.') &&
-            firebaseUser.email?.toLowerCase().endsWith('@pifagorschool.kz')
+            emailLower.startsWith('demo.') && emailLower.endsWith('@pifagorschool.kz')
           );
 
           const isDemoMaster = Boolean(
             tokenResult.claims?.isDemoMaster ||
             profile?.isDemoMaster ||
-            firebaseUser.email?.toLowerCase() === 'daniilivakin30@gmail.com' ||
+            emailLower === 'daniilivakin30@gmail.com' ||
             isDemoEmail
           );
           const isSwitchedDemo = Boolean(tokenResult.claims?.isSwitchedDemo || isDemoEmail);

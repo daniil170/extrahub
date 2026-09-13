@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Clock, CheckCircle2, XCircle, User, Calendar, MapPin, CreditCard } from 'lucide-react';
+import { Clock, CheckCircle2, XCircle, User, Calendar, MapPin, CreditCard, Sparkles } from 'lucide-react';
 import { useParentInvite } from './useParentInvite.js';
+import { useAuth } from '../../shared/hooks/useAuth.js';
+import { switchDemoRoleAndSignIn } from '../auth/api.js';
 import { Card, Badge, Button, Spinner, PageHeader } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
 
 export function ParentInvitePage() {
   const { token } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [navigatingParent, setNavigatingParent] = useState(false);
   const {
     inviteData,
     loading,
@@ -23,6 +27,21 @@ export function ParentInvitePage() {
 
   const [agreementChecked, setAgreementChecked] = useState(false);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
+
+  const handleGoToParent = async () => {
+    try {
+      setNavigatingParent(true);
+      if (user?.role !== 'parent' && user?.isDemoMaster) {
+        await switchDemoRoleAndSignIn('parent');
+      }
+      navigate('/parent');
+    } catch (e) {
+      console.warn('Switch to parent error:', e);
+      navigate('/parent');
+    } finally {
+      setNavigatingParent(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -113,8 +132,8 @@ export function ParentInvitePage() {
           </p>
 
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <Button variant="primary" onClick={() => navigate('/parent')}>
-              В родительский кабинет
+            <Button variant="primary" onClick={handleGoToParent} disabled={navigatingParent}>
+              {navigatingParent ? 'Переход...' : 'В родительский кабинет'}
             </Button>
             <Button variant="outline" onClick={() => navigate('/catalog')}>
               В каталог кружков
@@ -375,6 +394,28 @@ export function ParentInvitePage() {
             </div>
           )}
         </div>
+
+        {user?.isDemoMaster && (
+          <div
+            style={{
+              padding: '10px 14px',
+              backgroundColor: 'rgba(59, 130, 246, 0.08)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '13px',
+              color: 'var(--text-primary)',
+            }}
+          >
+            <Sparkles size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
+            <span>
+              <strong>Демо-режим:</strong> Вы можете подтвердить запись прямо сейчас без ручного переключения аккаунта.
+            </span>
+          </div>
+        )}
 
         {/* Mandatory Agreement Checkbox */}
         <div

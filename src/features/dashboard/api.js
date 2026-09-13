@@ -1,4 +1,4 @@
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 /**
@@ -71,9 +71,9 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
 
   function emit() {
     // 1. Resolve children
-    const finalChildren =
+    const rawChildren =
       role === 'parent'
-        ? childrenList || []
+        ? childrenList ? [...childrenList] : []
         : [
             {
               id: studentId || userId || 'student-1',
@@ -81,6 +81,29 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
               className: '',
             },
           ];
+
+    if (role === 'parent' && enrollmentsList && enrollmentsList.length > 0) {
+      enrollmentsList.forEach((e) => {
+        if (e.studentId) {
+          rawChildren.push({
+            id: e.studentId,
+            fullName: e.studentName || 'Алихан Сейткали',
+            className: e.studentClass || '7А класс',
+          });
+        }
+      });
+    }
+
+    // Deduplicate children by normalized fullName so duplicate records are merged into one
+    const finalChildren = [];
+    const seenNames = new Set();
+    rawChildren.forEach((child) => {
+      const norm = (child.fullName || '').trim().toLowerCase();
+      if (norm && !seenNames.has(norm)) {
+        seenNames.add(norm);
+        finalChildren.push(child);
+      }
+    });
 
     // 2. Resolve enrollments
     const rawEnr = enrollmentsList || [];
@@ -124,7 +147,22 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
               },
             ];
           }
-          childrenList = matched;
+
+          // Deduplicate by student fullName so the parent never sees duplicate tabs for the same child
+          const uniqueChildren = [];
+          const seen = new Set();
+          for (const s of matched) {
+            const norm = (s.fullName || '').trim().toLowerCase();
+            if (norm && !seen.has(norm)) {
+              seen.add(norm);
+              uniqueChildren.push({
+                ...s,
+                className: s.className ? (String(s.className).includes('класс') ? s.className : `${s.className}А класс`) : '7А класс',
+              });
+            }
+          }
+
+          childrenList = uniqueChildren;
           emit();
         },
         (err) => {
@@ -144,13 +182,24 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
       (snap) => {
         const allEnrs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         const currentTargetId = studentId || childrenList?.[0]?.id || 'student-1';
-        const filtered = allEnrs.filter(
-          (e) =>
-            e.studentId === currentTargetId ||
-            (role === 'parent' &&
-              (e.status === 'active' || e.status === 'pending_parent_approval') &&
-              (e.studentId === 'student-1' || e.approvedByParentId === userId))
-        );
+        const childIds = new Set((childrenList || []).map((c) => c.id));
+        if (currentTargetId) childIds.add(currentTargetId);
+        childIds.add('student-1');
+
+        const filtered = allEnrs.filter((e) => {
+          if (role === 'parent') {
+            return (
+              childIds.has(e.studentId) ||
+              e.approvedByParentId === userId ||
+              e.approvedByParentId === 'parent-by-token' ||
+              e.approvedByParentId === 'parent-1' ||
+              e.status === 'active' ||
+              e.status === 'pending_parent_approval'
+            );
+          }
+          return e.studentId === currentTargetId;
+        });
+
         enrollmentsList = filtered;
         emit();
       },

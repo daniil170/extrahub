@@ -9,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
-
+import { DEMO_ACTIVITY_GROUPS, DEMO_ACTIVITIES } from '../../shared/data/demoData.js';
 
 /**
  * Fetch groups taught by the teacher from Firestore
@@ -17,14 +17,23 @@ import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
  */
 export async function fetchTeacherGroups(teacherId) {
   try {
-    const grpsSnap = await getDocs(collection(db, COLLECTIONS.ACTIVITY_GROUPS));
-    const allGroups = grpsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    let allGroups = [];
+    try {
+      const grpsSnap = await getDocs(collection(db, COLLECTIONS.ACTIVITY_GROUPS));
+      allGroups = grpsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch (e) {
+      console.warn('Could not load activityGroups from Firestore:', e.message);
+    }
 
-    const actsSnap = await getDocs(collection(db, COLLECTIONS.ACTIVITIES));
     const actMap = {};
-    actsSnap.docs.forEach((d) => {
-      actMap[d.id] = d.data();
-    });
+    try {
+      const actsSnap = await getDocs(collection(db, COLLECTIONS.ACTIVITIES));
+      actsSnap.docs.forEach((d) => {
+        actMap[d.id] = d.data();
+      });
+    } catch (e) {
+      console.warn('Could not load activities from Firestore:', e.message);
+    }
 
     // Match groups by teacherId, or teacherId on parent activity, or fallback to teacher-1 / first groups
     let matchedGroups = allGroups.filter(
@@ -41,58 +50,109 @@ export async function fetchTeacherGroups(teacherId) {
       matchedGroups = allGroups.slice(0, 4);
     }
 
+    // Fallback to demo data if Firestore collection is empty
+    if (matchedGroups.length === 0) {
+      matchedGroups = (DEMO_ACTIVITY_GROUPS || []).slice(0, 4).map((g) => {
+        const act = (DEMO_ACTIVITIES || []).find((a) => a.id === g.activityId);
+        return {
+          ...g,
+          enrolledCount: g.enrolledCount || 6,
+          activityTitle: act?.title || 'Кружок робототехники',
+          location: act?.location || 'Кабинет 304 (IT-лаборатория)',
+        };
+      });
+    }
+
     return matchedGroups.map((g) => ({
       ...g,
-      activityTitle: actMap[g.activityId]?.title || 'Кружок',
-      location: actMap[g.activityId]?.location || 'Школьный корпус',
+      enrolledCount: g.enrolledCount || 6,
+      activityTitle: g.activityTitle || actMap[g.activityId]?.title || 'Кружок робототехники',
+      location: g.location || actMap[g.activityId]?.location || 'Кабинет 304 (IT-лаборатория)',
     }));
   } catch (err) {
     console.error('fetchTeacherGroups error:', err);
-    throw err;
+    return (DEMO_ACTIVITY_GROUPS || []).slice(0, 4).map((g) => {
+      const act = (DEMO_ACTIVITIES || []).find((a) => a.id === g.activityId);
+      return {
+        ...g,
+        enrolledCount: 6,
+        activityTitle: act?.title || 'Кружок робототехники',
+        location: act?.location || 'Кабинет 304 (IT-лаборатория)',
+      };
+    });
   }
 }
 
 /**
- * Fetch active students in group from Firestore
+ * Fetch active students in group from Firestore with rich realistic roster
  * @param {string} groupId
  */
 export async function fetchGroupStudents(groupId) {
   try {
-    const enrQ = query(
-      collection(db, COLLECTIONS.ENROLLMENTS),
-      where('groupId', '==', groupId),
-      where('status', '==', 'active')
-    );
-    const enrSnap = await getDocs(enrQ);
-
-    const studentIds = !enrSnap.empty
-      ? enrSnap.docs.map((d) => d.data().studentId)
-      : [];
-
-    const studentsSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
-    const studentsMap = {};
-    studentsSnap.docs.forEach((d) => {
-      studentsMap[d.id] = d.data();
-    });
-
-    if (studentIds.length > 0) {
-      return studentIds.map((sid) => ({
-        id: sid,
-        fullName: studentsMap[sid]?.fullName || `Ученик (${sid.slice(0, 6)})`,
-        className: studentsMap[sid]?.className || '7А класс',
-      }));
+    let studentIds = [];
+    try {
+      const enrQ = query(
+        collection(db, COLLECTIONS.ENROLLMENTS),
+        where('groupId', '==', groupId),
+        where('status', '==', 'active')
+      );
+      const enrSnap = await getDocs(enrQ);
+      if (!enrSnap.empty) {
+        studentIds = enrSnap.docs.map((d) => d.data().studentId);
+      }
+    } catch (e) {
+      console.warn('Could not query enrollments:', e.message);
     }
 
-    // Demo fallback students so journal is ready for immediate demonstration
+    const studentsMap = {};
+    try {
+      const studentsSnap = await getDocs(collection(db, COLLECTIONS.STUDENTS));
+      studentsSnap.docs.forEach((d) => {
+        studentsMap[d.id] = d.data();
+      });
+    } catch (e) {
+      console.warn('Could not query students collection:', e.message);
+    }
+
+    // Default class roster for demo so teacher always has realistic students to mark
+    const defaultClassStudents = [
+      { id: 'student-demo-1', fullName: 'Алихан Сейткали', className: '7А класс' },
+      { id: 'student-demo-2', fullName: 'Айзере Нургалиева', className: '7Б класс' },
+      { id: 'student-demo-3', fullName: 'Дамир Касымов', className: '8А класс' },
+      { id: 'student-demo-4', fullName: 'София Ким', className: '7А класс' },
+      { id: 'student-demo-5', fullName: 'Арсен Маликов', className: '8Б класс' },
+      { id: 'student-demo-6', fullName: 'Диана Жакипова', className: '7В класс' },
+    ];
+
+    const enrolledStudents = studentIds.map((sid) => ({
+      id: sid,
+      fullName:
+        studentsMap[sid]?.fullName ||
+        (sid === 'student-1' ? 'Алихан Сейткали' : `Ученик (${sid.slice(0, 6)})`),
+      className: studentsMap[sid]?.className || '7А класс',
+    }));
+
+    // Combine: newly enrolled students at the top, followed by default class roster
+    const seenIds = new Set(enrolledStudents.map((s) => s.id));
+    const finalRoster = [...enrolledStudents];
+    for (const demoSt of defaultClassStudents) {
+      if (!seenIds.has(demoSt.id)) {
+        finalRoster.push(demoSt);
+        seenIds.add(demoSt.id);
+      }
+    }
+
+    return finalRoster;
+  } catch (err) {
+    console.error('fetchGroupStudents error:', err);
     return [
       { id: 'student-demo-1', fullName: 'Алихан Сейткали', className: '7А класс' },
       { id: 'student-demo-2', fullName: 'Айзере Нургалиева', className: '7Б класс' },
       { id: 'student-demo-3', fullName: 'Дамир Касымов', className: '8А класс' },
       { id: 'student-demo-4', fullName: 'София Ким', className: '7А класс' },
+      { id: 'student-demo-5', fullName: 'Арсен Маликов', className: '8Б класс' },
+      { id: 'student-demo-6', fullName: 'Диана Жакипова', className: '7В класс' },
     ];
-  } catch (err) {
-    console.error('fetchGroupStudents error:', err);
-    throw err;
   }
 }
 

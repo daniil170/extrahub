@@ -46,7 +46,8 @@ export function DemoRoleSwitcher() {
       setSwitchingRole(targetRole);
       setSwitchError(null);
       await switchDemoRoleAndSignIn(targetRole);
-      if (targetRoute) {
+      const isInvitePage = window.location.pathname.startsWith('/invite');
+      if (targetRoute && !isInvitePage) {
         navigate(targetRoute);
       }
     } catch (err) {

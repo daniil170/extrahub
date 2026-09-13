@@ -65,8 +65,8 @@ export function ParentDashboard() {
         </div>
       )}
 
-      {/* Children Selector Tabs */}
-      {children.length > 0 && (
+      {/* Children Selector Tabs (only shown when parent has 2+ children) */}
+      {children.length > 1 && (
         <div
           style={{
             display: 'flex',

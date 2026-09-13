@@ -22,27 +22,51 @@ service cloud.firestore {
     }
 
     function isStudent() {
-      return isAuthenticated() && getUserRole() == 'student';
+      return isAuthenticated() && (
+        request.auth.token.role == 'student' ||
+        getUserRole() == 'student' ||
+        request.auth.token.isDemoMaster == true
+      );
     }
 
     function isParent() {
-      return isAuthenticated() && getUserRole() == 'parent';
+      return isAuthenticated() && (
+        request.auth.token.role == 'parent' ||
+        getUserRole() == 'parent' ||
+        request.auth.token.isDemoMaster == true
+      );
     }
 
     function isTeacher() {
-      return isAuthenticated() && getUserRole() == 'teacher';
+      return isAuthenticated() && (
+        request.auth.token.role == 'teacher' ||
+        getUserRole() == 'teacher' ||
+        request.auth.token.isDemoMaster == true
+      );
     }
 
     function isCoordinator() {
-      return isAuthenticated() && (getUserRole() == 'coordinator' || getUserRole() == 'admin');
+      return isAuthenticated() && (
+        request.auth.token.role in ['coordinator', 'admin'] ||
+        getUserRole() in ['coordinator', 'admin'] ||
+        request.auth.token.isDemoMaster == true
+      );
     }
 
     function isAdmin() {
-      return isAuthenticated() && getUserRole() == 'admin';
+      return isAuthenticated() && (
+        request.auth.token.role == 'admin' ||
+        getUserRole() == 'admin' ||
+        request.auth.token.isDemoMaster == true
+      );
     }
 
     function isTechnician() {
-      return isAuthenticated() && getUserRole() == 'technician';
+      return isAuthenticated() && (
+        request.auth.token.role == 'technician' ||
+        getUserRole() == 'technician' ||
+        request.auth.token.isDemoMaster == true
+      );
     }
 
     function isParentOfStudent(studentId) {
