@@ -8,19 +8,22 @@ import { generateInviteToken, calculateHoldExpiration } from '../shared/tokens.j
  * Callable Cloud Function to create an activity enrollment or put student on waitlist
  */
 export const createEnrollment = onCall(async (request) => {
-  const { studentId, groupId } = request.data || {};
+  try {
+    const { studentId, groupId } = request.data || {};
 
-  if (!studentId || typeof studentId !== 'string') {
-    throw new HttpsError('invalid-argument', 'Параметр studentId обязателен');
-  }
-  if (!groupId || typeof groupId !== 'string') {
-    throw new HttpsError('invalid-argument', 'Параметр groupId обязателен');
-  }
+    if (!studentId || typeof studentId !== 'string') {
+      throw new HttpsError('invalid-argument', 'Параметр studentId обязателен');
+    }
+    if (!groupId || typeof groupId !== 'string') {
+      throw new HttpsError('invalid-argument', 'Параметр groupId обязателен');
+    }
 
-  // Verify caller authentication
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'Требуется аутентификация');
-  }
+    // Verify caller authentication
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'Требуется аутентификация');
+    }
+
+    const callerUid = request.auth.uid;
 
   // Fetch student and activity group
   const studentRef = db.collection('students').doc(studentId);
@@ -258,4 +261,11 @@ export const createEnrollment = onCall(async (request) => {
       };
     }
   });
+  } catch (err) {
+    console.error('createEnrollment fatal error:', err);
+    if (err instanceof HttpsError) {
+      throw err;
+    }
+    throw new HttpsError('internal', `Ошибка записи: ${err.message}`);
+  }
 });
