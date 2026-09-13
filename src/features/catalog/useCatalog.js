@@ -15,16 +15,6 @@ function extractGradeNumber(val) {
 function matchesAgeFilter(activityAgeGroup, filterValue) {
   if (!filterValue || filterValue === 'all') return true;
   const str = String(activityAgeGroup || '').toLowerCase();
-  if (filterValue === '1-4') {
-    return (
-      str.includes('1–4') ||
-      str.includes('1-4') ||
-      str.includes('1–10') ||
-      str.includes('1–11') ||
-      str.includes('7') ||
-      str.includes('8')
-    );
-  }
   if (filterValue === '5-8') {
     return (
       str.includes('5–8') ||

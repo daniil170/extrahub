@@ -202,7 +202,7 @@ export function RegisterPage() {
                 htmlFor="reg-class"
                 style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
               >
-                Класс (1–11) <span style={{ color: 'var(--danger)' }}>*</span>
+                Класс (5–11) <span style={{ color: 'var(--danger)' }}>*</span>
               </label>
               <select
                 id="reg-class"
@@ -222,7 +222,7 @@ export function RegisterPage() {
                   cursor: 'pointer',
                 }}
               >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((cls) => (
+                {[5, 6, 7, 8, 9, 10, 11].map((cls) => (
                   <option key={cls} value={cls}>
                     {cls} класс
                   </option>

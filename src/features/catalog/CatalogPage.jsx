@@ -81,8 +81,7 @@ export function CatalogPage() {
   ];
 
   const ageOptions = [
-    { value: 'all', label: 'Все классы' },
-    { value: '1-4', label: '1–4 классы (7–10 лет)' },
+    { value: 'all', label: 'Все классы (5–11)' },
     { value: '5-8', label: '5–8 классы (11–14 лет)' },
     { value: '9-11', label: '9–11 классы (15–17 лет)' },
   ];

@@ -395,19 +395,19 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
             </div>
           )}
 
-          {/* Allowed Classes (1 - 11) */}
+          {/* Allowed Classes (5 - 11) */}
           <div style={{ gridColumn: '1 / -1' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
               <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                Доступные классы (1–11)
+                Доступные классы (5–11)
               </label>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
                   type="button"
-                  onClick={() => setAllowedClasses([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])}
+                  onClick={() => setAllowedClasses([5, 6, 7, 8, 9, 10, 11])}
                   style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '12px', cursor: 'pointer', padding: 0 }}
                 >
-                  Все классы
+                  Все (5–11)
                 </button>
                 <span style={{ color: 'var(--border-color)' }}>|</span>
                 <button
@@ -428,7 +428,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
               </div>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((cls) => {
+              {[5, 6, 7, 8, 9, 10, 11].map((cls) => {
                 const checked = allowedClasses.includes(cls);
                 return (
                   <label
