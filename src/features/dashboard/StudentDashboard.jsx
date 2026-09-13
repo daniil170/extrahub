@@ -219,15 +219,19 @@ export function StudentDashboard() {
                         )}
                       </div>
 
-                      <div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
                         {app.status === 'pending' && (
                           <Badge variant="warning">Заявка на экзамен подана</Badge>
                         )}
                         {app.status === 'passed' && (
-                          <Badge variant="success">Экзамен сдан</Badge>
+                          <Badge variant="success">
+                            Экзамен сдан{app.score !== null && app.score !== undefined ? ` (${app.score}/${app.maxScore || 100})` : ''}
+                          </Badge>
                         )}
                         {app.status === 'failed' && (
-                          <Badge variant="danger">Экзамен не сдан</Badge>
+                          <Badge variant="danger">
+                            Экзамен не сдан{app.score !== null && app.score !== undefined ? ` (${app.score}/${app.maxScore || 100})` : ''}
+                          </Badge>
                         )}
                       </div>
                     </div>
@@ -243,11 +247,19 @@ export function StudentDashboard() {
                       }}
                     >
                       {app.status === 'pending' &&
-                        'Заявка передана координатору. Ожидайте проведения и проверки вступительного испытания.'}
+                        'Заявка передана преподавателю. Ожидайте проведения и проверки вступительного испытания.'}
                       {app.status === 'passed' &&
-                        'Поздравляем! Вступительный экзамен сдан. Вы зачислены в секцию.'}
+                        `Поздравляем! Вступительный экзамен успешно сдан${
+                          app.score !== null && app.score !== undefined
+                            ? `, ваш результат: ${app.score} из ${app.maxScore || 100} баллов`
+                            : ''
+                        }. Вы зачислены в секцию.`}
                       {app.status === 'failed' &&
-                        'К сожалению, вступительный экзамен не сдан. Попробуйте выбрать другие направления в каталоге.'}
+                        `К сожалению, вступительный экзамен не сдан${
+                          app.score !== null && app.score !== undefined
+                            ? ` (набрано: ${app.score} из ${app.maxScore || 100} баллов)`
+                            : ''
+                        }. Вы можете выбрать другие направления в каталоге.`}
                     </div>
                   </Card>
                 ))}

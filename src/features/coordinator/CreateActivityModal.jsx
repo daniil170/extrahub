@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Sparkles, BookOpen, Target, AlertTriangle, Check } from 'lucide-react';
+import { db } from '../../app/config/firebase.js';
 import { Modal, Button } from '../../shared/ui/index.js';
 
 const CATEGORIES = [
@@ -82,10 +84,29 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
   const [ageGroup, setAgeGroup] = useState('10–14 лет (5–8 класс)');
   const [price, setPrice] = useState(24000);
   const [location, setLocation] = useState('Кабинет 204');
+  const [teacherId, setTeacherId] = useState('teacher-1');
+  const [teachersList, setTeachersList] = useState([]);
   const [teacherName, setTeacherName] = useState('Алия Сериковна Ахметова');
   const [teacherBio, setTeacherBio] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
   const [requirements, setRequirements] = useState('');
+
+  useEffect(() => {
+    async function fetchTeachers() {
+      try {
+        const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'teacher')));
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        if (list.length > 0) {
+          setTeachersList(list);
+          setTeacherId(list[0].id);
+          setTeacherName(list[0].fullName || list[0].displayName || 'Преподаватель');
+        }
+      } catch (err) {
+        console.warn('Could not fetch teachers list:', err);
+      }
+    }
+    fetchTeachers();
+  }, []);
 
   // 5 Modules
   const [syllabus, setSyllabus] = useState(DEFAULT_MODULES);
@@ -243,6 +264,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
       ageGroup: ageGroup.trim() || `${allowedClasses.join(', ')} классы`,
       price: Number(price) || 0,
       location: location.trim() || 'Школьный корпус',
+      teacherId: teacherId || 'teacher-1',
       teacherName: teacherName.trim(),
       teacherBio: teacherBio.trim(),
       targetAudience: targetAudience.trim(),
@@ -263,6 +285,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
         requiresExam: Boolean(requiresExam),
         allowedClasses: allowedClasses.map(Number),
         allowedShifts: allowedShifts.map(Number),
+        teacherId: teacherId || 'teacher-1',
       };
     }
 
@@ -699,8 +722,51 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
             />
           </div>
 
-          {/* Teacher Name */}
+          {/* Teacher Selection & Name */}
           <div style={{ gridColumn: '1 / -1' }}>
+            {teachersList.length > 0 && (
+              <div style={{ marginBottom: '10px' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    color: 'var(--text-secondary)',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Назначить преподавателя из системы:
+                </label>
+                <select
+                  value={teacherId}
+                  onChange={(e) => {
+                    const selId = e.target.value;
+                    setTeacherId(selId);
+                    const found = teachersList.find((t) => t.id === selId);
+                    if (found) {
+                      setTeacherName(found.fullName || found.displayName || '');
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '9px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border-color)',
+                    fontSize: '13.5px',
+                    backgroundColor: 'var(--bg-surface)',
+                    color: 'var(--text-primary)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {teachersList.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.fullName || t.email} ({t.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <label
               style={{
                 display: 'block',

@@ -1,28 +1,22 @@
 import { useState, useEffect } from 'react';
 import {
-  CheckCircle2,
-  XCircle,
   Clock,
   User,
   BookOpen,
   Calendar,
   AlertTriangle,
   GraduationCap,
+  Info,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
-import { useAuth } from '../../shared/hooks/useAuth.js';
-import {
-  subscribeCoordinatorExamApplications,
-  decideExamApplicationRecord,
-} from '../exam/api.js';
+import { subscribeCoordinatorExamApplications } from '../exam/api.js';
 import { Card, Badge, Button, Spinner } from '../../shared/ui/index.js';
 import { formatDate } from '../../shared/utils/index.js';
 
 export function ExamApplicationsTab() {
-  const { user } = useAuth();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [processingId, setProcessingId] = useState(null);
-  const [feedbackMessage, setFeedbackMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [filter, setFilter] = useState('all'); // 'all' | 'pending' | 'resolved'
 
@@ -49,34 +43,6 @@ export function ExamApplicationsTab() {
     };
   }, []);
 
-  const handleDecision = async (app, status) => {
-    setProcessingId(app.id);
-    setFeedbackMessage(null);
-    setErrorMessage(null);
-
-    try {
-      await decideExamApplicationRecord({
-        applicationId: app.id,
-        studentId: app.studentId,
-        groupId: app.groupId,
-        status,
-        coordinatorId: user?.id || 'coordinator',
-      });
-
-      setFeedbackMessage(
-        status === 'passed'
-          ? `Ученик ${app.studentName || 'ученик'} успешно сдал экзамен и зачислен в группу!`
-          : `Заявка ученика ${app.studentName || 'ученик'} отклонена (экзамен не сдан).`
-      );
-      setTimeout(() => setFeedbackMessage(null), 5000);
-    } catch (err) {
-      console.error('Error deciding exam application:', err);
-      setErrorMessage(err.message || 'Ошибка при сохранении решения по экзамену');
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
   const filteredApps = applications.filter((app) => {
     if (filter === 'pending') return app.status === 'pending';
     if (filter === 'resolved') return app.status === 'passed' || app.status === 'failed';
@@ -84,103 +50,137 @@ export function ExamApplicationsTab() {
   });
 
   const pendingCount = applications.filter((a) => a.status === 'pending').length;
+  const passedCount = applications.filter((a) => a.status === 'passed').length;
+  const failedCount = applications.filter((a) => a.status === 'failed').length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Top Banner / Summary */}
       <div
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '14px',
           backgroundColor: 'var(--bg-surface)',
-          padding: '16px 20px',
+          padding: '20px',
           borderRadius: 'var(--radius-md)',
           border: '1px solid var(--border-color)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--bg-subtle)',
-              color: 'var(--primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <GraduationCap size={22} />
-          </div>
-          <div>
-            <h3
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '14px',
+            marginBottom: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
               style={{
-                fontSize: '16px',
-                fontWeight: 600,
-                fontFamily: 'var(--font-heading)',
-                margin: 0,
-                color: 'var(--text-primary)',
+                width: '40px',
+                height: '40px',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--bg-subtle)',
+                color: 'var(--primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              Заявки на вступительные экзамены
-            </h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '2px 0 0' }}>
-              Кружки олимпийского резерва с обязательным вступительным испытанием
-            </p>
+              <GraduationCap size={22} />
+            </div>
+            <div>
+              <h3
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-heading)',
+                  margin: 0,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                Мониторинг вступительных экзаменов
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '2px 0 0' }}>
+                Статистика заявок в секции олимпийского резерва (оценивание проводит преподаватель)
+              </p>
+            </div>
+          </div>
+
+          {/* Filter Buttons */}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Button
+              size="sm"
+              variant={filter === 'all' ? 'primary' : 'outline'}
+              onClick={() => setFilter('all')}
+            >
+              Все ({applications.length})
+            </Button>
+            <Button
+              size="sm"
+              variant={filter === 'pending' ? 'primary' : 'outline'}
+              onClick={() => setFilter('pending')}
+            >
+              Ожидают ({pendingCount})
+            </Button>
+            <Button
+              size="sm"
+              variant={filter === 'resolved' ? 'primary' : 'outline'}
+              onClick={() => setFilter('resolved')}
+            >
+              Обработаны ({passedCount + failedCount})
+            </Button>
           </div>
         </div>
 
-        {/* Filter Buttons */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Button
-            size="sm"
-            variant={filter === 'all' ? 'primary' : 'outline'}
-            onClick={() => setFilter('all')}
-          >
-            Все ({applications.length})
-          </Button>
-          <Button
-            size="sm"
-            variant={filter === 'pending' ? 'primary' : 'outline'}
-            onClick={() => setFilter('pending')}
-          >
-            Ожидают ({pendingCount})
-          </Button>
-          <Button
-            size="sm"
-            variant={filter === 'resolved' ? 'primary' : 'outline'}
-            onClick={() => setFilter('resolved')}
-          >
-            Обработанные
-          </Button>
+        {/* 4 Stats Cards */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: '12px',
+            paddingTop: '12px',
+            borderTop: '1px solid var(--border-color)',
+          }}
+        >
+          <div style={{ backgroundColor: 'var(--bg-subtle)', padding: '10px 14px', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Всего заявок</div>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>{applications.length}</div>
+          </div>
+          <div style={{ backgroundColor: 'var(--bg-subtle)', padding: '10px 14px', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>На проверке</div>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--warning)', marginTop: '2px' }}>{pendingCount}</div>
+          </div>
+          <div style={{ backgroundColor: 'var(--bg-subtle)', padding: '10px 14px', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Успешно сдали</div>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--success)', marginTop: '2px' }}>{passedCount}</div>
+          </div>
+          <div style={{ backgroundColor: 'var(--bg-subtle)', padding: '10px 14px', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Не сдали</div>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--danger)', marginTop: '2px' }}>{failedCount}</div>
+          </div>
         </div>
       </div>
 
-      {/* Success / Error Alerts */}
-      {feedbackMessage && (
-        <div
-          role="status"
-          style={{
-            padding: '12px 16px',
-            backgroundColor: 'var(--success-light)',
-            color: 'var(--success)',
-            borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--success)',
-            fontSize: '13px',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <CheckCircle2 size={16} />
-          <span>{feedbackMessage}</span>
-        </div>
-      )}
+      {/* Info Notice for Coordinator */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '12px 16px',
+          backgroundColor: 'var(--bg-subtle)',
+          borderRadius: 'var(--radius-sm)',
+          border: '1px solid var(--border-color)',
+          fontSize: '13px',
+          color: 'var(--text-secondary)',
+        }}
+      >
+        <Info size={16} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+        <span>
+          <strong>Примечание:</strong> Оценку («Прошёл» / «Не прошёл») и баллы выставляет назначенный преподаватель курса в своём личном кабинете. Данный раздел предоставляет координатору сводную статистику для контроля процесса.
+        </span>
+      </div>
 
       {errorMessage && (
         <div
@@ -225,18 +225,16 @@ export function ExamApplicationsTab() {
           </h4>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
             {filter === 'pending'
-              ? 'На данный момент нет новых заявок, ожидающих решения.'
+              ? 'На данный момент нет новых заявок, ожидающих проверки преподавателем.'
               : 'Заявки на вступительные экзамены пока не поступали.'}
           </p>
         </Card>
       )}
 
-      {/* Application Cards */}
+      {/* Application Cards (Read-only for Coordinator) */}
       {!loading && filteredApps.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {filteredApps.map((app) => {
-            const isProcessing = processingId === app.id;
-
             return (
               <Card
                 key={app.id}
@@ -260,7 +258,7 @@ export function ExamApplicationsTab() {
                     gap: '16px',
                   }}
                 >
-                  {/* Info Left Column */}
+                  {/* Info Column */}
                   <div style={{ flex: '1 1 320px' }}>
                     <div
                       style={{
@@ -273,13 +271,18 @@ export function ExamApplicationsTab() {
                     >
                       <Badge variant="warning">Олимпийский резерв</Badge>
                       {app.status === 'pending' && (
-                        <Badge variant="warning">Ожидает решения</Badge>
+                        <Badge variant="warning">Ожидает проверки учителем</Badge>
                       )}
                       {app.status === 'passed' && (
-                        <Badge variant="success">Сдал (Зачислен)</Badge>
+                        <Badge variant="success">Прошёл (Зачислен)</Badge>
                       )}
                       {app.status === 'failed' && (
-                        <Badge variant="danger">Не сдал</Badge>
+                        <Badge variant="danger">Не прошёл</Badge>
+                      )}
+                      {app.score !== null && app.score !== undefined && (
+                        <Badge variant="default">
+                          Балл: {app.score} / {app.maxScore || 100}
+                        </Badge>
                       )}
                     </div>
 
@@ -308,7 +311,7 @@ export function ExamApplicationsTab() {
                         <User size={14} style={{ color: 'var(--text-muted)' }} />
                         <span>
                           <strong>Ученик:</strong> {app.studentName || 'Не указан'}{' '}
-                          {app.className ? `(${app.className})` : ''}
+                          {app.className ? `(${app.className} кл.)` : ''}
                         </span>
                       </div>
 
@@ -328,48 +331,54 @@ export function ExamApplicationsTab() {
                     </div>
                   </div>
 
-                  {/* Actions Column */}
+                  {/* Status & Evaluation Details Column */}
                   <div
                     style={{
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
+                      flexDirection: 'column',
+                      alignItems: 'flex-end',
+                      justifyContent: 'center',
+                      gap: '6px',
                       alignSelf: 'center',
                     }}
                   >
                     {app.status === 'pending' ? (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDecision(app, 'failed')}
-                          disabled={isProcessing}
-                          style={{
-                            borderColor: 'var(--danger)',
-                            color: 'var(--danger)',
-                          }}
-                        >
-                          <XCircle size={15} style={{ marginRight: '4px' }} />
-                          Не сдал
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          onClick={() => handleDecision(app, 'passed')}
-                          disabled={isProcessing}
-                          style={{
-                            backgroundColor: 'var(--success)',
-                            borderColor: 'var(--success)',
-                          }}
-                        >
-                          <CheckCircle2 size={15} style={{ marginRight: '4px' }} />
-                          {isProcessing ? 'Обработка...' : 'Сдал (Зачислить)'}
-                        </Button>
-                      </>
+                      <div
+                        style={{
+                          fontSize: '12.5px',
+                          color: 'var(--warning)',
+                          backgroundColor: 'var(--warning-light)',
+                          padding: '6px 12px',
+                          borderRadius: 'var(--radius-sm)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                        }}
+                      >
+                        <Clock size={14} />
+                        <span>На проверке у учителя</span>
+                      </div>
                     ) : (
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                        Решение принято {app.decidedAt ? formatDate(app.decidedAt) : ''}
+                      <div style={{ textAlign: 'right' }}>
+                        <div
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            color: app.status === 'passed' ? 'var(--success)' : 'var(--danger)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            justifyContent: 'flex-end',
+                          }}
+                        >
+                          {app.status === 'passed' ? <CheckCircle size={15} /> : <XCircle size={15} />}
+                          <span>{app.status === 'passed' ? 'Экзамен сдан' : 'Экзамен не сдан'}</span>
+                        </div>
+                        {app.gradedAt && (
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                            Проверено {formatDate(app.gradedAt)}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

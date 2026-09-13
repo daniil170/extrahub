@@ -19,6 +19,7 @@ import { createEnrollmentCall } from '../enrollment/api.js';
  * @param {number|string} [params.className]
  * @param {string} params.groupId
  * @param {string} params.activityId
+ * @param {string} [params.teacherId]
  * @param {string} [params.activityTitle]
  * @param {string} [params.groupName]
  */
@@ -28,6 +29,7 @@ export async function createExamApplicationRecord({
   className = '',
   groupId,
   activityId,
+  teacherId = '',
   activityTitle = 'Олимпийский резерв',
   groupName = 'Основная группа',
 }) {
@@ -41,12 +43,15 @@ export async function createExamApplicationRecord({
     className,
     groupId,
     activityId,
+    teacherId,
     activityTitle,
     groupName,
     status: 'pending', // 'pending' | 'passed' | 'failed'
+    score: null,
+    maxScore: 100,
+    gradedBy: null,
+    gradedAt: null,
     appliedAt: now,
-    decidedAt: null,
-    decidedBy: null,
   };
 
   const docRef = doc(db, COLLECTIONS.EXAM_APPLICATIONS, newId);
@@ -88,7 +93,39 @@ export function subscribeStudentExamApplications(studentId, onUpdate, onError) {
 }
 
 /**
- * Realtime subscription to all exam applications for Coordinator
+ * Realtime subscription to exam applications for a specific Teacher
+ * @param {string} teacherId
+ * @param {(applications: any[]) => void} onUpdate
+ * @param {(error: Error) => void} [onError]
+ * @returns {() => void} unsubscribe
+ */
+export function subscribeTeacherExamApplications(teacherId, onUpdate, onError) {
+  if (!teacherId) {
+    onUpdate([]);
+    return () => {};
+  }
+
+  const q = query(
+    collection(db, COLLECTIONS.EXAM_APPLICATIONS),
+    where('teacherId', '==', teacherId)
+  );
+
+  return onSnapshot(
+    q,
+    (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      list.sort((a, b) => new Date(b.appliedAt || 0) - new Date(a.appliedAt || 0));
+      onUpdate(list);
+    },
+    (err) => {
+      console.error('subscribeTeacherExamApplications error:', err);
+      if (onError) onError(err);
+    }
+  );
+}
+
+/**
+ * Realtime subscription to all exam applications for Coordinator (Read-only / Statistics)
  * @param {(applications: any[]) => void} onUpdate
  * @param {(error: Error) => void} [onError]
  * @returns {() => void} unsubscribe
@@ -111,25 +148,38 @@ export function subscribeCoordinatorExamApplications(onUpdate, onError) {
 }
 
 /**
- * Decision maker on an exam application (Passed / Failed)
+ * Decision maker on an exam application (Passed / Failed) by Teacher
  * If passed, automatically calls createEnrollmentCall to enroll student into group!
  * @param {Object} params
  * @param {string} params.applicationId
- * @param {'passed' | 'failed'} params.decision
+ * @param {'passed' | 'failed'} [params.status]
+ * @param {'passed' | 'failed'} [params.decision]
+ * @param {number|null} [params.score]
+ * @param {number} [params.maxScore]
  * @param {string} params.studentId
  * @param {string} params.groupId
- * @param {string} [params.coordinatorId]
+ * @param {string} [params.gradedBy]
  */
 export async function decideExamApplicationRecord({
   applicationId,
   decision,
   status,
+  score = null,
+  maxScore = 100,
   studentId,
   groupId,
-  coordinatorId = 'coordinator-1',
+  gradedBy = '',
 }) {
   const now = new Date().toISOString();
   const outcome = decision || status;
+  const numericScore =
+    score !== null && score !== undefined && score !== '' && !Number.isNaN(Number(score))
+      ? Number(score)
+      : null;
+  const numericMaxScore =
+    maxScore !== null && maxScore !== undefined && maxScore !== '' && !Number.isNaN(Number(maxScore))
+      ? Number(maxScore)
+      : 100;
 
   if (outcome === 'passed') {
     // 1. Create real enrollment in group
@@ -144,25 +194,29 @@ export async function decideExamApplicationRecord({
       );
     }
 
-    // 2. Update exam application status
+    // 2. Update exam application status with teacher's grade
     const docRef = doc(db, COLLECTIONS.EXAM_APPLICATIONS, applicationId);
     await updateDoc(docRef, {
       status: 'passed',
-      decidedAt: now,
-      decidedBy: coordinatorId,
+      score: numericScore,
+      maxScore: numericMaxScore,
+      gradedBy,
+      gradedAt: now,
       enrollmentId: enrollmentResult?.enrollmentId || null,
     });
 
-    return { success: true, status: 'passed', enrollmentResult };
+    return { success: true, status: 'passed', score: numericScore, enrollmentResult };
   }
 
   // If failed
   const docRef = doc(db, COLLECTIONS.EXAM_APPLICATIONS, applicationId);
   await updateDoc(docRef, {
     status: 'failed',
-    decidedAt: now,
-    decidedBy: coordinatorId,
+    score: numericScore,
+    maxScore: numericMaxScore,
+    gradedBy,
+    gradedAt: now,
   });
 
-  return { success: true, status: 'failed' };
+  return { success: true, status: 'failed', score: numericScore };
 }

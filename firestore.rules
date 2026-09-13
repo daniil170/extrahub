@@ -178,16 +178,35 @@ service cloud.firestore {
     // EXAM APPLICATIONS COLLECTION
     // ==========================================
     match /examApplications/{applicationId} {
+      // Student reads own, Parent reads child's, Coordinator/Admin reads all (for stats),
+      // Teacher reads applications assigned to their group/activity
       allow read: if isAuthenticated() && (
         resource.data.studentId == request.auth.uid ||
         isParentOfStudent(resource.data.studentId) ||
-        isCoordinator()
+        isCoordinator() ||
+        (isTeacher() && (resource.data.teacherId == request.auth.uid || isTeacherOfGroup(resource.data.groupId)))
       );
+
+      // Student submits exam application for themselves, or coordinator/admin
       allow create: if isAuthenticated() && (
         (isStudent() && request.resource.data.studentId == request.auth.uid) ||
         isCoordinator()
       );
-      allow update, delete: if isCoordinator();
+
+      // ONLY teacher of this group/activity can grade and decide status (passed / failed).
+      // Coordinator has read-only access for monitoring and statistics.
+      allow update: if isAuthenticated() && (
+        (
+          isTeacher() &&
+          (resource.data.teacherId == request.auth.uid || isTeacherOfGroup(resource.data.groupId)) &&
+          request.resource.data.status in ['passed', 'failed'] &&
+          request.resource.data.gradedBy == request.auth.uid &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['studentId', 'groupId', 'activityId', 'appliedAt'])
+        ) ||
+        isAdmin()
+      );
+
+      allow delete: if isAdmin();
     }
 
     // ==========================================

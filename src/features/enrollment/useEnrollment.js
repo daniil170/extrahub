@@ -86,6 +86,7 @@ export function useEnrollment() {
         const selectedGroup =
           (activeActivity.groups || []).find((g) => g.id === selectedGroupId) ||
           activeActivity.groups?.[0];
+        const teacherId = selectedGroup?.teacherId || activeActivity.teacherId || '';
         const studentName =
           user?.role === 'student'
             ? user.fullName || user.displayName || 'Ученик'
@@ -99,6 +100,7 @@ export function useEnrollment() {
           studentId: selectedStudentId,
           groupId: selectedGroupId,
           activityId: activeActivity.id,
+          teacherId,
           activityTitle: activeActivity.title,
           groupName: selectedGroup?.name || 'Основная группа',
           studentName,
