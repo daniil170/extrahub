@@ -35,12 +35,18 @@ export function AuthProvider({ children }) {
             firebaseUser.email?.split('@')[0] ||
             'Пользователь';
 
+          const isDemoEmail = Boolean(
+            firebaseUser.email?.toLowerCase().startsWith('demo.') &&
+            firebaseUser.email?.toLowerCase().endsWith('@pifagorschool.kz')
+          );
+
           const isDemoMaster = Boolean(
             tokenResult.claims?.isDemoMaster ||
             profile?.isDemoMaster ||
-            firebaseUser.email?.toLowerCase() === 'daniilivakin30@gmail.com'
+            firebaseUser.email?.toLowerCase() === 'daniilivakin30@gmail.com' ||
+            isDemoEmail
           );
-          const isSwitchedDemo = Boolean(tokenResult.claims?.isSwitchedDemo);
+          const isSwitchedDemo = Boolean(tokenResult.claims?.isSwitchedDemo || isDemoEmail);
 
           const authenticatedUser = createUser({
             id: firebaseUser.uid,

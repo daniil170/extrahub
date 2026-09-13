@@ -2,6 +2,7 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { db, auth } from '../config/firebase.js';
 
 const DEMO_MASTER_EMAIL = (process.env.DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
+const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'DemoRole2026!#';
 
 const ROLE_DEMO_ACCOUNTS = {
   student: {
@@ -45,7 +46,8 @@ export const switchDemoRole = onCall(async (request) => {
 
   const callerClaims = request.auth.token || {};
   const callerEmail = (callerClaims.email || '').trim().toLowerCase();
-  const isDemoMaster = Boolean(callerClaims.isDemoMaster) || callerEmail === DEMO_MASTER_EMAIL;
+  const isDemoEmail = callerEmail.startsWith('demo.') && callerEmail.endsWith('@pifagorschool.kz');
+  const isDemoMaster = Boolean(callerClaims.isDemoMaster) || callerEmail === DEMO_MASTER_EMAIL || isDemoEmail;
 
   if (!isDemoMaster) {
     throw new HttpsError(
@@ -92,45 +94,66 @@ export const switchDemoRole = onCall(async (request) => {
     if (err.code === 'auth/user-not-found') {
       targetUser = await auth.createUser({
         email: targetEmail,
-        password: 'DemoRole2026!#',
+        password: DEMO_PASSWORD,
         displayName: targetDisplayName,
         emailVerified: true,
       });
-
-      // Ensure Firestore document exists
-      await db.collection('users').doc(targetUser.uid).set({
-        id: targetUser.uid,
-        email: targetEmail,
-        fullName: targetDisplayName,
-        role: targetRoleName,
-        status: 'active',
-        isDemoMaster: targetRole === 'master',
-        ...extraUserData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
     } else {
+      console.error('Error finding user by email:', err);
       throw new HttpsError('internal', `Ошибка поиска демо-пользователя: ${err.message}`);
     }
   }
 
-  // 2. Build custom token with { isDemoMaster: true, role: targetRoleName }
-  // This allows the switched session to maintain isDemoMaster claim
-  // so the user can continue switching roles without permission-denied.
-  const customClaims = {
-    role: targetRoleName,
-    isDemoMaster: true,
-    isSwitchedDemo: targetRole !== 'master',
-  };
+  // Ensure password and display name for demo role accounts
+  if (targetRole !== 'master') {
+    try {
+      await auth.updateUser(targetUser.uid, {
+        password: DEMO_PASSWORD,
+        displayName: targetDisplayName,
+      });
+    } catch (pwErr) {
+      console.warn('Could not sync demo password:', pwErr.message);
+    }
+  }
 
-  const customToken = await auth.createCustomToken(targetUser.uid, customClaims);
+  // 2. Ensure Firestore document exists
+  try {
+    await db.collection('users').doc(targetUser.uid).set({
+      id: targetUser.uid,
+      email: targetEmail,
+      fullName: targetDisplayName,
+      role: targetRoleName,
+      status: 'active',
+      isDemoMaster: true,
+      isDemoAccount: targetRole !== 'master',
+      ...extraUserData,
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+  } catch (fsErr) {
+    console.error('Error writing demo user profile to Firestore:', fsErr);
+    throw new HttpsError('internal', `Ошибка создания профиля пользователя: ${fsErr.message}`);
+  }
+
+  // 3. Build custom token if possible, or provide password fallback
+  let customToken = null;
+  try {
+    const customClaims = {
+      role: targetRoleName,
+      isDemoMaster: true,
+      isSwitchedDemo: targetRole !== 'master',
+    };
+    customToken = await auth.createCustomToken(targetUser.uid, customClaims);
+  } catch (tokenErr) {
+    console.warn('createCustomToken failed (fallback to email/password will be used):', tokenErr.message);
+  }
 
   return {
     success: true,
     customToken,
+    email: targetEmail,
+    password: targetRole === 'master' ? null : DEMO_PASSWORD,
     targetRole,
     effectiveRole: targetRoleName,
-    email: targetEmail,
     uid: targetUser.uid,
   };
 });

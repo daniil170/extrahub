@@ -52,8 +52,28 @@ export async function logoutUser() {
 export async function switchDemoRoleAndSignIn(targetRole) {
   const switchFn = httpsCallable(functions, 'switchDemoRole');
   const result = await switchFn({ targetRole });
-  const { customToken } = result.data;
-  const userCredential = await signInWithCustomToken(auth, customToken);
-  return userCredential.user;
+  const { customToken, email, password } = result.data || {};
+
+  // Try custom token first
+  if (customToken) {
+    try {
+      const userCredential = await signInWithCustomToken(auth, customToken);
+      return userCredential.user;
+    } catch (tokenErr) {
+      console.warn('signInWithCustomToken failed, trying email/password fallback:', tokenErr);
+    }
+  }
+
+  // Fallback to email/password
+  if (email && password) {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
+  }
+
+  if (targetRole === 'master') {
+    throw new Error('Для возврата в мастер-аккаунт войдите под вашей почтой daniilivakin30@gmail.com');
+  }
+
+  throw new Error('Не удалось переключить демо-роль');
 }
 
