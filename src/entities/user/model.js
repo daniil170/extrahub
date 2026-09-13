@@ -34,6 +34,8 @@ export function createUser(data = {}) {
     status: data.status || 'active',
     className: data.className ? Number(data.className) : undefined,
     shift: data.shift ? Number(data.shift) : undefined,
+    isDemoMaster: Boolean(data.isDemoMaster),
+    isSwitchedDemo: Boolean(data.isSwitchedDemo),
     createdAt: data.createdAt || new Date().toISOString(),
   };
 }

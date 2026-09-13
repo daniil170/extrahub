@@ -1,5 +1,11 @@
-import { auth } from '../../app/config/firebase.js';
-import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, functions } from '../../app/config/firebase.js';
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+  signInWithCustomToken,
+} from 'firebase/auth';
+import { httpsCallable } from 'firebase/functions';
 import { getDocument, setDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { createUser } from '../../entities/user/model.js';
 
@@ -38,3 +44,16 @@ export async function registerWithEmail(email, password, profileData) {
 export async function logoutUser() {
   return signOut(auth);
 }
+
+/**
+ * Call switchDemoRole Cloud Function and sign in with the resulting custom token
+ * @param {'student' | 'parent' | 'teacher' | 'coordinator' | 'technician' | 'admin' | 'master'} targetRole
+ */
+export async function switchDemoRoleAndSignIn(targetRole) {
+  const switchFn = httpsCallable(functions, 'switchDemoRole');
+  const result = await switchFn({ targetRole });
+  const { customToken } = result.data;
+  const userCredential = await signInWithCustomToken(auth, customToken);
+  return userCredential.user;
+}
+

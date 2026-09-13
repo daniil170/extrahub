@@ -22,16 +22,20 @@ export const createStaffInvite = onCall(async (request) => {
 
   const { targetRole, email, activityId } = request.data || {};
 
-  if (!targetRole || !['coordinator', 'teacher'].includes(targetRole)) {
+  if (!targetRole || !['coordinator', 'teacher', 'technician'].includes(targetRole)) {
     throw new HttpsError(
       'invalid-argument',
-      'Параметр targetRole должен быть "coordinator" или "teacher"'
+      'Параметр targetRole должен быть "coordinator", "teacher" или "technician"'
     );
   }
 
   // Permission checks
   if (targetRole === 'coordinator' && callerRole !== 'admin') {
     throw new HttpsError('permission-denied', 'Только администратор может приглашать координатора');
+  }
+
+  if (targetRole === 'technician' && callerRole !== 'admin') {
+    throw new HttpsError('permission-denied', 'Только администратор может приглашать техника');
   }
 
   if (targetRole === 'teacher') {

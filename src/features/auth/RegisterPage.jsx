@@ -13,6 +13,7 @@ import {
 } from '../../shared/ui/index.js';
 
 const ALLOWED_EMAIL_DOMAIN = import.meta.env.VITE_ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+const DEMO_MASTER_EMAIL = (import.meta.env.VITE_DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -28,8 +29,9 @@ export function RegisterPage() {
   const [error, setError] = useState(null);
 
   const trimmedEmail = email.trim().toLowerCase();
+  const isMasterEmail = trimmedEmail === DEMO_MASTER_EMAIL;
   const isInvalidDomain =
-    trimmedEmail.includes('@') && !trimmedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
+    trimmedEmail.includes('@') && !isMasterEmail && !trimmedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +47,7 @@ export function RegisterPage() {
       return;
     }
 
-    if (!trimmedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`)) {
+    if (!isMasterEmail && !trimmedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`)) {
       setError(`Регистрация разрешена только со школьной почтой @${ALLOWED_EMAIL_DOMAIN}`);
       return;
     }

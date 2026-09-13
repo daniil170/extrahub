@@ -21,9 +21,11 @@ import {
   UserPlus,
   Shield,
   BookOpen,
+  Wrench,
 } from 'lucide-react';
 
 const ALLOWED_EMAIL_DOMAIN = import.meta.env.VITE_ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+const DEMO_MASTER_EMAIL = (import.meta.env.VITE_DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
 
 export function StaffInvitesTab() {
   const { user } = useAuth();
@@ -93,8 +95,9 @@ export function StaffInvitesTab() {
     setCopied(false);
 
     const trimmedEmail = email.trim().toLowerCase();
+    const isMasterEmail = trimmedEmail === DEMO_MASTER_EMAIL;
 
-    if (trimmedEmail && !trimmedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`)) {
+    if (trimmedEmail && !isMasterEmail && !trimmedEmail.endsWith(`@${ALLOWED_EMAIL_DOMAIN}`)) {
       setFormError(`Почта сотрудника должна принадлежать домену @${ALLOWED_EMAIL_DOMAIN}`);
       return;
     }
@@ -204,6 +207,32 @@ export function StaffInvitesTab() {
                 />
                 <BookOpen size={16} /> Преподаватель кружка
               </label>
+
+              {isAdmin && (
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: `1px solid ${inviteRole === 'technician' ? 'var(--primary)' : 'var(--border-color)'}`,
+                    backgroundColor: inviteRole === 'technician' ? 'var(--primary-light)' : 'transparent',
+                    cursor: 'pointer',
+                    fontSize: '13.5px',
+                    fontWeight: inviteRole === 'technician' ? 600 : 400,
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="technician"
+                    checked={inviteRole === 'technician'}
+                    onChange={() => setInviteRole('technician')}
+                  />
+                  <Wrench size={16} /> Техник по ремонту
+                </label>
+              )}
             </div>
           </div>
 
@@ -391,8 +420,20 @@ export function StaffInvitesTab() {
                       }}
                     >
                       <td style={{ padding: '12px' }}>
-                        <Badge variant={inv.targetRole === 'coordinator' ? 'primary' : 'warning'}>
-                          {inv.targetRole === 'coordinator' ? 'Координатор' : 'Преподаватель'}
+                        <Badge
+                          variant={
+                            inv.targetRole === 'coordinator'
+                              ? 'primary'
+                              : inv.targetRole === 'technician'
+                                ? 'info'
+                                : 'warning'
+                          }
+                        >
+                          {inv.targetRole === 'coordinator'
+                            ? 'Координатор'
+                            : inv.targetRole === 'technician'
+                              ? 'Техник'
+                              : 'Преподаватель'}
                         </Badge>
                       </td>
                       <td style={{ padding: '12px' }}>
