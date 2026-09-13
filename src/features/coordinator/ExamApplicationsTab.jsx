@@ -27,10 +27,22 @@ export function ExamApplicationsTab() {
   const [filter, setFilter] = useState('all'); // 'all' | 'pending' | 'resolved'
 
   useEffect(() => {
-    const unsubscribe = subscribeCoordinatorExamApplications((apps) => {
-      setApplications(apps);
-      setLoading(false);
-    });
+    const unsubscribe = subscribeCoordinatorExamApplications(
+      (apps) => {
+        setApplications(apps);
+        setLoading(false);
+      },
+      (err) => {
+        setLoading(false);
+        if (err?.code === 'permission-denied') {
+          setErrorMessage(
+            'Недостаточно прав для чтения заявок на экзамен. Пожалуйста, задеплойте обновлённые правила: firebase deploy --only firestore:rules'
+          );
+        } else {
+          setErrorMessage(err.message || 'Ошибка при загрузке заявок');
+        }
+      }
+    );
 
     return () => {
       if (unsubscribe) unsubscribe();
