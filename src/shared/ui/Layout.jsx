@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar.jsx';
 import { Footer } from './Footer.jsx';
+import { CookieConsentBanner } from './CookieConsentBanner.jsx';
 import { IntroAnimation } from './IntroAnimation.jsx';
 import { useAuth } from '../hooks/useAuth.js';
 import { DemoRoleSwitcher } from '../../features/auth/DemoRoleSwitcher.jsx';
@@ -16,6 +17,7 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <CookieConsentBanner />
       <DemoRoleSwitcher />
     </div>
   );

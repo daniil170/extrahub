@@ -3,17 +3,13 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../app/config/firebase.js';
 import { fetchInviteDetails, registerViaInviteCall } from './api.js';
-import {
-  Card,
-  Button,
-  PageHeader,
-  Alert,
-  Spinner,
-} from '../../shared/ui/index.js';
-import { ShieldCheck, BookOpen, AlertCircle, Wrench } from 'lucide-react';
+import { Card, Button, PageHeader, Alert, Spinner } from '../../shared/ui/index.js';
+import { ShieldCheck, BookOpen, AlertCircle, Wrench, User, Lock, Mail } from 'lucide-react';
 
 const ALLOWED_EMAIL_DOMAIN = import.meta.env.VITE_ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
-const DEMO_MASTER_EMAIL = (import.meta.env.VITE_DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
+const DEMO_MASTER_EMAIL = (import.meta.env.VITE_DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com')
+  .trim()
+  .toLowerCase();
 
 export function StaffInvitePage() {
   const { token } = useParams();
@@ -29,6 +25,7 @@ export function StaffInvitePage() {
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -97,6 +94,13 @@ export function StaffInvitePage() {
 
     if (password !== confirmPassword) {
       setSubmitError('Пароли не совпадают');
+      return;
+    }
+
+    if (!termsAccepted) {
+      setSubmitError(
+        'Для завершения регистрации необходимо принять Условия использования и Политику конфиденциальности'
+      );
       return;
     }
 
@@ -212,7 +216,14 @@ export function StaffInvitePage() {
             <BookOpen size={24} />
           )}
           <div>
-            <div style={{ fontSize: '11px', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
+            <div
+              style={{
+                fontSize: '11px',
+                textTransform: 'uppercase',
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+              }}
+            >
               Назначенная роль
             </div>
             <div style={{ fontSize: '15px', fontWeight: 600 }}>
@@ -236,7 +247,10 @@ export function StaffInvitePage() {
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+        >
           {/* Email */}
           <div>
             <label
@@ -245,27 +259,40 @@ export function StaffInvitePage() {
             >
               Корпоративная почта (@{ALLOWED_EMAIL_DOMAIN})
             </label>
-            <input
-              id="invite-email"
-              type="email"
-              required
-              disabled={hasFixedEmail || submitting}
-              value={hasFixedEmail ? inviteData.invite.email : email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={`user@${ALLOWED_EMAIL_DOMAIN}`}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: hasFixedEmail ? 'var(--bg-subtle)' : 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                outline: 'none',
-              }}
-            />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Mail
+                size={17}
+                style={{ position: 'absolute', left: '12px', color: 'var(--text-muted)' }}
+              />
+              <input
+                id="invite-email"
+                type="email"
+                required
+                disabled={hasFixedEmail || submitting}
+                value={hasFixedEmail ? inviteData.invite.email : email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={`user@${ALLOWED_EMAIL_DOMAIN}`}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 38px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: hasFixedEmail ? 'var(--bg-subtle)' : 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
+              />
+            </div>
             {hasFixedEmail && (
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--text-muted)',
+                  marginTop: '4px',
+                  display: 'block',
+                }}
+              >
                 Почта привязана к приглашению и не может быть изменена.
               </span>
             )}
@@ -279,25 +306,31 @@ export function StaffInvitePage() {
             >
               Ваше ФИО <span style={{ color: 'var(--danger)' }}>*</span>
             </label>
-            <input
-              id="invite-name"
-              type="text"
-              required
-              placeholder="Иванов Иван Иванович"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              disabled={submitting}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                outline: 'none',
-              }}
-            />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <User
+                size={17}
+                style={{ position: 'absolute', left: '12px', color: 'var(--text-muted)' }}
+              />
+              <input
+                id="invite-name"
+                type="text"
+                required
+                placeholder="Иванов Иван Иванович"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                disabled={submitting}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 38px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
+              />
+            </div>
           </div>
 
           {/* Password */}
@@ -308,25 +341,31 @@ export function StaffInvitePage() {
             >
               Задайте пароль (от 6 символов) <span style={{ color: 'var(--danger)' }}>*</span>
             </label>
-            <input
-              id="invite-password"
-              type="password"
-              required
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={submitting}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                outline: 'none',
-              }}
-            />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Lock
+                size={17}
+                style={{ position: 'absolute', left: '12px', color: 'var(--text-muted)' }}
+              />
+              <input
+                id="invite-password"
+                type="password"
+                required
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={submitting}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 38px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
+              />
+            </div>
           </div>
 
           {/* Confirm Password */}
@@ -337,35 +376,108 @@ export function StaffInvitePage() {
             >
               Повторите пароль <span style={{ color: 'var(--danger)' }}>*</span>
             </label>
-            <input
-              id="invite-confirm-password"
-              type="password"
-              required
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={submitting}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Lock
+                size={17}
+                style={{ position: 'absolute', left: '12px', color: 'var(--text-muted)' }}
+              />
+              <input
+                id="invite-confirm-password"
+                type="password"
+                required
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={submitting}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 38px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Mandatory Agreement Checkbox */}
+          <div
+            style={{
+              padding: '12px 14px',
+              backgroundColor: 'var(--bg-subtle)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-sm)',
+              marginTop: '4px',
+            }}
+          >
+            <label
               style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                outline: 'none',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px',
+                fontSize: '13px',
+                lineHeight: 1.5,
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                userSelect: 'none',
               }}
-            />
+            >
+              <input
+                type="checkbox"
+                required
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                disabled={submitting}
+                style={{
+                  width: '17px',
+                  height: '17px',
+                  marginTop: '2px',
+                  flexShrink: 0,
+                  accentColor: 'var(--primary)',
+                  cursor: 'pointer',
+                }}
+              />
+              <span>
+                Я принимаю{' '}
+                <Link
+                  to="/terms-of-use"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--primary)', textDecoration: 'underline' }}
+                >
+                  Условия использования
+                </Link>{' '}
+                и{' '}
+                <Link
+                  to="/privacy-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--primary)', textDecoration: 'underline' }}
+                >
+                  Политику конфиденциальности
+                </Link>
+              </span>
+            </label>
           </div>
 
           <Button
             type="submit"
             variant="primary"
             style={{ width: '100%', marginTop: '8px', padding: '12px' }}
-            disabled={submitting}
+            disabled={submitting || !termsAccepted}
           >
             {submitting ? (
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
                 <Spinner size="sm" /> Создание аккаунта...
               </span>
             ) : (

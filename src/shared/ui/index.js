@@ -12,4 +12,4 @@ export * from './Icons.jsx';
 export * from './IntroAnimation.jsx';
 export * from './CapacityBadge.jsx';
 export * from './Alert.jsx';
-
+export * from './CookieConsentBanner.jsx';

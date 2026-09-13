@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Clock, CheckCircle2, XCircle, User, Calendar, MapPin, CreditCard, Sparkles } from 'lucide-react';
+import {
+  Clock,
+  CheckCircle2,
+  XCircle,
+  User,
+  Calendar,
+  MapPin,
+  CreditCard,
+  Sparkles,
+} from 'lucide-react';
 import { useParentInvite } from './useParentInvite.js';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { switchDemoRoleAndSignIn } from '../auth/api.js';
@@ -73,7 +82,14 @@ export function ParentInvitePage() {
           >
             <Clock size={28} />
           </div>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', margin: '0 0 10px', color: 'var(--text-primary)' }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: '20px',
+              margin: '0 0 10px',
+              color: 'var(--text-primary)',
+            }}
+          >
             Срок действия брони истёк
           </h2>
           <p
@@ -117,7 +133,14 @@ export function ParentInvitePage() {
           >
             <CheckCircle2 size={28} />
           </div>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '22px', margin: '0 0 10px', color: 'var(--text-primary)' }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: '22px',
+              margin: '0 0 10px',
+              color: 'var(--text-primary)',
+            }}
+          >
             Запись подтверждена!
           </h2>
           <p
@@ -167,7 +190,14 @@ export function ParentInvitePage() {
           >
             <XCircle size={28} />
           </div>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '20px', margin: '0 0 10px', color: 'var(--text-primary)' }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: '20px',
+              margin: '0 0 10px',
+              color: 'var(--text-primary)',
+            }}
+          >
             Запись отклонена
           </h2>
           <p
@@ -333,9 +363,20 @@ export function ParentInvitePage() {
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                 Расписание занятий
               </div>
-              <div style={{ fontSize: '14px', fontWeight: 500, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  marginTop: '2px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
                 <Calendar size={14} style={{ flexShrink: 0 }} />
-                <span>{formatDaysOfWeek(group.daysOfWeek)} &bull; {group.startTime}–{group.endTime}</span>
+                <span>
+                  {formatDaysOfWeek(group.daysOfWeek)} &bull; {group.startTime}–{group.endTime}
+                </span>
               </div>
             </div>
 
@@ -343,7 +384,16 @@ export function ParentInvitePage() {
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                 Место проведения
               </div>
-              <div style={{ fontSize: '14px', fontWeight: 500, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  marginTop: '2px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
                 <MapPin size={14} style={{ flexShrink: 0 }} />
                 <span>{activity.location}</span>
               </div>
@@ -370,13 +420,27 @@ export function ParentInvitePage() {
               <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                 Стоимость занятий:
               </span>
-              <strong style={{ fontSize: '18px', color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>
+              <strong
+                style={{
+                  fontSize: '18px',
+                  color: 'var(--primary)',
+                  fontFamily: 'var(--font-mono)',
+                }}
+              >
                 {activity.price === 0 ? 'Бесплатно' : formatCurrency(activity.price)}
               </strong>
             </div>
 
             {paymentTerms?.dueDate && activity.price > 0 && (
-              <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div
+                style={{
+                  fontSize: '12.5px',
+                  color: 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
                 <CreditCard size={14} style={{ flexShrink: 0 }} />
                 <span>
                   <strong>Условия оплаты:</strong> срок внесения первого взноса до{' '}
@@ -388,7 +452,15 @@ export function ParentInvitePage() {
 
           {/* Hold Expiration notice */}
           {invite?.expiresAt && (
-            <div style={{ fontSize: '12px', color: 'var(--accent-coral)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div
+              style={{
+                fontSize: '12px',
+                color: 'var(--accent-coral)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
               <Clock size={13} style={{ flexShrink: 0 }} />
               <span>Бронь удерживается до {formatDate(invite.expiresAt)}</span>
             </div>
@@ -412,7 +484,8 @@ export function ParentInvitePage() {
           >
             <Sparkles size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
             <span>
-              <strong>Демо-режим:</strong> Вы можете подтвердить запись прямо сейчас без ручного переключения аккаунта.
+              <strong>Демо-режим:</strong> Вы можете подтвердить запись прямо сейчас без ручного
+              переключения аккаунта.
             </span>
           </div>
         )}
@@ -452,7 +525,27 @@ export function ParentInvitePage() {
               }}
             />
             <span>
-              Я ознакомлен(а) с расписанием, стоимостью кружка и сроком внесения первого взноса.
+              Я подтверждаю, что являюсь родителем (законным представителем) учащегося,
+              ознакомлен(а) с расписанием и стоимостью кружка, и даю согласие на обработку
+              персональных данных ребёнка в соответствии с{' '}
+              <Link
+                to="/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--primary)', textDecoration: 'underline' }}
+              >
+                Политикой конфиденциальности
+              </Link>{' '}
+              и{' '}
+              <Link
+                to="/terms-of-use"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--primary)', textDecoration: 'underline' }}
+              >
+                Условиями использования
+              </Link>
+              .
             </span>
           </label>
         </div>

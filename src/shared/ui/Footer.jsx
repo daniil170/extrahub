@@ -145,7 +145,12 @@ export function Footer() {
               <li>
                 <Link
                   to="/catalog"
-                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  style={{
+                    color: 'inherit',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
                   className="footer-link"
                 >
                   <Search size={14} /> Каталог секций и кружков
@@ -154,7 +159,12 @@ export function Footer() {
               <li>
                 <Link
                   to="/student"
-                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  style={{
+                    color: 'inherit',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
                   className="footer-link"
                 >
                   <Clock size={14} /> Бронь места с таймером 24ч
@@ -163,7 +173,12 @@ export function Footer() {
               <li>
                 <Link
                   to="/parent"
-                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  style={{
+                    color: 'inherit',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
                   className="footer-link"
                 >
                   <CreditCard size={14} /> Онлайн-биллинг и оплата (₸)
@@ -172,7 +187,12 @@ export function Footer() {
               <li>
                 <Link
                   to="/teacher"
-                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  style={{
+                    color: 'inherit',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
                   className="footer-link"
                 >
                   <ClipboardList size={14} /> Электронный журнал в 1 клик
@@ -181,7 +201,12 @@ export function Footer() {
               <li>
                 <Link
                   to="/coordinator"
-                  style={{ color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  style={{
+                    color: 'inherit',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
                   className="footer-link"
                 >
                   <BarChart2 size={14} /> Контроль вместимости и очереди
@@ -205,9 +230,19 @@ export function Footer() {
             >
               Команда проекта
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}
+            >
               <div>
-                <div style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
                   <Code size={14} color="var(--primary)" /> Ivakin Daniil
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
@@ -216,7 +251,15 @@ export function Footer() {
               </div>
 
               <div>
-                <div style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
                   <Lightbulb size={14} color="var(--primary)" /> Amir Timurbulat
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
@@ -225,7 +268,15 @@ export function Footer() {
               </div>
 
               <div>
-                <div style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
                   <TrendingUp size={14} color="var(--primary)" /> Maulen Stanbaev
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
@@ -277,8 +328,14 @@ export function Footer() {
                 marginBottom: '12px',
               }}
             >
-              <MapPin size={16} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--primary)' }} />
-              <span>Разработано с учётом образовательных стандартов и регламентов школ Республики Казахстан.</span>
+              <MapPin
+                size={16}
+                style={{ flexShrink: 0, marginTop: '2px', color: 'var(--primary)' }}
+              />
+              <span>
+                Разработано с учётом образовательных стандартов и регламентов школ Республики
+                Казахстан.
+              </span>
             </div>
             <div
               style={{
@@ -291,8 +348,14 @@ export function Footer() {
                 marginBottom: '16px',
               }}
             >
-              <ShieldCheck size={16} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--primary)' }} />
-              <span>100% защита персональных данных учащихся и родителей на уровне правил Cloud Security Rules.</span>
+              <ShieldCheck
+                size={16}
+                style={{ flexShrink: 0, marginTop: '2px', color: 'var(--primary)' }}
+              />
+              <span>
+                100% защита персональных данных учащихся и родителей на уровне правил Cloud Security
+                Rules.
+              </span>
             </div>
             <div
               style={{
@@ -310,7 +373,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar with copyright */}
+        {/* Bottom bar with copyright and legal links */}
         <div
           style={{
             borderTop: '1px solid var(--border-color)',
@@ -319,22 +382,27 @@ export function Footer() {
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '12px',
-            fontSize: '12.5px',
+            gap: '16px',
+            fontSize: '13px',
             color: 'var(--text-muted)',
           }}
         >
           <div>
-            © 2026 ExtraHub Platform. <strong>Все права защищены</strong> (All rights reserved).
+            © ExtraHub 2026. <strong>Все права защищены</strong>.
           </div>
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-            <Link to="/about" style={{ color: 'inherit' }}>
+          <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <Link to="/privacy-policy" style={{ color: 'inherit' }} className="footer-link">
+              Политика конфиденциальности
+            </Link>
+            <Link to="/terms-of-use" style={{ color: 'inherit' }} className="footer-link">
+              Условия использования
+            </Link>
+            <Link to="/about" style={{ color: 'inherit' }} className="footer-link">
               О платформе
             </Link>
-            <Link to="/catalog" style={{ color: 'inherit' }}>
+            <Link to="/catalog" style={{ color: 'inherit' }} className="footer-link">
               Каталог секций
             </Link>
-            <span>Республика Казахстан</span>
           </div>
         </div>
       </div>

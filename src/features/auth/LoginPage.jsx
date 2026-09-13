@@ -1,40 +1,55 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { Mail, Lock, Eye, EyeOff, LogIn, ArrowRight } from 'lucide-react';
 import { auth } from '../../app/config/firebase.js';
 import { useAuth } from '../../shared/hooks/useAuth.js';
-import {
-  Card,
-  Button,
-  PageHeader,
-  Alert,
-  Spinner,
-} from '../../shared/ui/index.js';
+import { useTheme } from '../../shared/hooks/index.js';
+import { Button, Alert, Spinner } from '../../shared/ui/index.js';
+import logoImg from '../../assets/logo.png';
+import logoDarkImg from '../../assets/logo-dark.svg';
+import './auth.css';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isDark } = useTheme();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // If already logged in, offer quick jump to dashboard
   if (user) {
     return (
-      <div style={{ maxWidth: '480px', margin: '40px auto', padding: '0 16px' }}>
-        <Card style={{ padding: '32px 24px', textAlign: 'center' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>
-            Вы уже вошли как {user.fullName}
-          </h3>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
-            Роль в системе: <b>{user.role}</b> ({user.email})
+      <div className="auth-page-wrapper">
+        <div className="auth-card" style={{ textAlign: 'center' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <img
+              src={isDark ? logoDarkImg : logoImg}
+              alt="ExtraHub Logo"
+              style={{ width: '44px', height: '44px', objectFit: 'contain' }}
+            />
+          </div>
+          <h3 className="auth-title">Вы уже вошли в систему</h3>
+          <p className="auth-subtitle" style={{ marginBottom: '20px' }}>
+            Пользователь: <strong>{user.fullName || user.email}</strong>
+            <br />
+            Роль в системе:{' '}
+            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--primary)' }}>
+              {user.role}
+            </span>
           </p>
-          <Button variant="primary" style={{ width: '100%' }} onClick={() => navigate('/dashboard')}>
-            Перейти в панель управления
+          <Button
+            variant="primary"
+            style={{ width: '100%', padding: '12px' }}
+            onClick={() => navigate('/dashboard')}
+          >
+            Перейти в панель управления <ArrowRight size={16} style={{ marginLeft: '6px' }} />
           </Button>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -52,12 +67,15 @@ export function LoginPage() {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, trimmedEmail, password);
-      // Wait momentarily for onAuthStateChanged to sync, then navigate to dashboard
       navigate('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
       let msg = 'Неверный адрес электронной почты или пароль';
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
+      if (
+        err.code === 'auth/user-not-found' ||
+        err.code === 'auth/invalid-credential' ||
+        err.code === 'auth/wrong-password'
+      ) {
         msg = 'Неверный email или пароль. Пожалуйста, проверьте введённые данные.';
       } else if (err.code === 'auth/too-many-requests') {
         msg = 'Слишком много неудачных попыток. Пожалуйста, попробуйте позже.';
@@ -69,121 +87,143 @@ export function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: '460px', margin: '40px auto', padding: '0 16px' }}>
-      <PageHeader
-        title="Вход в ExtraHub"
-        subtitle="Единая платформа внеурочной деятельности и кружков"
-      />
+    <div className="auth-page-wrapper">
+      <div className="auth-card">
+        {/* Brand Header */}
+        <div className="auth-header">
+          <Link to="/catalog" className="auth-logo-link">
+            <img
+              src={isDark ? logoDarkImg : logoImg}
+              alt="ExtraHub Logo"
+              style={{ width: '36px', height: '36px', objectFit: 'contain' }}
+            />
+            <span className="auth-logo-title">ExtraHub</span>
+          </Link>
+          <h1 className="auth-title">Добро пожаловать</h1>
+          <p className="auth-subtitle">
+            Единая цифровая платформа внеурочной деятельности и школьных кружков
+          </p>
+        </div>
 
-      <Card style={{ padding: '28px 24px', marginTop: '16px' }}>
+        {/* Two-tab Switcher */}
+        <div className="auth-tabs-nav" role="tablist" aria-label="Авторизация и регистрация">
+          <button type="button" className="auth-tab-btn active" role="tab" aria-selected="true">
+            <LogIn size={15} /> Вход
+          </button>
+          <Link to="/register" className="auth-tab-btn" role="tab" aria-selected="false">
+            Регистрация
+          </Link>
+        </div>
+
         {error && (
           <Alert variant="danger" style={{ marginBottom: '20px' }}>
             {error}
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <label
-              htmlFor="login-email"
-              style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
-            >
+        <form onSubmit={handleSubmit} noValidate>
+          {/* Email input with left icon */}
+          <div className="auth-field">
+            <label htmlFor="login-email" className="auth-field-label">
               Электронная почта
             </label>
-            <input
-              id="login-email"
-              type="email"
-              required
-              placeholder="user@pifagorschool.kz"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                outline: 'none',
-              }}
-            />
+            <div className="auth-input-wrapper">
+              <Mail size={17} className="auth-input-icon" />
+              <input
+                id="login-email"
+                type="email"
+                required
+                autoComplete="email"
+                inputMode="email"
+                placeholder="user@pifagorschool.kz"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                className="auth-input"
+              />
+            </div>
           </div>
 
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          {/* Password input with left lock and right eye toggle */}
+          <div className="auth-field">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '6px',
+              }}
+            >
               <label
                 htmlFor="login-password"
-                style={{ fontSize: '13px', fontWeight: 600 }}
+                className="auth-field-label"
+                style={{ marginBottom: 0 }}
               >
                 Пароль
               </label>
             </div>
-            <input
-              id="login-password"
-              type="password"
-              required
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                outline: 'none',
-              }}
-            />
+            <div className="auth-input-wrapper">
+              <Lock size={17} className="auth-input-icon" />
+              <input
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                className="auth-input"
+                style={{ paddingRight: '40px' }}
+              />
+              <button
+                type="button"
+                className="auth-input-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           <Button
             type="submit"
             variant="primary"
-            style={{ width: '100%', marginTop: '4px', padding: '12px' }}
+            style={{ width: '100%', marginTop: '8px', padding: '12px' }}
             disabled={loading}
           >
             {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
                 <Spinner size="sm" /> Вход в систему...
               </span>
             ) : (
-              'Войти'
+              'Войти в аккаунт'
             )}
           </Button>
         </form>
 
-        <div
-          style={{
-            marginTop: '20px',
-            paddingTop: '16px',
-            borderTop: '1px solid var(--border-color)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            fontSize: '13px',
-            textAlign: 'center',
-          }}
-        >
-          <div>
+        <div className="auth-footer-help">
+          <p style={{ margin: '0 0 6px 0' }}>
             Ученик школы?{' '}
-            <Link
-              to="/register"
-              style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}
-            >
-              Зарегистрироваться
+            <Link to="/register" style={{ color: 'var(--primary)', fontWeight: 600 }}>
+              Зарегистрироваться в 2 шага
             </Link>
-          </div>
-
+          </p>
           <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)' }}>
-            Для сотрудников и преподавателей: вход по корпоративной почте или по персональной ссылке-приглашению.
+            Для преподавателей и сотрудников: вход по корпоративной почте или по персональной
+            ссылке-приглашению.
           </p>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

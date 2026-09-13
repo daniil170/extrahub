@@ -9,6 +9,8 @@ import { RegisterPage } from '../../features/auth/RegisterPage.jsx';
 import { ParentInvitePage } from '../../features/invite/ParentInvitePage.jsx';
 import { StaffInvitePage } from '../../features/invite/StaffInvitePage.jsx';
 import { AboutPage } from '../../features/about/AboutPage.jsx';
+import { PrivacyPolicyPage } from '../../features/legal/PrivacyPolicyPage.jsx';
+import { TermsOfUsePage } from '../../features/legal/TermsOfUsePage.jsx';
 import {
   StudentDashboard,
   ParentDashboard,
@@ -34,6 +36,14 @@ export const router = createBrowserRouter([
       {
         path: 'about',
         element: <AboutPage />,
+      },
+      {
+        path: 'privacy-policy',
+        element: <PrivacyPolicyPage />,
+      },
+      {
+        path: 'terms-of-use',
+        element: <TermsOfUsePage />,
       },
       {
         path: 'dashboard',
