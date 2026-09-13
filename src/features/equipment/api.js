@@ -40,14 +40,21 @@ function sortIssues(issues) {
  * @returns {Promise<import('../../entities/equipmentIssue/model.js').EquipmentIssue[]>}
  */
 export async function fetchEquipmentIssues({ role = 'technician', userId = '' } = {}) {
-  const colRef = collection(db, COLLECTIONS.EQUIPMENT_ISSUES);
-  let q = colRef;
-  if (role === 'teacher' && userId) {
-    q = query(colRef, where('reportedBy', '==', userId));
+  try {
+    const colRef = collection(db, COLLECTIONS.EQUIPMENT_ISSUES);
+    let q = colRef;
+    if (role === 'teacher' && userId) {
+      q = query(colRef, where('reportedBy', '==', userId));
+    }
+    const snap = await getDocs(q);
+    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return sortIssues(list);
+  } catch (err) {
+    if (err.code !== 'permission-denied') {
+      console.error('Failed to fetch equipment issues:', err);
+    }
+    return [];
   }
-  const snap = await getDocs(q);
-  const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  return sortIssues(list);
 }
 
 /**
@@ -132,7 +139,9 @@ export function subscribeEquipmentIssues(callback) {
       callback(sortIssues(liveData));
     },
     (error) => {
-      console.error('Equipment issues subscription error:', error);
+      if (error.code !== 'permission-denied') {
+        console.error('Equipment issues subscription error:', error);
+      }
     }
   );
 }

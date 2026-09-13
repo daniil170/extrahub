@@ -129,7 +129,9 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
           emit();
         },
         (err) => {
-          console.error('Children snapshot error:', err);
+          if (err.code !== 'permission-denied') {
+            console.error('Children snapshot error:', err);
+          }
           childrenList = [];
           emit();
         }
@@ -150,7 +152,9 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
           emit();
         },
         (err) => {
-          console.error('Enrollments snapshot error:', err);
+          if (err.code !== 'permission-denied') {
+            console.error('Enrollments snapshot error:', err);
+          }
           enrollmentsList = [];
           emit();
         }
@@ -166,7 +170,9 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
           emit();
         },
         (err) => {
-          console.error('Payments snapshot error:', err);
+          if (err.code !== 'permission-denied') {
+            console.error('Payments snapshot error:', err);
+          }
           paymentsList = [];
           emit();
         }
