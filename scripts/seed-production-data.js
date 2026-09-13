@@ -18,6 +18,7 @@ import {
   DEMO_ACTIVITY_GROUPS,
   DEMO_EQUIPMENT_ISSUES,
   DEMO_TECHNICIANS,
+  DEMO_STUDENTS,
 } from '../src/shared/data/demoData.js';
 
 const PROJECT_ID = process.env.VITE_FIREBASE_PROJECT_ID || 'extrahub-c95af';
@@ -152,7 +153,19 @@ async function main() {
     console.log(`   ✓ [${user.id}] ${user.fullName} (${user.role}) -> ${user.email}`);
   }
 
-  // 4. Seed Equipment Issues for Technician Cabinet Demo
+  // 4. Seed Students
+  console.log(`\n📌 Seeding Students (${DEMO_STUDENTS.length} items)...`);
+  for (const st of DEMO_STUDENTS) {
+    const studentData = {
+      ...st,
+      createdAt: new Date().toISOString(),
+      status: 'active',
+    };
+    await writeFirestoreDoc(accessToken, 'students', st.id, studentData);
+    console.log(`   ✓ [${st.id}] ${st.fullName} (${st.className})`);
+  }
+
+  // 5. Seed Equipment Issues for Technician Cabinet Demo
   console.log(`\n📌 Seeding Equipment Issues (${DEMO_EQUIPMENT_ISSUES.length} items)...`);
   for (const issue of DEMO_EQUIPMENT_ISSUES) {
     await writeFirestoreDoc(accessToken, 'equipmentIssues', issue.id, issue);

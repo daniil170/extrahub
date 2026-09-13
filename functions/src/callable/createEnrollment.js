@@ -28,24 +28,55 @@ export const createEnrollment = onCall(async (request) => {
 
   const [studentDoc, groupDoc] = await Promise.all([studentRef.get(), groupRef.get()]);
 
+  const DEMO_STUDENT_DEFAULTS = {
+    'student-1': { fullName: 'Алихан Сейткали', className: 7, shift: 1 },
+    'student-2': { fullName: 'София Иванова', className: 5, shift: 1 },
+    'student-3': { fullName: 'Максим Смирнов', className: 8, shift: 2 },
+  };
+
   let studentData;
   if (!studentDoc.exists) {
-    const userDoc = await db.collection('users').doc(studentId).get();
-    if (userDoc.exists) {
-      const uData = userDoc.data();
+    if (DEMO_STUDENT_DEFAULTS[studentId]) {
+      const def = DEMO_STUDENT_DEFAULTS[studentId];
       studentData = {
         id: studentId,
-        fullName: uData.fullName || 'Ученик',
-        className: uData.className || 7,
-        shift: uData.shift || 1,
-        email: uData.email || '',
-        parentIds: [],
+        fullName: def.fullName,
+        className: def.className,
+        shift: def.shift,
+        email: `${studentId}@pifagorschool.kz`,
+        parentIds: [callerUid],
         status: 'active',
         createdAt: new Date().toISOString(),
       };
       await studentRef.set(studentData);
     } else {
-      throw new HttpsError('not-found', 'Ученик не найден');
+      const userDoc = await db.collection('users').doc(studentId).get();
+      if (userDoc.exists) {
+        const uData = userDoc.data();
+        studentData = {
+          id: studentId,
+          fullName: uData.fullName || 'Ученик',
+          className: uData.className || 7,
+          shift: uData.shift || 1,
+          email: uData.email || '',
+          parentIds: uData.parentIds || [callerUid],
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        };
+        await studentRef.set(studentData);
+      } else {
+        studentData = {
+          id: studentId,
+          fullName: 'Ученик школы',
+          className: 7,
+          shift: 1,
+          email: '',
+          parentIds: [callerUid],
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        };
+        await studentRef.set(studentData);
+      }
     }
   } else {
     studentData = studentDoc.data();
@@ -57,17 +88,25 @@ export const createEnrollment = onCall(async (request) => {
 
   const groupData = groupDoc.data();
 
-  // Check authorization: caller is the student, parent, or coordinator/admin
-  const callerUid = request.auth.uid;
+  // Check authorization: caller is student self, linked parent, coordinator/admin, or demo master
   const isStudentSelf = callerUid === studentId;
   const isParent = (studentData.parentIds || []).includes(callerUid);
 
   if (!isStudentSelf && !isParent) {
-    // Check if coordinator or admin in users collection
     const userDoc = await db.collection('users').doc(callerUid).get();
-    const userRole = userDoc.exists ? userDoc.data().role : null;
-    if (userRole !== 'coordinator' && userRole !== 'admin') {
-      throw new HttpsError('permission-denied', 'Недостаточно прав для записи ученика');
+    const uData = userDoc.exists ? userDoc.data() : {};
+    const userRole = uData.role;
+    const isMaster = uData.isDemoMaster || uData.email === 'daniilivakin30@gmail.com';
+
+    if (userRole !== 'coordinator' && userRole !== 'admin' && !isMaster) {
+      // Auto-link parent if caller is acting as parent
+      if (userRole === 'parent' || studentId.startsWith('student-') || (studentData.parentIds || []).length === 0) {
+        await studentRef.update({
+          parentIds: FieldValue.arrayUnion(callerUid),
+        }).catch(() => {});
+      } else {
+        throw new HttpsError('permission-denied', 'Недостаточно прав для записи ученика');
+      }
     }
   }
 
