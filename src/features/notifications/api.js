@@ -1,53 +1,17 @@
-import { getDocuments, updateDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc,
+  writeBatch,
+  onSnapshot,
+} from 'firebase/firestore';
+import { db } from '../../app/config/firebase.js';
+import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 
-import { DEMO_NOTIFICATIONS } from '../../shared/data/demoData.js';
-
-const STORAGE_KEY = 'extrahub_notifications_v4';
-
-const ROLE_NOTIFICATIONS = DEMO_NOTIFICATIONS;
-
-function getAllInitialNotifications() {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch {
-      // ignore
-    }
-  }
-
-  // Flatten all role arrays
-  const all = Object.values(ROLE_NOTIFICATIONS).flat();
-  return all;
-}
-
-let devNotificationsStore = getAllInitialNotifications();
 const listeners = new Set();
-
-function persistStore() {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(devNotificationsStore));
-    } catch {
-      // ignore
-    }
-  }
-}
-
-function notifySubscribers() {
-  listeners.forEach((listener) => {
-    try {
-      listener(devNotificationsStore);
-    } catch (err) {
-      console.error('Error in notifications listener:', err);
-    }
-  });
-}
 
 export function subscribeNotifications(callback) {
   listeners.add(callback);
@@ -55,99 +19,102 @@ export function subscribeNotifications(callback) {
 }
 
 /**
- * Fetch notifications for user / role
+ * Realtime Firestore subscription for user notifications
  * @param {string} userId
- * @param {string} [role]
+ * @param {(notifications: any[]) => void} callback
  */
-export async function fetchUserNotifications(userId, role = 'student') {
-  try {
-    const fetchPromise = getDocuments(COLLECTIONS.NOTIFICATIONS);
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Firestore timeout')), 300)
-    );
-    const data = await Promise.race([fetchPromise, timeoutPromise]);
-    const userNotifs = data.filter((n) => n.userId === userId || n.role === role);
-    if (userNotifs.length > 0) return userNotifs;
-  } catch {
-    // Graceful offline fallback
-  }
-
-  const roleList = devNotificationsStore.filter(
-    (n) => n.role === role || n.userId === userId
+export function subscribeUserNotifications(userId, callback) {
+  if (!userId) return () => {};
+  const q = query(
+    collection(db, COLLECTIONS.NOTIFICATIONS),
+    where('userId', '==', userId)
   );
-
-  return roleList.sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+  return onSnapshot(
+    q,
+    (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      callback(list.sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt)));
+    },
+    (err) => {
+      console.error('Notifications subscription error:', err);
+    }
+  );
 }
 
 /**
- * Mark a specific notification as read
+ * Fetch notifications for user from Firestore
+ * @param {string} userId
+ * @param {string} [_role]
+ */
+export async function fetchUserNotifications(userId, _role = 'student') {
+  if (!userId) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.NOTIFICATIONS),
+      where('userId', '==', userId)
+    );
+    const snap = await getDocs(q);
+    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return list.sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
+  } catch (err) {
+    console.error('Failed to fetch user notifications:', err);
+    return [];
+  }
+}
+
+/**
+ * Mark a specific notification as read in Firestore
  * @param {string} notificationId
  */
 export async function markNotificationAsRead(notificationId) {
   try {
-    const updatePromise = updateDocument(COLLECTIONS.NOTIFICATIONS, notificationId, {
-      isRead: true,
-    });
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Firestore timeout')), 300)
-    );
-    await Promise.race([updatePromise, timeoutPromise]);
-  } catch {
-    // ignore
+    const docRef = doc(db, COLLECTIONS.NOTIFICATIONS, notificationId);
+    await updateDoc(docRef, { isRead: true });
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to mark notification as read:', err);
+    throw err;
   }
-
-  devNotificationsStore = devNotificationsStore.map((n) =>
-    n.id === notificationId ? { ...n, isRead: true } : n
-  );
-  persistStore();
-  notifySubscribers();
-  return { success: true };
 }
 
 /**
- * Mark all notifications as read for a given role or user
- * @param {string} [role]
+ * Mark all notifications as read for a given user in Firestore
+ * @param {string} [_role]
  * @param {string} [userId]
  */
-export async function markAllNotificationsAsRead(role, userId) {
-  devNotificationsStore = devNotificationsStore.map((n) => {
-    if ((role && n.role === role) || (userId && n.userId === userId) || (!role && !userId)) {
-      return { ...n, isRead: true };
-    }
-    return n;
-  });
+export async function markAllNotificationsAsRead(_role, userId) {
+  if (!userId) return { success: true };
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.NOTIFICATIONS),
+      where('userId', '==', userId),
+      where('isRead', '==', false)
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) return { success: true };
 
-  persistStore();
-  notifySubscribers();
-  return { success: true };
+    const batch = writeBatch(db);
+    snap.docs.forEach((d) => {
+      batch.update(d.ref, { isRead: true });
+    });
+    await batch.commit();
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to mark all notifications as read:', err);
+    throw err;
+  }
 }
 
 /**
- * Add a new notification programmatically (e.g. from app actions)
+ * Add a notification programmatically
  * @param {Object} notif
  */
 export function addNotification(notif) {
-  const newNotif = {
-    id: notif.id || `notif-${Date.now()}`,
-    role: notif.role || 'student',
-    type: notif.type || 'system_notice',
-    title: notif.title || 'Новое уведомление',
-    text: notif.text || '',
-    isRead: false,
-    sentAt: notif.sentAt || new Date().toISOString(),
-  };
-
-  devNotificationsStore = [newNotif, ...devNotificationsStore];
-  persistStore();
-  notifySubscribers();
-  return newNotif;
+  // Can be used for transient client triggers
+  return notif;
 }
 
-/**
- * Reset notifications store to defaults
- */
 export function resetNotificationsStore() {
-  devNotificationsStore = Object.values(ROLE_NOTIFICATIONS).flat();
-  persistStore();
-  notifySubscribers();
+  // No-op on real backend
 }
+

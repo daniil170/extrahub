@@ -47,24 +47,8 @@ export async function fetchInviteDetails(token) {
     const res = await callable({ token, inviteToken: token });
     return res.data;
   } catch (err) {
-    // If backend reports explicit business errors (expired, not found, inactive)
-    if (
-      err.code === 'not-found' ||
-      err.code === 'functions/not-found' ||
-      err.code === 'failed-precondition' ||
-      err.code === 'functions/failed-precondition'
-    ) {
-      throw err;
-    }
-
-    console.warn('getInviteDetails Cloud Function unavailable, using dev simulation:', err.message);
-    return {
-      ...MOCK_FALLBACK_INVITE,
-      invite: {
-        ...MOCK_FALLBACK_INVITE.invite,
-        token,
-      },
-    };
+    console.error('getInviteDetails error:', err);
+    throw err;
   }
 }
 
@@ -78,16 +62,8 @@ export async function approveInviteCall(token) {
     const res = await callable({ token, inviteToken: token });
     return res.data;
   } catch (err) {
-    if (
-      err.code === 'failed-precondition' ||
-      err.code === 'functions/failed-precondition' ||
-      err.code === 'not-found' ||
-      err.code === 'functions/not-found'
-    ) {
-      throw err;
-    }
-    console.warn('approveEnrollment Cloud Function unavailable, simulating success:', err.message);
-    return { success: true };
+    console.error('approveEnrollment error:', err);
+    throw err;
   }
 }
 
@@ -101,15 +77,8 @@ export async function rejectInviteCall(token) {
     const res = await callable({ token, inviteToken: token });
     return res.data;
   } catch (err) {
-    if (
-      err.code === 'failed-precondition' ||
-      err.code === 'functions/failed-precondition' ||
-      err.code === 'not-found' ||
-      err.code === 'functions/not-found'
-    ) {
-      throw err;
-    }
-    console.warn('rejectEnrollment Cloud Function unavailable, simulating success:', err.message);
-    return { success: true };
+    console.error('rejectEnrollment error:', err);
+    throw err;
   }
 }
+

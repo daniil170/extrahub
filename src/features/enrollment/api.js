@@ -14,33 +14,9 @@ export async function createEnrollmentCall({ studentId, groupId }) {
     const result = await callable({ studentId, groupId });
     return result.data;
   } catch (error) {
-    // If it's a domain/business error from Cloud Functions (e.g. schedule conflict, capacity, permission)
-    if (
-      error.code === 'failed-precondition' ||
-      error.code === 'functions/failed-precondition' ||
-      error.code === 'permission-denied' ||
-      error.code === 'functions/permission-denied' ||
-      error.code === 'invalid-argument' ||
-      error.code === 'functions/invalid-argument'
-    ) {
-      throw error;
-    }
-
-    // In local dev without emulator/cloud connection, provide smooth simulation fallback
-    console.warn(
-      'createEnrollment Cloud Function unavailable, using dev simulation:',
-      error.message
-    );
-    const mockToken = `mock-inv-${Math.random().toString(36).substring(2, 9)}`;
-    const holdExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-    return {
-      success: true,
-      waitlisted: false,
-      enrollmentId: `enr-${Date.now()}`,
-      inviteToken: mockToken,
-      holdExpiresAt,
-      isDevMock: true,
-    };
+    const message = error.message || 'Ошибка записи на секцию';
+    console.error('createEnrollment failed:', error);
+    throw new Error(message, { cause: error });
   }
 }
 
@@ -56,21 +32,9 @@ export async function cancelEnrollmentCall({ enrollmentId }) {
     const result = await callable({ enrollmentId });
     return result.data;
   } catch (error) {
-    if (
-      error.code === 'failed-precondition' ||
-      error.code === 'functions/failed-precondition' ||
-      error.code === 'permission-denied' ||
-      error.code === 'functions/permission-denied' ||
-      error.code === 'not-found' ||
-      error.code === 'functions/not-found'
-    ) {
-      throw error;
-    }
-
-    console.warn(
-      'cancelEnrollment Cloud Function unavailable, using dev simulation:',
-      error.message
-    );
-    return { success: true, isDevMock: true };
+    const message = error.message || 'Ошибка отмены записи';
+    console.error('cancelEnrollment failed:', error);
+    throw new Error(message, { cause: error });
   }
 }
+

@@ -114,7 +114,7 @@ export function resetActivitiesStore() {
 }
 
 /**
- * Create a new Activity record (saves to Firestore or dev local storage)
+ * Create a new Activity record (saves directly to Firestore)
  * @param {Object} activityData
  */
 export async function createActivityRecord(activityData) {
@@ -185,109 +185,57 @@ export async function createActivityRecord(activityData) {
     createdAt: new Date().toISOString(),
   };
 
-  try {
-    const docRef = doc(db, COLLECTIONS.ACTIVITIES, newId);
-    const setPromise = setDoc(docRef, record);
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Firestore timeout')), 300)
-    );
-    await Promise.race([setPromise, timeoutPromise]);
-  } catch (err) {
-    console.warn('createActivityRecord fallback to dev storage:', err.message);
-  }
+  const docRef = doc(db, COLLECTIONS.ACTIVITIES, newId);
+  await setDoc(docRef, record);
 
-  // Prepend to store so newly created appears immediately at the top
   devActivitiesStore = [record, ...devActivitiesStore.filter((a) => a.id !== newId)];
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      localStorage.setItem(ACTIVITIES_STORAGE_KEY, JSON.stringify(devActivitiesStore));
-    } catch {
-      // ignore
-    }
-  }
   notifyActivitiesChanged();
 
   return { success: true, activity: record };
 }
 
 /**
- * Subscribe to real-time activities and activityGroups from Firestore,
- * with graceful fallback to mock data when Firestore collections are empty or offline.
+ * Subscribe to real-time activities and activityGroups from Firestore
  * @param {(activities: any[]) => void} onUpdate
  * @param {(error: Error) => void} onError
  * @returns {() => void} unsubscribe function
  */
 export function subscribeCatalog(onUpdate, onError) {
-  let activitiesData = null;
-  let groupsData = null;
-  let teachersData = null;
+  let activitiesData = [];
+  let groupsData = [];
 
   function pushCombined() {
-    const acts = activitiesData && activitiesData.length > 0 ? activitiesData : devActivitiesStore;
-    const grps = groupsData && groupsData.length > 0 ? groupsData : MOCK_ACTIVITY_GROUPS;
-    const tchrs =
-      teachersData && teachersData.length > 0 ? teachersData : Object.values(MOCK_TEACHERS);
-
-    const enriched = combineCatalogData(acts, grps, tchrs);
+    const enriched = combineCatalogData(activitiesData, groupsData, []);
     onUpdate(enriched);
   }
 
-  // Also react immediately to local activity store changes (e.g. newly created activity)
-  const unsubLocal = subscribeActivities(() => {
-    if (!activitiesData || activitiesData.length === 0) {
+  const unsubActivities = onSnapshot(
+    collection(db, COLLECTIONS.ACTIVITIES),
+    (snapshot) => {
+      activitiesData = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
       pushCombined();
+    },
+    (err) => {
+      console.error('Activities subscription error:', err);
+      if (onError) onError(err);
     }
-  });
+  );
 
-  try {
-    const unsubActivities = onSnapshot(
-      collection(db, COLLECTIONS.ACTIVITIES),
-      (snapshot) => {
-        activitiesData = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-        pushCombined();
-      },
-      (err) => {
-        console.warn('Activities subscription fallback:', err.message);
-        pushCombined();
-      }
-    );
+  const unsubGroups = onSnapshot(
+    collection(db, COLLECTIONS.ACTIVITY_GROUPS),
+    (snapshot) => {
+      groupsData = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      pushCombined();
+    },
+    (err) => {
+      console.error('Groups subscription error:', err);
+      if (onError) onError(err);
+    }
+  );
 
-    const unsubGroups = onSnapshot(
-      collection(db, COLLECTIONS.ACTIVITY_GROUPS),
-      (snapshot) => {
-        groupsData = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-        pushCombined();
-      },
-      (err) => {
-        console.warn('Groups subscription fallback:', err.message);
-        pushCombined();
-      }
-    );
-
-    const unsubUsers = onSnapshot(
-      collection(db, COLLECTIONS.USERS),
-      (snapshot) => {
-        teachersData = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-        pushCombined();
-      },
-      (err) => {
-        console.warn('Teachers subscription fallback:', err.message);
-        pushCombined();
-      }
-    );
-
-    return () => {
-      unsubLocal();
-      unsubActivities();
-      unsubGroups();
-      unsubUsers();
-    };
-  } catch (error) {
-    console.warn('Firestore subscription failed, falling back to mock catalog:', error.message);
-    pushCombined();
-    if (onError) onError(error);
-    return () => {
-      unsubLocal();
-    };
-  }
+  return () => {
+    unsubActivities();
+    unsubGroups();
+  };
 }
+

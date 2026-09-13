@@ -13,6 +13,7 @@
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "seed": "node scripts/seed-demo-data.js",
+    "seed:prod": "node scripts/seed-production-data.js",
     "preview": "vite preview"
   },
   "dependencies": {

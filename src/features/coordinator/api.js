@@ -9,13 +9,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
-import {
-  MOCK_ACTIVITIES,
-  MOCK_ACTIVITY_GROUPS,
-  devActivitiesStore,
-  subscribeActivities,
-  createActivityRecord,
-} from '../catalog/api.js';
+import { subscribeActivities, createActivityRecord } from '../catalog/api.js';
 import { DEMO_WAITLIST, DEMO_STUDENTS } from '../../shared/data/demoData.js';
 
 export { createActivityRecord };
@@ -235,10 +229,6 @@ export const MOCK_COORDINATOR_PAYMENTS = [
   },
 ];
 
-// In-memory dev storage to persist changes across UI sessions if Firestore is offline
-let devGroupsStore = [...MOCK_ACTIVITY_GROUPS];
-let devPaymentsStore = [...MOCK_COORDINATOR_PAYMENTS];
-
 /**
  * Pure function to calculate school-wide capacity metrics
  */
@@ -341,9 +331,9 @@ export function subscribeCoordinatorOverview(onUpdate, onError) {
   let waitlistList = null;
 
   function emit() {
-    const acts = actsList && actsList.length > 0 ? actsList : devActivitiesStore;
-    const grps = grpsList && grpsList.length > 0 ? grpsList : devGroupsStore;
-    const wlist = waitlistList && waitlistList.length > 0 ? waitlistList : MOCK_WAITLIST;
+    const acts = actsList || [];
+    const grps = grpsList || [];
+    const wlist = waitlistList || [];
 
     const summary = {
       totalActivities: acts.length,
@@ -376,7 +366,10 @@ export function subscribeCoordinatorOverview(onUpdate, onError) {
         actsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Activities snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubActs);
 
@@ -386,7 +379,10 @@ export function subscribeCoordinatorOverview(onUpdate, onError) {
         grpsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Groups snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubGrps);
 
@@ -396,13 +392,16 @@ export function subscribeCoordinatorOverview(onUpdate, onError) {
         waitlistList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Waitlist snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubWlist);
 
     return () => unsubs.forEach((fn) => fn && fn());
   } catch (err) {
-    console.warn('subscribeCoordinatorOverview fallback to mock:', err.message);
+    console.error('subscribeCoordinatorOverview error:', err);
     emit();
     if (onError) onError(err);
     return () => unsubs.forEach((fn) => fn && fn());
@@ -425,16 +424,11 @@ export async function updateGroupCapacity(groupId, newCapacity, currentEnrolledC
 
   try {
     const docRef = doc(db, COLLECTIONS.ACTIVITY_GROUPS, groupId);
-    const updatePromise = updateDoc(docRef, { capacity: cap });
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Firestore timeout')), 1000)
-    );
-    await Promise.race([updatePromise, timeoutPromise]);
+    await updateDoc(docRef, { capacity: cap });
     return { success: true };
   } catch (err) {
-    console.warn('updateGroupCapacity fallback to mock store:', err.message);
-    devGroupsStore = devGroupsStore.map((g) => (g.id === groupId ? { ...g, capacity: cap } : g));
-    return { success: true, isDevMock: true };
+    console.error('updateGroupCapacity error:', err);
+    throw err;
   }
 }
 
@@ -457,16 +451,11 @@ export async function createActivityGroup(groupData) {
 
   try {
     const docRef = doc(db, COLLECTIONS.ACTIVITY_GROUPS, newId);
-    const setPromise = setDoc(docRef, payload);
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Firestore timeout')), 1000)
-    );
-    await Promise.race([setPromise, timeoutPromise]);
+    await setDoc(docRef, payload);
     return { success: true, id: newId };
   } catch (err) {
-    console.warn('createActivityGroup fallback to mock store:', err.message);
-    devGroupsStore = [...devGroupsStore, payload];
-    return { success: true, id: newId, isDevMock: true };
+    console.error('createActivityGroup error:', err);
+    throw err;
   }
 }
 
@@ -481,11 +470,11 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
   let enrsList = null;
 
   function emit() {
-    const pays = paymentsList && paymentsList.length > 0 ? paymentsList : devPaymentsStore;
-    const stds = studentsList && studentsList.length > 0 ? studentsList : MOCK_STUDENTS_CATALOG;
-    const acts = actsList && actsList.length > 0 ? actsList : MOCK_ACTIVITIES;
-    const grps = grpsList && grpsList.length > 0 ? grpsList : devGroupsStore;
-    const enrs = enrsList && enrsList.length > 0 ? enrsList : MOCK_COORDINATOR_ENROLLMENTS;
+    const pays = paymentsList || [];
+    const stds = studentsList || [];
+    const acts = actsList || [];
+    const grps = grpsList || [];
+    const enrs = enrsList || [];
 
     const stdMap = {};
     stds.forEach((s) => {
@@ -534,7 +523,10 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
         paymentsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Payments snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubPays);
 
@@ -544,7 +536,10 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
         studentsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Students snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubStds);
 
@@ -554,7 +549,10 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
         actsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Activities snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubActs);
 
@@ -564,7 +562,10 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
         grpsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Groups snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubGrps);
 
@@ -574,13 +575,16 @@ export function subscribeCoordinatorPayments(onUpdate, onError) {
         enrsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Enrollments snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubEnrs);
 
     return () => unsubs.forEach((fn) => fn && fn());
   } catch (err) {
-    console.warn('subscribeCoordinatorPayments fallback to mock:', err.message);
+    console.error('subscribeCoordinatorPayments error:', err);
     emit();
     if (onError) onError(err);
     return () => {};
@@ -598,31 +602,22 @@ export async function createGroupInvoicesRecord({
   periodTitle = 'Оплата за кружок',
   activeEnrollments = [],
 }) {
-  const sourceEnrollments =
-    activeEnrollments && activeEnrollments.length > 0
-      ? activeEnrollments
-      : MOCK_COORDINATOR_ENROLLMENTS;
-
-  const matching = sourceEnrollments.filter((e) => e.groupId === groupId && e.status === 'active');
+  const matching = (activeEnrollments || []).filter((e) => e.groupId === groupId && e.status === 'active');
 
   if (matching.length === 0) {
     throw new Error('В выбранной группе нет активных зачисленных учеников для выставления счетов');
   }
 
-  const act = MOCK_ACTIVITIES.find((a) => a.id === activityId) || {};
-  const grp = devGroupsStore.find((g) => g.id === groupId) || {};
-  const groupName = grp.name || 'Основная группа';
-
   const newInvoices = matching.map((enr, i) => ({
     id: `pay-grp-${Date.now()}-${i}-${enr.studentId}`,
     groupId,
-    groupName,
+    groupName: enr.groupName || 'Основная группа',
     enrollmentId: enr.id,
     studentId: enr.studentId,
     studentName: enr.studentName || `Ученик (${enr.studentId})`,
     className: enr.className || '',
     activityId: activityId || enr.activityId,
-    activityTitle: act.title || enr.activityTitle || 'Кружок',
+    activityTitle: enr.activityTitle || 'Кружок',
     amount: Number(amount) || 0,
     periodTitle,
     dueDate: dueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -636,11 +631,7 @@ export async function createGroupInvoicesRecord({
       const docRef = doc(db, COLLECTIONS.PAYMENTS, inv.id);
       return setDoc(docRef, inv);
     });
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Firestore timeout')), 1000)
-    );
-    await Promise.race([Promise.all(promises), timeoutPromise]);
-    devPaymentsStore = [...newInvoices, ...devPaymentsStore];
+    await Promise.all(promises);
     return {
       success: true,
       count: newInvoices.length,
@@ -648,15 +639,8 @@ export async function createGroupInvoicesRecord({
       invoices: newInvoices,
     };
   } catch (err) {
-    console.warn('createGroupInvoicesRecord fallback to mock store:', err.message);
-    devPaymentsStore = [...newInvoices, ...devPaymentsStore];
-    return {
-      success: true,
-      count: newInvoices.length,
-      totalAmount: newInvoices.length * (Number(amount) || 0),
-      invoices: newInvoices,
-      isDevMock: true,
-    };
+    console.error('createGroupInvoicesRecord error:', err);
+    throw err;
   }
 }
 
@@ -682,16 +666,11 @@ export async function createPaymentRecord(paymentData) {
 
   try {
     const docRef = doc(db, COLLECTIONS.PAYMENTS, newId);
-    const setPromise = setDoc(docRef, payload);
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Firestore timeout')), 1000)
-    );
-    await Promise.race([setPromise, timeoutPromise]);
+    await setDoc(docRef, payload);
     return { success: true, id: newId };
   } catch (err) {
-    console.warn('createPaymentRecord fallback to mock store:', err.message);
-    devPaymentsStore = [payload, ...devPaymentsStore];
-    return { success: true, id: newId, isDevMock: true };
+    console.error('createPaymentRecord error:', err);
+    throw err;
   }
 }
 
@@ -699,24 +678,16 @@ export async function createPaymentRecord(paymentData) {
  * Mark an existing invoice as paid offline
  */
 export async function markPaymentAsPaid(paymentId) {
-  const paidAtStr = new Date().toISOString();
   try {
     const docRef = doc(db, COLLECTIONS.PAYMENTS, paymentId);
-    const updatePromise = updateDoc(docRef, {
+    await updateDoc(docRef, {
       status: 'paid',
       paidAt: serverTimestamp(),
     });
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Firestore timeout')), 1000)
-    );
-    await Promise.race([updatePromise, timeoutPromise]);
     return { success: true };
   } catch (err) {
-    console.warn('markPaymentAsPaid fallback to mock store:', err.message);
-    devPaymentsStore = devPaymentsStore.map((p) =>
-      p.id === paymentId ? { ...p, status: 'paid', paidAt: paidAtStr } : p
-    );
-    return { success: true, isDevMock: true };
+    console.error('markPaymentAsPaid error:', err);
+    throw err;
   }
 }
 
@@ -726,15 +697,11 @@ export async function markPaymentAsPaid(paymentId) {
 export async function cancelPaymentRecord(paymentId) {
   try {
     const docRef = doc(db, COLLECTIONS.PAYMENTS, paymentId);
-    const delPromise = deleteDoc(docRef);
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Firestore timeout')), 1000)
-    );
-    await Promise.race([delPromise, timeoutPromise]);
+    await deleteDoc(docRef);
     return { success: true };
   } catch (err) {
-    console.warn('cancelPaymentRecord fallback to mock store:', err.message);
-    devPaymentsStore = devPaymentsStore.filter((p) => p.id !== paymentId);
-    return { success: true, isDevMock: true };
+    console.error('cancelPaymentRecord error:', err);
+    throw err;
   }
 }
+

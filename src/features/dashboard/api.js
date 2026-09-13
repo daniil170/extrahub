@@ -1,7 +1,7 @@
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
-import { MOCK_ACTIVITIES, MOCK_ACTIVITY_GROUPS, MOCK_TEACHERS } from '../catalog/api.js';
+import { MOCK_TEACHERS } from '../catalog/api.js';
 
 import {
   DEMO_STUDENTS,
@@ -80,15 +80,13 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
   let paymentsList = null;
   let activitiesList = null;
   let groupsList = null;
-  let teachersList = null;
+  const teachersList = [];
 
   function emit() {
     // 1. Resolve children
     const finalChildren =
       role === 'parent'
-        ? childrenList && childrenList.length > 0
-          ? childrenList
-          : MOCK_CHILDREN
+        ? childrenList || []
         : [
             {
               id: studentId || userId || 'student-1',
@@ -98,28 +96,15 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
           ];
 
     // 2. Resolve enrollments
-    const isTargetStudent = (itemStudentId) =>
-      itemStudentId === studentId ||
-      (!studentId && itemStudentId === 'student-1') ||
-      (studentId === 'dev-user-1' && itemStudentId === 'student-1');
-
-    const rawEnr =
-      enrollmentsList && enrollmentsList.length > 0
-        ? enrollmentsList
-        : MOCK_ENROLLMENTS.filter((e) => isTargetStudent(e.studentId));
-
-    const acts = activitiesList && activitiesList.length > 0 ? activitiesList : MOCK_ACTIVITIES;
-    const grps = groupsList && groupsList.length > 0 ? groupsList : MOCK_ACTIVITY_GROUPS;
-    const tchrs =
-      teachersList && teachersList.length > 0 ? teachersList : Object.values(MOCK_TEACHERS);
+    const rawEnr = enrollmentsList || [];
+    const acts = activitiesList || [];
+    const grps = groupsList || [];
+    const tchrs = teachersList || [];
 
     const enrichedEnrollments = enrichEnrollments(rawEnr, acts, grps, tchrs);
 
     // 3. Resolve payments
-    const finalPayments =
-      paymentsList && paymentsList.length > 0
-        ? paymentsList
-        : MOCK_PAYMENTS.filter((p) => isTargetStudent(p.studentId));
+    const finalPayments = paymentsList || [];
 
     onUpdate({
       children: finalChildren,
@@ -132,7 +117,7 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
 
   try {
     // 1. Children subscription for parent
-    if (role === 'parent') {
+    if (role === 'parent' && userId) {
       const parentQ = query(
         collection(db, COLLECTIONS.STUDENTS),
         where('parentIds', 'array-contains', userId)
@@ -140,16 +125,12 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
       const unsubChildren = onSnapshot(
         parentQ,
         (snap) => {
-          if (!snap.empty) {
-            childrenList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-          } else {
-            childrenList = MOCK_CHILDREN;
-          }
+          childrenList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
           emit();
         },
         (err) => {
-          console.warn('Children snapshot fallback:', err.message);
-          childrenList = MOCK_CHILDREN;
+          console.error('Children snapshot error:', err);
+          childrenList = [];
           emit();
         }
       );
@@ -165,16 +146,12 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
       const unsubEnr = onSnapshot(
         enrQ,
         (snap) => {
-          if (!snap.empty) {
-            enrollmentsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-          } else {
-            enrollmentsList = MOCK_ENROLLMENTS.filter((e) => e.studentId === studentId);
-          }
+          enrollmentsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
           emit();
         },
         (err) => {
-          console.warn('Enrollments snapshot fallback:', err.message);
-          enrollmentsList = MOCK_ENROLLMENTS.filter((e) => e.studentId === studentId);
+          console.error('Enrollments snapshot error:', err);
+          enrollmentsList = [];
           emit();
         }
       );
@@ -185,16 +162,12 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
       const unsubPay = onSnapshot(
         payQ,
         (snap) => {
-          if (!snap.empty) {
-            paymentsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-          } else {
-            paymentsList = MOCK_PAYMENTS.filter((p) => p.studentId === studentId);
-          }
+          paymentsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
           emit();
         },
         (err) => {
-          console.warn('Payments snapshot fallback:', err.message);
-          paymentsList = MOCK_PAYMENTS.filter((p) => p.studentId === studentId);
+          console.error('Payments snapshot error:', err);
+          paymentsList = [];
           emit();
         }
       );
@@ -208,7 +181,10 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
         activitiesList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Activities snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubActs);
 
@@ -218,27 +194,21 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
         groupsList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         emit();
       },
-      () => emit()
+      (err) => {
+        console.error('Groups snapshot error:', err);
+        emit();
+      }
     );
     unsubs.push(unsubGrps);
-
-    const unsubUsers = onSnapshot(
-      collection(db, COLLECTIONS.USERS),
-      (snap) => {
-        teachersList = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        emit();
-      },
-      () => emit()
-    );
-    unsubs.push(unsubUsers);
 
     return () => {
       unsubs.forEach((fn) => fn && fn());
     };
   } catch (err) {
-    console.warn('Dashboard data subscription fallback:', err.message);
+    console.error('Dashboard data subscription error:', err);
     emit();
     if (onError) onError(err);
     return () => {};
   }
 }
+

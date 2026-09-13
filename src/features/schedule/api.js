@@ -1,45 +1,52 @@
-import { getDocuments, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
-
-const MOCK_SCHEDULE = [
-  {
-    id: 'sch-1',
-    activityTitle: 'Робототехника и Arduino',
-    dayOfWeek: 1, // Понедельник
-    startTime: '15:30',
-    endTime: '17:00',
-    location: 'Кабинет 304',
-    teacherName: 'Михаил Петров',
-  },
-  {
-    id: 'sch-2',
-    activityTitle: 'Шахматный клуб "Гроссмейстер"',
-    dayOfWeek: 3, // Среда
-    startTime: '16:00',
-    endTime: '17:30',
-    location: 'Библиотека',
-    teacherName: 'Анна Смирнова',
-  },
-  {
-    id: 'sch-3',
-    activityTitle: 'Робототехника и Arduino',
-    dayOfWeek: 5, // Пятница
-    startTime: '15:30',
-    endTime: '17:00',
-    location: 'Кабинет 304',
-    teacherName: 'Михаил Петров',
-  },
-];
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../app/config/firebase.js';
+import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 
 /**
- * Fetch schedule for student
- * @param {string} _studentId
+ * Fetch schedule for student from Firestore
+ * @param {string} studentId
  */
-export async function fetchStudentSchedule(_studentId) {
+export async function fetchStudentSchedule(studentId) {
+  if (!studentId) return [];
   try {
-    const groups = await getDocuments(COLLECTIONS.ACTIVITY_GROUPS);
-    return groups.length > 0 ? groups : MOCK_SCHEDULE;
+    // 1. Get active enrollments for student
+    const enrQ = query(
+      collection(db, COLLECTIONS.ENROLLMENTS),
+      where('studentId', '==', studentId),
+      where('status', '==', 'active')
+    );
+    const enrSnap = await getDocs(enrQ);
+    if (enrSnap.empty) return [];
+
+    const groupIds = Array.from(new Set(enrSnap.docs.map((d) => d.data().groupId).filter(Boolean)));
+
+    // 2. Fetch activities
+    const actsSnap = await getDocs(collection(db, COLLECTIONS.ACTIVITIES));
+    const actMap = {};
+    actsSnap.docs.forEach((d) => {
+      actMap[d.id] = d.data();
+    });
+
+    // 3. Fetch groups
+    const grpsSnap = await getDocs(collection(db, COLLECTIONS.ACTIVITY_GROUPS));
+    const studentGroups = grpsSnap.docs
+      .filter((d) => groupIds.includes(d.id))
+      .map((d) => {
+        const grp = d.data();
+        const act = actMap[grp.activityId] || {};
+        return {
+          id: d.id,
+          ...grp,
+          activityTitle: act.title || 'Кружок',
+          location: act.location || 'Школьный корпус',
+          teacherName: act.teacherName || 'Преподаватель',
+        };
+      });
+
+    return studentGroups;
   } catch (error) {
-    console.warn('Using mock schedule:', error.message);
-    return MOCK_SCHEDULE;
+    console.error('Failed to fetch student schedule:', error);
+    throw error;
   }
 }
+
