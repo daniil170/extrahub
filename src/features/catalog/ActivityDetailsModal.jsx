@@ -10,7 +10,7 @@ import {
   Info,
   Target,
 } from 'lucide-react';
-import { Modal, Badge, Button } from '../../shared/ui/index.js';
+import { Modal, Badge, Button, CapacityBadge } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 
 /**
@@ -91,9 +91,7 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
               <Badge variant="info">{activity.category}</Badge>
               <Badge variant="default">{activity.ageGroup}</Badge>
             </div>
-            <Badge variant={isFull ? 'danger' : 'success'}>
-              {isFull ? 'Мест нет' : `Осталось ${remainingSpots} мест`}
-            </Badge>
+            <CapacityBadge remaining={remainingSpots} isFull={isFull} />
           </div>
 
           <h2
@@ -526,11 +524,11 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <Badge variant={gIsFull ? 'danger' : 'success'}>
-                        {gIsFull
-                          ? 'Группа заполнена'
-                          : `Осталось мест: ${gRemaining} из ${gCapacity}`}
-                      </Badge>
+                      <CapacityBadge
+                        remaining={gRemaining}
+                        total={gCapacity}
+                        isFull={gIsFull}
+                      />
                       {onEnroll && (
                         <Button
                           size="sm"

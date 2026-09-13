@@ -11,7 +11,7 @@ import {
   AlertTriangle,
   Calendar,
 } from 'lucide-react';
-import { Modal, Button, Badge } from '../../shared/ui/index.js';
+import { Modal, Button, Badge, CapacityBadge } from '../../shared/ui/index.js';
 import { formatDaysOfWeek, formatCurrency } from '../../shared/utils/index.js';
 import { MOCK_STUDENTS } from './useEnrollment.js';
 
@@ -528,9 +528,11 @@ export function EnrollmentModal({
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <Badge variant={isFull ? 'danger' : 'success'}>
-                      {isFull ? 'Мест нет' : `${enrolled} / ${cap} мест`}
-                    </Badge>
+                    <CapacityBadge
+                      remaining={Math.max(0, cap - enrolled)}
+                      total={cap}
+                      isFull={isFull}
+                    />
                   </div>
                 </div>
               );

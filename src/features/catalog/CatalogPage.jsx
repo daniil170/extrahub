@@ -12,7 +12,7 @@ import { useCatalog } from './useCatalog.js';
 import { useEnrollment } from '../enrollment/useEnrollment.js';
 import { EnrollmentModal } from '../enrollment/EnrollmentModal.jsx';
 import { ActivityDetailsModal } from './ActivityDetailsModal.jsx';
-import { Card, Badge, Button, Spinner, PageHeader } from '../../shared/ui/index.js';
+import { Card, Badge, Button, Spinner, PageHeader, CapacityBadge } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 
 export function CatalogPage() {
@@ -373,9 +373,7 @@ export function CatalogPage() {
                     </div>
 
                     {/* Capacity Badge */}
-                    <Badge variant={isFull ? 'danger' : 'success'}>
-                      {isFull ? 'Мест нет' : `Осталось ${remainingSpots} мест`}
-                    </Badge>
+                    <CapacityBadge remaining={remainingSpots} isFull={isFull} />
                   </div>
 
                   <h3

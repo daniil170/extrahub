@@ -41,3 +41,26 @@ export function formatDaysOfWeek(days = []) {
 export function formatCurrency(amount = 0, currency = '₸') {
   return `${amount.toLocaleString('ru-RU')} ${currency}`;
 }
+
+/**
+ * Format Russian noun "место" based on count (1 место, 2-4 места, 5+ мест)
+ * @param {number} count
+ * @returns {string}
+ */
+export function formatSpotsPlural(count = 0) {
+  const abs = Math.abs(count);
+  const mod10 = abs % 10;
+  const mod100 = abs % 100;
+
+  if (mod100 >= 11 && mod100 <= 19) {
+    return `${count} мест`;
+  }
+  if (mod10 === 1) {
+    return `${count} место`;
+  }
+  if (mod10 >= 2 && mod10 <= 4) {
+    return `${count} места`;
+  }
+  return `${count} мест`;
+}
+
