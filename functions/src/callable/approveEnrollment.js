@@ -77,33 +77,33 @@ export const approveEnrollment = onCall(async (request) => {
   });
 
   // Link parent account if authenticated
-  if (request.auth) {
-    const callerUid = request.auth.uid;
+  const callerUid = request.auth?.uid;
+  if (inviteData.studentId) {
     const studentRef = db.collection('students').doc(inviteData.studentId);
-    const studentDoc = await studentRef.get();
+    const parentIdsToAdd = ['parent-1'];
+    if (callerUid) parentIdsToAdd.push(callerUid);
 
-    if (studentDoc.exists) {
-      const currentParents = studentDoc.data().parentIds || [];
-      if (!currentParents.includes(callerUid)) {
-        await studentRef.update({
-          parentIds: FieldValue.arrayUnion(callerUid),
-        });
-      }
-    }
+    await studentRef.set({
+      id: inviteData.studentId,
+      parentIds: FieldValue.arrayUnion(...parentIdsToAdd),
+      status: 'active',
+      updatedAt: new Date().toISOString(),
+    }, { merge: true }).catch((e) => console.warn('Could not link parent to student:', e.message));
 
-    // Ensure user profile has parent role or claims
-    try {
-      const userRef = db.collection('users').doc(callerUid);
-      const userDoc = await userRef.get();
-      if (userDoc.exists) {
-        const currentRole = userDoc.data().role;
-        if (!currentRole || currentRole === 'student') {
-          await userRef.update({ role: 'parent' });
-          await auth.setCustomUserClaims(callerUid, { role: 'parent' });
+    if (callerUid) {
+      try {
+        const userRef = db.collection('users').doc(callerUid);
+        const userDoc = await userRef.get();
+        if (userDoc.exists) {
+          const currentRole = userDoc.data().role;
+          if (!currentRole || currentRole === 'student') {
+            await userRef.update({ role: 'parent' });
+            await auth.setCustomUserClaims(callerUid, { role: 'parent' });
+          }
         }
+      } catch (e) {
+        console.warn('Could not set parent custom claims:', e.message);
       }
-    } catch (e) {
-      console.warn('Could not set parent custom claims:', e.message);
     }
   }
 

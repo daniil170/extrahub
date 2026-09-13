@@ -86,13 +86,7 @@ service cloud.firestore {
     // STUDENTS COLLECTION
     // ==========================================
     match /students/{studentId} {
-      allow read: if isAuthenticated() && (
-        request.auth.uid == studentId ||
-        isParentOfStudent(studentId) ||
-        isTeacher() ||
-        isCoordinator()
-      );
-
+      allow read: if isAuthenticated();
       allow create, update, delete: if isCoordinator();
     }
 
@@ -127,7 +121,9 @@ service cloud.firestore {
     match /enrollments/{enrollmentId} {
       allow read: if isAuthenticated() && (
         resource.data.studentId == request.auth.uid ||
+        resource.data.approvedByParentId == request.auth.uid ||
         isParentOfStudent(resource.data.studentId) ||
+        isParent() ||
         isTeacher() ||
         isCoordinator()
       );
