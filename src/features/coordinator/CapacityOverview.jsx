@@ -327,19 +327,21 @@ export function CapacityOverview() {
               </button>
             </div>
 
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={openCreateActivity}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontWeight: 600,
-              }}
-            >
-              <Plus size={15} /> Создать кружок
-            </Button>
+            {viewMode === 'manage' && (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={openCreateActivity}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontWeight: 600,
+                }}
+              >
+                <Plus size={15} /> Создать кружок
+              </Button>
+            )}
           </div>
         </div>
 
