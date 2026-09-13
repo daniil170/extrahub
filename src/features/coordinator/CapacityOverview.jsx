@@ -9,6 +9,7 @@ import {
   CreditCard,
   Edit3,
   School,
+  Trash2,
 } from 'lucide-react';
 import { useCoordinatorOverview } from './useCoordinatorOverview.js';
 import { Card, Badge, Button, Spinner } from '../../shared/ui/index.js';
@@ -16,6 +17,7 @@ import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 import { EditCapacityModal } from './EditCapacityModal.jsx';
 import { CreateGroupModal } from './CreateGroupModal.jsx';
 import { CreateActivityModal } from './CreateActivityModal.jsx';
+import { DeleteConfirmModal } from './DeleteConfirmModal.jsx';
 
 export function CapacityOverview() {
   const {
@@ -42,6 +44,21 @@ export function CapacityOverview() {
     openCreateActivity,
     closeCreateActivity,
     saveNewActivity,
+    // Multi-selection
+    selectedGroupIds,
+    toggleSelectGroup,
+    selectAllGroups,
+    clearSelection,
+    isGroupSelected,
+    // Deletion
+    deleteModalOpen,
+    deleteTarget,
+    isDeleting,
+    promptDeleteGroup,
+    promptDeleteActivity,
+    promptDeleteBatch,
+    closeDeleteModal,
+    confirmDelete,
   } = useCoordinatorOverview();
 
   if (loading) {
@@ -260,6 +277,106 @@ export function CapacityOverview() {
           </Button>
         </div>
 
+        {/* Multi-Selection and Bulk Actions Toolbar */}
+        {groups.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 16px',
+              backgroundColor: selectedGroupIds.length > 0 ? 'rgba(14, 165, 233, 0.08)' : 'var(--bg-surface)',
+              borderRadius: 'var(--radius-md)',
+              border: `1px solid ${selectedGroupIds.length > 0 ? 'var(--primary)' : 'var(--border-color)'}`,
+              marginBottom: '16px',
+              flexWrap: 'wrap',
+              gap: '12px',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  fontSize: '13.5px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={groups.length > 0 && selectedGroupIds.length === groups.length}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      selectAllGroups();
+                    } else {
+                      clearSelection();
+                    }
+                  }}
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    cursor: 'pointer',
+                    accentColor: 'var(--primary)',
+                  }}
+                />
+                <span>
+                  {selectedGroupIds.length === groups.length
+                    ? 'Снять выбор со всех'
+                    : 'Выбрать все кружки / группы'}
+                </span>
+              </label>
+
+              {selectedGroupIds.length > 0 && (
+                <span
+                  style={{
+                    fontSize: '12.5px',
+                    backgroundColor: 'var(--primary)',
+                    color: '#ffffff',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontWeight: 600,
+                  }}
+                >
+                  Выбрано: {selectedGroupIds.length} из {groups.length}
+                </span>
+              )}
+            </div>
+
+            {selectedGroupIds.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={clearSelection}
+                  style={{ fontSize: '12.5px' }}
+                >
+                  Сбросить
+                </Button>
+                <Button
+                  size="sm"
+                  variant="danger"
+                  onClick={promptDeleteBatch}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: 'var(--danger)',
+                    color: '#ffffff',
+                    fontWeight: 600,
+                  }}
+                >
+                  <Trash2 size={14} />
+                  <span>Удалить выбранные ({selectedGroupIds.length})</span>
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Section for Activities without groups (if any) */}
         {activities.filter((a) => !groups.some((g) => g.activityId === a.id)).length > 0 && (
           <div
@@ -332,14 +449,25 @@ export function CapacityOverview() {
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><MapPin size={12} /> {act.location}</span>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="primary"
-                      onClick={() => openCreateGroup(act)}
-                      style={{ width: '100%', justifyContent: 'center', fontSize: '12.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
-                    >
-                      <Plus size={14} /> Открыть первую группу
-                    </Button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        onClick={() => openCreateGroup(act)}
+                        style={{ flex: 1, justifyContent: 'center', fontSize: '12.5px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      >
+                        <Plus size={14} /> Открыть группу
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => promptDeleteActivity(act)}
+                        title="Удалить кружок из базы данных"
+                        style={{ padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Trash2 size={13} />
+                      </Button>
+                    </div>
                   </div>
                 ))}
             </div>
@@ -389,6 +517,8 @@ export function CapacityOverview() {
                 title: group.activityTitle,
               };
 
+            const isSelected = isGroupSelected(group.id);
+
             return (
               <Card
                 key={group.id}
@@ -397,6 +527,9 @@ export function CapacityOverview() {
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   borderLeft: `3px solid ${group.statusColor}`,
+                  backgroundColor: isSelected ? 'rgba(14, 165, 233, 0.05)' : undefined,
+                  outline: isSelected ? '2px solid var(--primary)' : undefined,
+                  transition: 'all 0.15s ease',
                 }}
               >
                 <div>
@@ -409,7 +542,21 @@ export function CapacityOverview() {
                       marginBottom: '8px',
                     }}
                   >
-                    <Badge variant="info">{group.category}</Badge>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelectGroup(group.id)}
+                        title="Выбрать секцию"
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          cursor: 'pointer',
+                          accentColor: 'var(--primary)',
+                        }}
+                      />
+                      <Badge variant="info">{group.category}</Badge>
+                    </div>
                     {group.waitlistCount > 0 && (
                       <span
                         style={{
@@ -548,6 +695,21 @@ export function CapacityOverview() {
                   >
                     <Plus size={13} /> Новая группа
                   </Button>
+
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => promptDeleteGroup(group)}
+                    title="Удалить эту группу из базы данных"
+                    style={{
+                      padding: '0 10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Trash2 size={13} />
+                  </Button>
                 </div>
               </Card>
             );
@@ -580,6 +742,15 @@ export function CapacityOverview() {
         onClose={closeCreateActivity}
         onSave={saveNewActivity}
         isCreating={isCreatingActivity}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        target={deleteTarget}
+        isDeleting={isDeleting}
       />
     </div>
   );

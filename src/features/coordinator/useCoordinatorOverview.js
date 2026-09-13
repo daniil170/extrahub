@@ -4,6 +4,9 @@ import {
   updateGroupCapacity,
   createActivityGroup,
   createActivityRecord,
+  deleteActivityGroupRecord,
+  deleteActivityRecord,
+  deleteBatchGroupsRecord,
 } from './api.js';
 
 export function useCoordinatorOverview() {
@@ -145,6 +148,96 @@ export function useCoordinatorOverview() {
     setCreateActivityModalOpen(false);
   }, [isCreatingActivity]);
 
+  // Multi-Selection State
+  const [selectedGroupIds, setSelectedGroupIds] = useState([]);
+
+  const toggleSelectGroup = useCallback((groupId) => {
+    setSelectedGroupIds((prev) =>
+      prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId]
+    );
+  }, []);
+
+  const selectAllGroups = useCallback(() => {
+    setSelectedGroupIds(groups.map((g) => g.id));
+  }, [groups]);
+
+  const clearSelection = useCallback(() => {
+    setSelectedGroupIds([]);
+  }, []);
+
+  const isGroupSelected = useCallback(
+    (groupId) => selectedGroupIds.includes(groupId),
+    [selectedGroupIds]
+  );
+
+  // Deletion Modal and Action State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const promptDeleteGroup = useCallback((group) => {
+    setDeleteTarget({
+      type: 'single',
+      groupId: group.id,
+      activityId: group.activityId,
+      title: `${group.activityTitle} (${group.name})`,
+    });
+    setDeleteModalOpen(true);
+  }, []);
+
+  const promptDeleteActivity = useCallback((activity) => {
+    setDeleteTarget({
+      type: 'activity',
+      activityId: activity.id,
+      title: activity.title,
+    });
+    setDeleteModalOpen(true);
+  }, []);
+
+  const promptDeleteBatch = useCallback(() => {
+    if (selectedGroupIds.length === 0) return;
+    setDeleteTarget({
+      type: 'batch',
+      groupIds: [...selectedGroupIds],
+      count: selectedGroupIds.length,
+      title: `выбранные секции (${selectedGroupIds.length} шт.)`,
+    });
+    setDeleteModalOpen(true);
+  }, [selectedGroupIds]);
+
+  const closeDeleteModal = useCallback(() => {
+    if (isDeleting) return;
+    setDeleteModalOpen(false);
+    setDeleteTarget(null);
+  }, [isDeleting]);
+
+  const confirmDelete = useCallback(async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    setError(null);
+    try {
+      if (deleteTarget.type === 'single') {
+        await deleteActivityGroupRecord(deleteTarget.groupId, deleteTarget.activityId);
+        setSelectedGroupIds((prev) => prev.filter((id) => id !== deleteTarget.groupId));
+        setActionSuccess(`Группа «${deleteTarget.title}» удалена из базы данных`);
+      } else if (deleteTarget.type === 'activity') {
+        await deleteActivityRecord(deleteTarget.activityId);
+        setActionSuccess(`Кружок «${deleteTarget.title}» удален из базы данных`);
+      } else if (deleteTarget.type === 'batch') {
+        await deleteBatchGroupsRecord(deleteTarget.groupIds);
+        setSelectedGroupIds([]);
+        setActionSuccess(`Удалено из базы данных: ${deleteTarget.count} групп`);
+      }
+      setDeleteModalOpen(false);
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error('Delete failed:', err);
+      setError(err.message || 'Ошибка удаления из базы данных');
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [deleteTarget]);
+
   const saveNewActivity = useCallback(async (activityData, initialGroupData) => {
     setIsCreatingActivity(true);
     try {
@@ -192,5 +285,20 @@ export function useCoordinatorOverview() {
     openCreateActivity,
     closeCreateActivity,
     saveNewActivity,
+    // Multi-Selection
+    selectedGroupIds,
+    toggleSelectGroup,
+    selectAllGroups,
+    clearSelection,
+    isGroupSelected,
+    // Deletion
+    deleteModalOpen,
+    deleteTarget,
+    isDeleting,
+    promptDeleteGroup,
+    promptDeleteActivity,
+    promptDeleteBatch,
+    closeDeleteModal,
+    confirmDelete,
   };
 }

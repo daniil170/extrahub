@@ -1,5 +1,9 @@
 import {
   collection,
+  query,
+  where,
+  getDocs,
+  writeBatch,
   doc,
   setDoc,
   updateDoc,
@@ -231,6 +235,111 @@ export async function createActivityGroup(groupData) {
     return { success: true, id: newId };
   } catch (err) {
     console.error('createActivityGroup error:', err);
+    throw err;
+  }
+}
+
+/**
+ * Delete a single activity group from Firestore.
+ * Also deletes the parent activity if no other groups remain.
+ * @param {string} groupId
+ * @param {string} [activityId]
+ */
+export async function deleteActivityGroupRecord(groupId, activityId) {
+  try {
+    const groupRef = doc(db, COLLECTIONS.ACTIVITY_GROUPS, groupId);
+    await deleteDoc(groupRef);
+
+    if (activityId) {
+      const grpQ = query(
+        collection(db, COLLECTIONS.ACTIVITY_GROUPS),
+        where('activityId', '==', activityId)
+      );
+      const snap = await getDocs(grpQ);
+      const remaining = snap.docs.filter((d) => d.id !== groupId);
+      if (remaining.length === 0) {
+        const actRef = doc(db, COLLECTIONS.ACTIVITIES, activityId);
+        await deleteDoc(actRef);
+      }
+    }
+    return { success: true };
+  } catch (err) {
+    console.error('deleteActivityGroupRecord error:', err);
+    throw err;
+  }
+}
+
+/**
+ * Delete an entire activity and all of its groups from Firestore
+ * @param {string} activityId
+ */
+export async function deleteActivityRecord(activityId) {
+  try {
+    const batch = writeBatch(db);
+
+    const grpQ = query(
+      collection(db, COLLECTIONS.ACTIVITY_GROUPS),
+      where('activityId', '==', activityId)
+    );
+    const snap = await getDocs(grpQ);
+    snap.docs.forEach((d) => {
+      batch.delete(d.ref);
+    });
+
+    const actRef = doc(db, COLLECTIONS.ACTIVITIES, activityId);
+    batch.delete(actRef);
+
+    await batch.commit();
+    return { success: true };
+  } catch (err) {
+    console.error('deleteActivityRecord error:', err);
+    throw err;
+  }
+}
+
+/**
+ * Batch delete multiple activity groups and clean up empty activities
+ * @param {string[]} groupIds
+ * @param {string[]} [activityIds]
+ */
+export async function deleteBatchGroupsRecord(groupIds = [], activityIds = []) {
+  try {
+    const batch = writeBatch(db);
+
+    groupIds.forEach((gId) => {
+      const gRef = doc(db, COLLECTIONS.ACTIVITY_GROUPS, gId);
+      batch.delete(gRef);
+    });
+
+    activityIds.forEach((aId) => {
+      const aRef = doc(db, COLLECTIONS.ACTIVITIES, aId);
+      batch.delete(aRef);
+    });
+
+    await batch.commit();
+
+    // Clean up empty activities that now have 0 groups left
+    const remainingGrps = await getDocs(collection(db, COLLECTIONS.ACTIVITY_GROUPS));
+    const activeActivityIds = new Set(remainingGrps.docs.map((d) => d.data().activityId));
+
+    const allActs = await getDocs(collection(db, COLLECTIONS.ACTIVITIES));
+    const cleanupBatch = writeBatch(db);
+    let cleanupCount = 0;
+
+    allActs.docs.forEach((d) => {
+      if (!activeActivityIds.has(d.id)) {
+        cleanupBatch.delete(d.ref);
+        cleanupCount++;
+      }
+    });
+
+    if (cleanupCount > 0) {
+      await cleanupBatch.commit();
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('deleteBatchGroupsRecord error:', err);
     throw err;
   }
 }
