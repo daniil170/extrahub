@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Check,
   AlertTriangle,
@@ -10,6 +11,8 @@ import {
   Edit3,
   School,
   Trash2,
+  Eye,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useCoordinatorOverview } from './useCoordinatorOverview.js';
 import { Card, Badge, Button, Spinner } from '../../shared/ui/index.js';
@@ -18,8 +21,13 @@ import { EditCapacityModal } from './EditCapacityModal.jsx';
 import { CreateGroupModal } from './CreateGroupModal.jsx';
 import { CreateActivityModal } from './CreateActivityModal.jsx';
 import { DeleteConfirmModal } from './DeleteConfirmModal.jsx';
+import { ActivityViewMode } from './ActivityViewMode.jsx';
+import { ActivityDetailsModal } from '../catalog/ActivityDetailsModal.jsx';
 
 export function CapacityOverview() {
+  const [viewMode, setViewMode] = useState('view'); // 'view' | 'manage'
+  const [detailsActivity, setDetailsActivity] = useState(null);
+
   const {
     summary,
     activities,
@@ -255,28 +263,94 @@ export function CapacityOverview() {
             <h3
               style={{ margin: 0, fontSize: '19px', fontWeight: 700, color: 'var(--text-primary)' }}
             >
-              Мониторинг групп и управление вместимостью
+              {viewMode === 'view' ? 'Каталог и структура кружков' : 'Мониторинг групп и управление вместимостью'}
             </h3>
             <span style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>
               Всего групп: <strong>{groups.length}</strong> &bull; Кружков: <strong>{activities.length}</strong>
             </span>
           </div>
 
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={openCreateActivity}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontWeight: 600,
-            }}
-          >
-            <Plus size={15} /> Создать кружок
-          </Button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            {/* View / Manage Mode Switcher */}
+            <div
+              style={{
+                display: 'inline-flex',
+                backgroundColor: 'var(--bg-subtle)',
+                padding: '3px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setViewMode('view')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: 'none',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  backgroundColor: viewMode === 'view' ? 'var(--bg-surface)' : 'transparent',
+                  color: viewMode === 'view' ? 'var(--primary)' : 'var(--text-secondary)',
+                  boxShadow: viewMode === 'view' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                }}
+              >
+                <Eye size={15} />
+                <span>Режим просмотра</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('manage')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: 'none',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  backgroundColor: viewMode === 'manage' ? 'var(--bg-surface)' : 'transparent',
+                  color: viewMode === 'manage' ? 'var(--primary)' : 'var(--text-secondary)',
+                  boxShadow: viewMode === 'manage' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                }}
+              >
+                <SlidersHorizontal size={15} />
+                <span>Режим работы</span>
+              </button>
+            </div>
+
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={openCreateActivity}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontWeight: 600,
+              }}
+            >
+              <Plus size={15} /> Создать кружок
+            </Button>
+          </div>
         </div>
 
+        {viewMode === 'view' ? (
+          <ActivityViewMode
+            activities={activities}
+            groups={groups}
+            onOpenDetails={(act) => setDetailsActivity(act)}
+          />
+        ) : (
+          <>
         {/* Multi-Selection and Bulk Actions Toolbar */}
         {groups.length > 0 && (
           <div
@@ -716,7 +790,17 @@ export function CapacityOverview() {
           })}
         </div>
         )}
+        </>
+        )}
       </div>
+
+      {/* Activity Details Modal (view curriculum / syllabus in view mode) */}
+      <ActivityDetailsModal
+        isOpen={Boolean(detailsActivity)}
+        onClose={() => setDetailsActivity(null)}
+        activity={detailsActivity}
+        onEnroll={null}
+      />
 
       {/* Edit Capacity Modal */}
       <EditCapacityModal
