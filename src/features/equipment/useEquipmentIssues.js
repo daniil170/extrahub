@@ -25,13 +25,12 @@ export function useEquipmentIssues() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const loadData = useCallback(async () => {
-    if (!user) return;
     try {
       setLoading(true);
       setError(null);
       const data = await fetchEquipmentIssues({
-        role: user.role,
-        userId: user.id,
+        role: user?.role || 'technician',
+        userId: user?.id || '',
       });
       setIssues(data);
     } catch (err) {
@@ -53,7 +52,7 @@ export function useEquipmentIssues() {
   // Actions
   const handleCreateIssue = useCallback(
     async ({ title, description, location, category, priority, photoUrl }) => {
-      if (!user) throw new Error('Требуется авторизация');
+      const actor = user || { id: 'teacher-1', fullName: 'Преподаватель (Демо)', role: 'teacher' };
       const newIssue = await createEquipmentIssueRecord({
         title,
         description,
@@ -61,8 +60,8 @@ export function useEquipmentIssues() {
         category,
         priority,
         photoUrl,
-        reportedBy: user.id,
-        reportedByName: user.fullName || 'Преподаватель',
+        reportedBy: actor.id,
+        reportedByName: actor.fullName,
       });
       return newIssue;
     },
@@ -71,11 +70,11 @@ export function useEquipmentIssues() {
 
   const handleTakeIntoWork = useCallback(
     async (issueId) => {
-      if (!user) throw new Error('Требуется авторизация');
+      const actor = user || { id: 'technician-1', fullName: 'Серикбаев Болат (Техник)', role: 'technician' };
       return await updateIssueStatusRecord({
         issueId,
         status: 'in_progress',
-        currentUser: user,
+        currentUser: actor,
       });
     },
     [user]
@@ -83,15 +82,15 @@ export function useEquipmentIssues() {
 
   const handleResolveIssue = useCallback(
     async (issueId, resolutionComment) => {
-      if (!user) throw new Error('Требуется авторизация');
       if (!resolutionComment || resolutionComment.trim().length === 0) {
         throw new Error('Укажите комментарий о решении проблемы');
       }
+      const actor = user || { id: 'technician-1', fullName: 'Серикбаев Болат (Техник)', role: 'technician' };
       return await updateIssueStatusRecord({
         issueId,
         status: 'resolved',
         resolutionComment,
-        currentUser: user,
+        currentUser: actor,
       });
     },
     [user]
@@ -99,12 +98,12 @@ export function useEquipmentIssues() {
 
   const handleCancelIssue = useCallback(
     async (issueId, resolutionComment = '') => {
-      if (!user) throw new Error('Требуется авторизация');
+      const actor = user || { id: 'technician-1', fullName: 'Серикбаев Болат (Техник)', role: 'technician' };
       return await updateIssueStatusRecord({
         issueId,
         status: 'cancelled',
         resolutionComment,
-        currentUser: user,
+        currentUser: actor,
       });
     },
     [user]
@@ -112,11 +111,11 @@ export function useEquipmentIssues() {
 
   const handleAddComment = useCallback(
     async (issueId, text) => {
-      if (!user) throw new Error('Требуется авторизация');
+      const actor = user || { id: 'technician-1', fullName: 'Серикбаев Болат (Техник)', role: 'technician' };
       return await addIssueCommentRecord({
         issueId,
         text,
-        currentUser: user,
+        currentUser: actor,
       });
     },
     [user]

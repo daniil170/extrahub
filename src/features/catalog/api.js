@@ -2,16 +2,6 @@ import { collection, doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 
-import {
-  DEMO_TEACHERS,
-  DEMO_ACTIVITIES,
-  DEMO_ACTIVITY_GROUPS,
-} from '../../shared/data/demoData.js';
-
-export const MOCK_TEACHERS = DEMO_TEACHERS;
-export const MOCK_ACTIVITIES = DEMO_ACTIVITIES;
-export const MOCK_ACTIVITY_GROUPS = DEMO_ACTIVITY_GROUPS;
-
 /**
  * Merge raw activities, groups, and teachers into ready-to-display activity models
  */
@@ -38,7 +28,6 @@ export function combineCatalogData(rawActivities, rawGroups, rawTeachers) {
 
     const teacherName =
       teacherMap[act.teacherId] ||
-      MOCK_TEACHERS[act.teacherId]?.fullName ||
       act.teacherName ||
       'Преподаватель школы';
 
@@ -52,65 +41,6 @@ export function combineCatalogData(rawActivities, rawGroups, rawTeachers) {
       isFull,
     };
   });
-}
-
-/**
- * Subscribe to real-time activities and activityGroups from Firestore,
- * with graceful fallback to mock data when Firestore collections are empty or offline.
- * @param {(activities: any[]) => void} onUpdate
- * @param {(error: Error) => void} onError
- * @returns {() => void} unsubscribe function
- */
-const ACTIVITIES_STORAGE_KEY = 'extrahub_dev_activities';
-
-function getInitialActivities() {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      const saved = localStorage.getItem(ACTIVITIES_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch {
-      // ignore
-    }
-  }
-  return [...MOCK_ACTIVITIES];
-}
-
-export let devActivitiesStore = getInitialActivities();
-const activityListeners = new Set();
-
-export function notifyActivitiesChanged() {
-  activityListeners.forEach((listener) => {
-    try {
-      listener(devActivitiesStore);
-    } catch (err) {
-      console.error('Error in activity listener:', err);
-    }
-  });
-}
-
-export function subscribeActivities(callback) {
-  activityListeners.add(callback);
-  return () => activityListeners.delete(callback);
-}
-
-/**
- * Reset activities store to default mocks (useful for testing or resetting demo state)
- */
-export function resetActivitiesStore() {
-  devActivitiesStore = [...MOCK_ACTIVITIES];
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      localStorage.removeItem(ACTIVITIES_STORAGE_KEY);
-    } catch {
-      // ignore
-    }
-  }
-  notifyActivitiesChanged();
 }
 
 /**
@@ -187,9 +117,6 @@ export async function createActivityRecord(activityData) {
 
   const docRef = doc(db, COLLECTIONS.ACTIVITIES, newId);
   await setDoc(docRef, record);
-
-  devActivitiesStore = [record, ...devActivitiesStore.filter((a) => a.id !== newId)];
-  notifyActivitiesChanged();
 
   return { success: true, activity: record };
 }

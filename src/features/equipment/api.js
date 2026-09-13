@@ -1,16 +1,73 @@
-import { httpsCallable } from 'firebase/functions';
 import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  getDoc,
-  orderBy,
-  onSnapshot,
-} from 'firebase/firestore';
-import { functions, db } from '../../app/config/firebase.js';
-import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
+  DEMO_EQUIPMENT_ISSUES,
+  DEMO_ISSUE_COMMENTS,
+} from '../../shared/data/demoData.js';
+import {
+  createEquipmentIssue,
+  createIssueComment,
+} from '../../entities/equipmentIssue/model.js';
+
+const ISSUES_STORAGE_KEY = 'extrahub_equipment_issues_v2';
+const COMMENTS_STORAGE_KEY = 'extrahub_equipment_comments_v2';
+
+function getInitialIssues() {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const saved = localStorage.getItem(ISSUES_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return [...DEMO_EQUIPMENT_ISSUES];
+}
+
+function getInitialComments() {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const saved = localStorage.getItem(COMMENTS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return parsed;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return { ...DEMO_ISSUE_COMMENTS };
+}
+
+let devEquipmentIssuesStore = getInitialIssues();
+let devIssueCommentsStore = getInitialComments();
+const subscribers = new Set();
+
+function persistStores() {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      localStorage.setItem(ISSUES_STORAGE_KEY, JSON.stringify(devEquipmentIssuesStore));
+      localStorage.setItem(COMMENTS_STORAGE_KEY, JSON.stringify(devIssueCommentsStore));
+    } catch {
+      // ignore
+    }
+  }
+}
+
+function notifySubscribers() {
+  subscribers.forEach((callback) => {
+    try {
+      callback([...devEquipmentIssuesStore]);
+    } catch (err) {
+      console.error('Error in equipment subscriber:', err);
+    }
+  });
+}
 
 /**
  * Priority weighting for sorting: critical > high > medium > low
@@ -24,132 +81,172 @@ const PRIORITY_WEIGHTS = {
 
 function sortIssues(issues) {
   return [...issues].sort((a, b) => {
-    // 1. Critical first
     const weightDiff = (PRIORITY_WEIGHTS[b.priority] || 0) - (PRIORITY_WEIGHTS[a.priority] || 0);
     if (weightDiff !== 0) return weightDiff;
-    // 2. Newest first
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
 }
 
 /**
- * Fetch equipment issues filtered by role and user from real Firestore
+ * Fetch equipment issues filtered by role and user from local demo store
  * @param {Object} [params]
  * @param {string} [params.role]
  * @param {string} [params.userId]
  * @returns {Promise<import('../../entities/equipmentIssue/model.js').EquipmentIssue[]>}
  */
 export async function fetchEquipmentIssues({ role = 'technician', userId = '' } = {}) {
-  try {
-    const colRef = collection(db, COLLECTIONS.EQUIPMENT_ISSUES);
-    let q = colRef;
-    if (role === 'teacher' && userId) {
-      q = query(colRef, where('reportedBy', '==', userId));
-    }
-    const snap = await getDocs(q);
-    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    return sortIssues(list);
-  } catch (err) {
-    if (err.code !== 'permission-denied') {
-      console.error('Failed to fetch equipment issues:', err);
-    }
-    return [];
+  if (role === 'teacher' && userId) {
+    return sortIssues(devEquipmentIssuesStore.filter((i) => i.reportedBy === userId));
   }
+  return sortIssues(devEquipmentIssuesStore);
 }
 
 /**
- * Fetch a single issue by ID from Firestore
+ * Fetch a single issue by ID from local demo store
  * @param {string} issueId
  */
 export async function fetchIssueById(issueId) {
-  const docRef = doc(db, COLLECTIONS.EQUIPMENT_ISSUES, issueId);
-  const snap = await getDoc(docRef);
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() };
+  return devEquipmentIssuesStore.find((i) => i.id === issueId) || null;
 }
 
 /**
- * Create a new equipment issue via Cloud Function
+ * Create a new equipment issue in demo store
  * @param {Object} issueData
  */
 export async function createEquipmentIssueRecord(issueData) {
-  const callable = httpsCallable(functions, 'createEquipmentIssue');
-  const res = await callable(issueData);
-  if (!res?.data?.issue) {
-    throw new Error('Не удалось создать заявку на ремонт оборудования');
-  }
-  return res.data.issue;
+  const now = new Date().toISOString();
+  const newIssue = createEquipmentIssue({
+    ...issueData,
+    id: `issue-${Date.now()}`,
+    status: 'new',
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  devEquipmentIssuesStore = [newIssue, ...devEquipmentIssuesStore];
+  persistStores();
+  notifySubscribers();
+
+  return newIssue;
 }
 
 /**
- * Update issue status via Cloud Function
+ * Update issue status in demo store (take into work, resolve with comment, or cancel)
  * @param {Object} params
  * @param {string} params.issueId
  * @param {'in_progress' | 'resolved' | 'cancelled'} params.status
  * @param {string} [params.resolutionComment]
+ * @param {Object} [params.currentUser]
  */
-export async function updateIssueStatusRecord({ issueId, status, resolutionComment = '' }) {
-  const callable = httpsCallable(functions, 'updateIssueStatus');
-  const res = await callable({ issueId, status, resolutionComment });
-  if (!res?.data?.success) {
-    throw new Error('Не удалось обновить статус заявки');
-  }
-  return res.data;
+export async function updateIssueStatusRecord({
+  issueId,
+  status,
+  resolutionComment = '',
+  currentUser = {},
+}) {
+  const now = new Date().toISOString();
+  let updatedIssue = null;
+
+  devEquipmentIssuesStore = devEquipmentIssuesStore.map((iss) => {
+    if (iss.id === issueId) {
+      const updates = {
+        ...iss,
+        status,
+        updatedAt: now,
+      };
+
+      if (status === 'in_progress') {
+        updates.assignedTo = currentUser.id || 'technician-1';
+        updates.assignedToName = currentUser.fullName || 'Дежурный техник';
+      } else if (status === 'resolved') {
+        updates.resolutionComment = resolutionComment.trim();
+        updates.resolvedAt = now;
+        if (!updates.assignedTo) {
+          updates.assignedTo = currentUser.id || 'technician-1';
+          updates.assignedToName = currentUser.fullName || 'Дежурный техник';
+        }
+      }
+
+      updatedIssue = updates;
+      return updates;
+    }
+    return iss;
+  });
+
+  persistStores();
+  notifySubscribers();
+
+  return { success: true, issue: updatedIssue };
 }
 
 /**
- * Add a comment to an issue via Cloud Function
+ * Add a comment to an issue in demo store
  * @param {Object} params
  * @param {string} params.issueId
  * @param {string} params.text
+ * @param {Object} [params.currentUser]
  */
-export async function addIssueCommentRecord({ issueId, text }) {
-  const callable = httpsCallable(functions, 'addIssueComment');
-  const res = await callable({ issueId, text });
-  if (!res?.data?.comment) {
-    throw new Error('Не удалось отправить комментарий к заявке');
-  }
-  return res.data.comment;
+export async function addIssueCommentRecord({ issueId, text, currentUser = {} }) {
+  const now = new Date().toISOString();
+  const newComment = createIssueComment({
+    id: `com-${Date.now()}`,
+    issueId,
+    authorId: currentUser.id || 'dev-user',
+    authorName: currentUser.fullName || 'Пользователь',
+    authorRole: currentUser.role || 'teacher',
+    text: text.trim(),
+    createdAt: now,
+  });
+
+  const currentComments = devIssueCommentsStore[issueId] || [];
+  devIssueCommentsStore = {
+    ...devIssueCommentsStore,
+    [issueId]: [...currentComments, newComment],
+  };
+
+  // Bump issue updatedAt
+  devEquipmentIssuesStore = devEquipmentIssuesStore.map((iss) =>
+    iss.id === issueId ? { ...iss, updatedAt: now } : iss
+  );
+
+  persistStores();
+  notifySubscribers();
+
+  return newComment;
 }
 
 /**
- * Fetch all comments for a specific issue from Firestore subcollection
+ * Fetch all comments for a specific issue from demo store
  * @param {string} issueId
  */
 export async function fetchIssueComments(issueId) {
-  try {
-    const commentsRef = collection(db, COLLECTIONS.EQUIPMENT_ISSUES, issueId, 'comments');
-    const snap = await getDocs(query(commentsRef, orderBy('createdAt', 'asc')));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  } catch (err) {
-    console.error('Error fetching issue comments:', err);
-    return [];
-  }
+  return devIssueCommentsStore[issueId] || [];
 }
 
 /**
- * Real-time subscription to equipment issues in Firestore
+ * Real-time subscription to local demo equipment store
+ * @param {(issues: any[]) => void} callback
+ * @returns {() => void} unsubscribe
  */
 export function subscribeEquipmentIssues(callback) {
-  const colRef = collection(db, COLLECTIONS.EQUIPMENT_ISSUES);
-  return onSnapshot(
-    colRef,
-    (snapshot) => {
-      const liveData = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      callback(sortIssues(liveData));
-    },
-    (error) => {
-      if (error.code !== 'permission-denied') {
-        console.error('Equipment issues subscription error:', error);
-      }
-    }
-  );
+  subscribers.add(callback);
+  // Send initial data immediately
+  try {
+    callback(sortIssues(devEquipmentIssuesStore));
+  } catch (err) {
+    console.error('Error sending initial equipment issues:', err);
+  }
+  return () => {
+    subscribers.delete(callback);
+  };
 }
 
 /**
- * Reset local store helper (kept for interface compatibility)
+ * Reset local store to default demo dataset
  */
 export function resetEquipmentIssuesStore() {
-  // No-op on real backend
+  devEquipmentIssuesStore = [...DEMO_EQUIPMENT_ISSUES];
+  devIssueCommentsStore = { ...DEMO_ISSUE_COMMENTS };
+  persistStores();
+  notifySubscribers();
 }
-

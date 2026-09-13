@@ -1,18 +1,6 @@
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
-import { MOCK_TEACHERS } from '../catalog/api.js';
-
-import {
-  DEMO_STUDENTS,
-  DEMO_ENROLLMENTS,
-  DEMO_PAYMENTS,
-} from '../../shared/data/demoData.js';
-
-export const MOCK_CHILDREN = DEMO_STUDENTS.slice(0, 2);
-export const MOCK_ENROLLMENTS = DEMO_ENROLLMENTS;
-export const MOCK_PAYMENTS = DEMO_PAYMENTS;
-
 /**
  * Enriches enrollments with activity and group details
  */
@@ -29,7 +17,7 @@ export function enrichEnrollments(rawEnrollments, activities, groups, teachers) 
 
   const teacherMap = {};
   (teachers || []).forEach((t) => {
-    teacherMap[t.id] = t.fullName || t.name;
+    if (t?.id) teacherMap[t.id] = t.fullName || t.name;
   });
 
   return (rawEnrollments || []).map((enr) => {
@@ -39,7 +27,6 @@ export function enrichEnrollments(rawEnrollments, activities, groups, teachers) 
     const teacherId = activity?.teacherId || group?.teacherId;
     const teacherName =
       teacherMap[teacherId] ||
-      MOCK_TEACHERS[teacherId]?.fullName ||
       activity?.teacherName ||
       'Преподаватель школы';
 

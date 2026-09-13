@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
-import { subscribeDashboardData, MOCK_CHILDREN } from './api.js';
+import { subscribeDashboardData } from './api.js';
 import { cancelEnrollmentCall } from '../enrollment/api.js';
 
 export function useParentDashboard(initialStudentId) {
@@ -9,12 +9,12 @@ export function useParentDashboard(initialStudentId) {
 
   const [children, setChildren] = useState(() =>
     role === 'student'
-      ? [{ id: user?.id || 'student-1', fullName: user?.fullName || 'Ученик', className: '' }]
-      : MOCK_CHILDREN
+      ? [{ id: user?.id, fullName: user?.fullName || 'Ученик', className: '' }]
+      : []
   );
 
   const [activeStudentId, setActiveStudentId] = useState(
-    initialStudentId || (role === 'student' ? user?.id || 'student-1' : 'student-1')
+    initialStudentId || (role === 'student' ? user?.id : null)
   );
 
   const [enrollments, setEnrollments] = useState([]);
@@ -39,7 +39,7 @@ export function useParentDashboard(initialStudentId) {
   // Adjust activeStudentId if user role changes or children load
   useEffect(() => {
     if (role === 'student') {
-      setActiveStudentId(user?.id || 'student-1');
+      setActiveStudentId(user?.id);
     }
   }, [role, user?.id]);
 
@@ -50,12 +50,15 @@ export function useParentDashboard(initialStudentId) {
 
     const unsubscribe = subscribeDashboardData(
       {
-        userId: user?.id || 'dev-user-1',
+        userId: user?.id,
         role,
         studentId: activeStudentId,
       },
       (data) => {
         setChildren(data.children);
+        if (!activeStudentId && data.children && data.children.length > 0) {
+          setActiveStudentId(data.children[0].id);
+        }
         setEnrollments(data.enrollments);
         setPayments(data.payments);
         setLoading(false);

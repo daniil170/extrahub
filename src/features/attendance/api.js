@@ -10,40 +10,6 @@ import {
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 
-import { DEMO_STUDENTS } from '../../shared/data/demoData.js';
-
-export const MOCK_TEACHER_GROUPS = [
-  {
-    id: 'grp-1-1',
-    activityId: 'act-1',
-    activityTitle: 'Робототехника и микроэлектроника Arduino',
-    name: 'Группа А (Начинающие)',
-    location: 'Кабинет 304 (IT-лаборатория)',
-    daysOfWeek: [1, 3],
-    startTime: '15:30',
-    endTime: '17:00',
-    enrolledCount: 8,
-    capacity: 12,
-  },
-  {
-    id: 'grp-1-2',
-    activityId: 'act-1',
-    activityTitle: 'Робототехника и микроэлектроника Arduino',
-    name: 'Группа Б (Продвинутые)',
-    location: 'Кабинет 304 (IT-лаборатория)',
-    daysOfWeek: [2, 4],
-    startTime: '16:00',
-    endTime: '17:30',
-    enrolledCount: 10,
-    capacity: 10,
-  },
-];
-
-export const MOCK_GROUP_STUDENTS = {
-  'grp-1-1': DEMO_STUDENTS,
-  'grp-1-2': DEMO_STUDENTS.slice(2, 8),
-};
-
 
 /**
  * Fetch groups taught by the teacher from Firestore
