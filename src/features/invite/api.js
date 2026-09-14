@@ -128,10 +128,10 @@ export async function registerViaInviteCall({ inviteToken, email, password, full
  * @param {string} params.fullName
  * @param {string} [params.className]
  */
-export async function registerStudentCall({ email, password, fullName, className }) {
+export async function registerStudentCall({ email, password, fullName, className, shift }) {
   try {
     const callable = httpsCallable(functions, 'registerStudent');
-    const res = await callable({ email, password, fullName, className });
+    const res = await callable({ email, password, fullName, className, shift });
     return res.data;
   } catch (err) {
     console.error('registerStudent error:', err);

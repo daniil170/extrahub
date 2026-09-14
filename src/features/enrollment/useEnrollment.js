@@ -91,6 +91,9 @@ export function useEnrollment() {
       return;
     }
 
+    // Guard against double-click / double-submit
+    if (isSubmitting) return;
+
     setIsSubmitting(true);
     setConflictError(null);
     setGeneralError(null);
@@ -151,7 +154,7 @@ export function useEnrollment() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [activeActivity, selectedGroupId, selectedStudentId, user]);
+  }, [activeActivity, selectedGroupId, selectedStudentId, user, isSubmitting]);
 
   return {
     isOpen,
