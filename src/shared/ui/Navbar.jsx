@@ -159,8 +159,9 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
         {/* Left: Brand logo & Desktop Links */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <NavLink
-            to={currentUser?.role === 'technician' ? '/technician' : '/catalog'}
+            to="/about"
             onClick={() => setMobileMenuOpen(false)}
+            title="О платформе ExtraHub"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -211,10 +212,6 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                     Заявки на ремонт
                   </NavLink>
                 )}
-
-                <NavLink to="/about" style={navLinkStyle}>
-                  О платформе
-                </NavLink>
               </>
             )}
           </nav>
@@ -566,10 +563,6 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                     Заявки на ремонт
                   </NavLink>
                 )}
-
-                <NavLink to="/about" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-                  О платформе и команде
-                </NavLink>
               </>
             )}
           </nav>

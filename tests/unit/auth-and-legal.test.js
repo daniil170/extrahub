@@ -164,5 +164,16 @@ describe('Auth Redesign and Legal Pages Test Suite', () => {
       expect(content).not.toContain('ACHIEVEMENT_ICONS');
       expect(content).not.toContain('DEMO_ACHIEVEMENTS');
     });
+
+    it('Navbar logo links to /about and header nav omits "О платформе"', () => {
+      const navbarPath = path.resolve(__dirname, '../../src/shared/ui/Navbar.jsx');
+      const content = fs.readFileSync(navbarPath, 'utf8');
+
+      // Logo links to /about
+      expect(content).toContain('to="/about"');
+      // "О платформе" is no longer a separate nav item in desktop or mobile links
+      expect(content).not.toContain('О платформе</NavLink>');
+      expect(content).not.toContain('О платформе и команде</NavLink>');
+    });
   });
 });
