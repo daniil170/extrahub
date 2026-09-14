@@ -125,4 +125,34 @@ describe('Auth Redesign and Legal Pages Test Suite', () => {
       expect(content).toContain('/terms-of-use');
     });
   });
+
+  describe('Auth Session Persistence & Demo Role Switcher Loading', () => {
+    it('caches user profile in localStorage in AuthContext to eliminate reload flicker', () => {
+      const authPath = path.resolve(__dirname, '../../src/features/auth/AuthContext.jsx');
+      const content = fs.readFileSync(authPath, 'utf8');
+
+      expect(content).toContain('extrahub_auth_cache');
+      expect(content).toContain('localStorage.getItem(AUTH_CACHE_KEY)');
+      expect(content).toContain('localStorage.setItem(AUTH_CACHE_KEY');
+      expect(content).toContain('localStorage.removeItem(AUTH_CACHE_KEY)');
+    });
+
+    it('Navbar accepts loading prop and displays a loading state instead of public login buttons', () => {
+      const navbarPath = path.resolve(__dirname, '../../src/shared/ui/Navbar.jsx');
+      const content = fs.readFileSync(navbarPath, 'utf8');
+
+      expect(content).toContain('loading = false');
+      expect(content).toContain('aria-label="Загрузка профиля..."');
+    });
+
+    it('DemoRoleSwitcher renders a full-screen loading overlay during role switching', () => {
+      const switcherPath = path.resolve(__dirname, '../../src/features/auth/DemoRoleSwitcher.jsx');
+      const content = fs.readFileSync(switcherPath, 'utf8');
+
+      expect(content).toContain('switchingRole &&');
+      expect(content).toContain('Смена демо-роли...');
+      expect(content).toContain('backdropFilter');
+      expect(content).toContain('aria-busy="true"');
+    });
+  });
 });

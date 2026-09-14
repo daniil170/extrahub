@@ -11,7 +11,7 @@ import { Spinner, Card } from '../../shared/ui/index.js';
 export function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading, isAuthenticated } = useAuth();
 
-  if (loading) {
+  if (loading && !user) {
     return (
       <div style={{ textAlign: 'center', padding: '60px 0' }}>
         <Spinner size="lg" label="Проверка прав доступа..." />
@@ -19,11 +19,18 @@ export function ProtectedRoute({ children, allowedRoles }) {
     );
   }
 
-  if (!isAuthenticated || !user) {
+  if (!loading && (!isAuthenticated || !user)) {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
+    if (loading) {
+      return (
+        <div style={{ textAlign: 'center', padding: '60px 0' }}>
+          <Spinner size="lg" label="Проверка прав доступа..." />
+        </div>
+      );
+    }
     return (
       <div style={{ maxWidth: '600px', margin: '40px auto' }}>
         <Card style={{ borderColor: 'var(--danger)', backgroundColor: 'var(--danger-light)' }}>

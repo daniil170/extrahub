@@ -82,9 +82,10 @@ function getInitials(fullName = '') {
  * Modern compact navigation bar
  * @param {Object} props
  * @param {import('../../entities/user/model.js').User|null} props.currentUser
+ * @param {boolean} [props.loading]
  * @param {() => void} props.onLogout
  */
-export function Navbar({ currentUser, onLogout }) {
+export function Navbar({ currentUser, loading = false, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
@@ -389,6 +390,34 @@ export function Navbar({ currentUser, onLogout }) {
                 )}
               </div>
             </>
+          ) : loading ? (
+            <div
+              aria-label="Загрузка профиля..."
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 12px',
+                borderRadius: '999px',
+                backgroundColor: 'var(--bg-subtle)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-muted)',
+                fontSize: '12px',
+                height: '32px',
+              }}
+            >
+              <div
+                style={{
+                  width: '13px',
+                  height: '13px',
+                  borderRadius: '50%',
+                  border: '2px solid var(--border-color)',
+                  borderTopColor: 'var(--primary)',
+                  animation: 'spin 0.8s linear infinite',
+                }}
+              />
+              <span style={{ color: 'var(--text-secondary)' }}>Загрузка...</span>
+            </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <NavLink
@@ -454,7 +483,7 @@ export function Navbar({ currentUser, onLogout }) {
             gap: '14px',
           }}
         >
-          {currentUser && (
+          {currentUser ? (
             <div
               style={{
                 padding: '12px 14px',
@@ -483,7 +512,32 @@ export function Navbar({ currentUser, onLogout }) {
                 </span>
               </div>
             </div>
-          )}
+          ) : loading ? (
+            <div
+              style={{
+                padding: '10px 14px',
+                backgroundColor: 'var(--bg-subtle)',
+                borderRadius: 'var(--radius-md)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--text-muted)',
+                fontSize: '12.5px',
+              }}
+            >
+              <div
+                style={{
+                  width: '13px',
+                  height: '13px',
+                  borderRadius: '50%',
+                  border: '2px solid var(--border-color)',
+                  borderTopColor: 'var(--primary)',
+                  animation: 'spin 0.8s linear infinite',
+                }}
+              />
+              <span>Загрузка профиля...</span>
+            </div>
+          ) : null}
 
           {/* Navigation Links */}
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -544,7 +598,7 @@ export function Navbar({ currentUser, onLogout }) {
               >
                 Выйти из аккаунта
               </button>
-            ) : (
+            ) : loading ? null : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <NavLink
                   to="/login"

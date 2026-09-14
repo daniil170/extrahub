@@ -5,8 +5,17 @@ import { getDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { createUser } from '../../entities/user/model.js';
 import { AuthContext } from './context.js';
 
+const AUTH_CACHE_KEY = 'extrahub_auth_cache';
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const cached = localStorage.getItem(AUTH_CACHE_KEY);
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -71,16 +80,31 @@ export function AuthProvider({ children }) {
 
           if (isSubscribed) {
             setUser(authenticatedUser);
+            try {
+              localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(authenticatedUser));
+            } catch (cacheErr) {
+              console.warn('Failed to cache user profile in localStorage:', cacheErr);
+            }
           }
         } catch (e) {
           console.error('Error resolving user auth session:', e);
           if (isSubscribed) {
             setUser(null);
+            try {
+              localStorage.removeItem(AUTH_CACHE_KEY);
+            } catch {
+              // ignore
+            }
           }
         }
       } else {
         if (isSubscribed) {
           setUser(null);
+          try {
+            localStorage.removeItem(AUTH_CACHE_KEY);
+          } catch {
+            // ignore
+          }
         }
       }
 
@@ -102,6 +126,11 @@ export function AuthProvider({ children }) {
       console.error('Logout error:', err);
     }
     setUser(null);
+    try {
+      localStorage.removeItem(AUTH_CACHE_KEY);
+    } catch {
+      // ignore
+    }
     localStorage.removeItem('extrahub_dev_user');
   };
 

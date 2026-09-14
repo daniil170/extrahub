@@ -7,12 +7,12 @@ import { useAuth } from '../hooks/useAuth.js';
 import { DemoRoleSwitcher } from '../../features/auth/DemoRoleSwitcher.jsx';
 
 export function Layout() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <IntroAnimation />
-      <Navbar currentUser={user} onLogout={logout} />
+      <Navbar currentUser={user} loading={loading} onLogout={logout} />
       <main className="app-main">
         <Outlet />
       </main>
