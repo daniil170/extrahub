@@ -11,6 +11,9 @@ import {
   Info,
   AlertTriangle,
   GraduationCap,
+  History,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { useParentDashboard } from './useParentDashboard.js';
@@ -46,6 +49,15 @@ export function StudentDashboard() {
       if (unsubscribe) unsubscribe();
     };
   }, [user?.id]);
+
+  const [showCancelled, setShowCancelled] = useState(false);
+
+  const activeEnrollments = enrollments.filter(
+    (e) => e.status !== 'cancelled' && e.status !== 'cancelled_by_timeout'
+  );
+  const cancelledEnrollments = enrollments.filter(
+    (e) => e.status === 'cancelled' || e.status === 'cancelled_by_timeout'
+  );
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '48px' }}>
@@ -125,7 +137,7 @@ export function StudentDashboard() {
               </Link>
             </div>
 
-            {enrollments.length === 0 && examApplications.length === 0 ? (
+            {activeEnrollments.length === 0 && examApplications.length === 0 ? (
               <Card style={{ textAlign: 'center', padding: '40px 20px' }}>
                 <div
                   style={{
@@ -256,7 +268,7 @@ export function StudentDashboard() {
                 ))}
 
                 {/* Regular Enrollments */}
-                {enrollments.map((enr) => {
+                {activeEnrollments.map((enr) => {
                   const act = enr.activity;
                   const grp = enr.group;
                   const canCancel =
@@ -440,6 +452,98 @@ export function StudentDashboard() {
                     </Card>
                   );
                 })}
+              </div>
+            )}
+
+            {/* Cancelled History (Collapsible) */}
+            {cancelledEnrollments.length > 0 && (
+              <div style={{ marginTop: '20px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCancelled((prev) => !prev)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: 'var(--bg-subtle)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-sm)',
+                    color: 'var(--text-secondary)',
+                    fontSize: '12.5px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    padding: '6px 12px',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <History size={13} style={{ color: 'var(--text-muted)' }} />
+                  <span>
+                    {showCancelled
+                      ? 'Скрыть отменённые записи'
+                      : `История отменённых записей (${cancelledEnrollments.length})`}
+                  </span>
+                  {showCancelled ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+
+                {showCancelled && (
+                  <div
+                    style={{
+                      marginTop: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                    }}
+                  >
+                    {cancelledEnrollments.map((enr) => {
+                      const act = enr.activity;
+                      return (
+                        <Card
+                          key={enr.id}
+                          style={{
+                            borderRadius: 'var(--radius-md)',
+                            backgroundColor: 'var(--bg-subtle)',
+                            borderLeft: '3px solid var(--border-color)',
+                            padding: '12px 16px',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              gap: '12px',
+                            }}
+                          >
+                            <div>
+                              <h4
+                                style={{
+                                  margin: 0,
+                                  fontSize: '14px',
+                                  fontWeight: 600,
+                                  color: 'var(--text-primary)',
+                                }}
+                              >
+                                {act?.title || 'Кружок'}
+                              </h4>
+                              <div
+                                style={{
+                                  fontSize: '12px',
+                                  color: 'var(--text-muted)',
+                                  marginTop: '2px',
+                                }}
+                              >
+                                {enr.cancelledAt
+                                  ? `Отменено: ${formatDate(enr.cancelledAt)}`
+                                  : 'Запись отменена'}
+                              </div>
+                            </div>
+                            <Badge variant="default">Отменено</Badge>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </div>
