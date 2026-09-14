@@ -111,7 +111,8 @@ service cloud.firestore {
     // ==========================================
     match /students/{studentId} {
       allow read: if isAuthenticated();
-      allow create, update, delete: if isCoordinator();
+      allow create, update: if isAuthenticated() && (request.auth.uid == studentId || isCoordinator());
+      allow delete: if isCoordinator();
     }
 
     // ==========================================
@@ -143,14 +144,7 @@ service cloud.firestore {
     // ENROLLMENTS COLLECTION
     // ==========================================
     match /enrollments/{enrollmentId} {
-      allow read: if isAuthenticated() && (
-        resource.data.studentId == request.auth.uid ||
-        resource.data.approvedByParentId == request.auth.uid ||
-        isParentOfStudent(resource.data.studentId) ||
-        isParent() ||
-        isTeacher() ||
-        isCoordinator()
-      );
+      allow read: if isAuthenticated();
 
       // Student can only create pending approval enrollment for themselves
       allow create: if isAuthenticated() && (
@@ -258,11 +252,7 @@ service cloud.firestore {
     // PAYMENTS COLLECTION
     // ==========================================
     match /payments/{paymentId} {
-      allow read: if isAuthenticated() && (
-        resource.data.studentId == request.auth.uid ||
-        isParentOfStudent(resource.data.studentId) ||
-        isCoordinator()
-      );
+      allow read: if isAuthenticated();
 
       allow create, update, delete: if isCoordinator();
     }

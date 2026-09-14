@@ -134,6 +134,13 @@ export function RegisterPage() {
       // 2. Sign in via Firebase Auth
       const userCred = await signInWithEmailAndPassword(auth, trimmedEmail, password);
 
+      // Force refresh token so newly assigned 'student' custom claims are immediately loaded
+      try {
+        await userCred.user.getIdToken(true);
+      } catch (tokenErr) {
+        console.warn('Token refresh error:', tokenErr);
+      }
+
       // 3. Ensure profile has className and shift in users and students
       try {
         await updateDoc(doc(db, 'users', userCred.user.uid), {

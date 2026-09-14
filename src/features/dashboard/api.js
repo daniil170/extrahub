@@ -181,9 +181,10 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
       collection(db, COLLECTIONS.ENROLLMENTS),
       (snap) => {
         const allEnrs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        const currentTargetId = studentId || childrenList?.[0]?.id || 'student-1';
+        const currentTargetId = studentId || userId || childrenList?.[0]?.id || 'student-1';
         const childIds = new Set((childrenList || []).map((c) => c.id));
         if (currentTargetId) childIds.add(currentTargetId);
+        if (userId) childIds.add(userId);
         childIds.add('student-1');
 
         const filtered = allEnrs.filter((e) => {
@@ -197,7 +198,7 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
               e.status === 'pending_parent_approval'
             );
           }
-          return e.studentId === currentTargetId;
+          return e.studentId === currentTargetId || (userId && e.studentId === userId);
         });
 
         enrollmentsList = filtered;
@@ -216,9 +217,9 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
       collection(db, COLLECTIONS.PAYMENTS),
       (snap) => {
         const allPays = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        const currentTargetId = studentId || childrenList?.[0]?.id || 'student-1';
+        const currentTargetId = studentId || userId || childrenList?.[0]?.id || 'student-1';
         paymentsList = allPays.filter(
-          (p) => p.studentId === currentTargetId || p.studentId === 'student-1'
+          (p) => p.studentId === currentTargetId || (userId && p.studentId === userId)
         );
         emit();
       },
