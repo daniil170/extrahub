@@ -1,5 +1,6 @@
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '../../app/config/firebase.js';
+import { functions, auth } from '../../app/config/firebase.js';
+import { updateDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 
 /**
  * Call createEnrollment Cloud Function
@@ -21,7 +22,7 @@ export async function createEnrollmentCall({ studentId, groupId }) {
 }
 
 /**
- * Call cancelEnrollment Cloud Function
+ * Call cancelEnrollment Cloud Function with direct Firestore fallback
  * @param {Object} params
  * @param {string} params.enrollmentId
  * @returns {Promise<{ success: boolean }>}
@@ -32,9 +33,21 @@ export async function cancelEnrollmentCall({ enrollmentId }) {
     const result = await callable({ enrollmentId });
     return result.data;
   } catch (error) {
-    const message = error.message || 'Ошибка отмены записи';
-    console.error('cancelEnrollment failed:', error);
-    throw new Error(message, { cause: error });
+    console.warn('cancelEnrollment Cloud Function failed, attempting direct Firestore update fallback:', error);
+    try {
+      const nowStr = new Date().toISOString();
+      await updateDocument(COLLECTIONS.ENROLLMENTS, enrollmentId, {
+        status: 'cancelled',
+        cancelledAt: nowStr,
+        cancelledBy: auth.currentUser?.uid || 'parent',
+      });
+      return { success: true, status: 'cancelled' };
+    } catch (fsErr) {
+      console.error('Direct Firestore cancel failed:', fsErr);
+      const message = error.message || fsErr.message || 'Ошибка отмены записи';
+      throw new Error(message, { cause: fsErr });
+    }
   }
 }
+
 

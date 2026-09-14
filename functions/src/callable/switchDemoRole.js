@@ -1,4 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { FieldValue } from 'firebase-admin/firestore';
 import { db, auth } from '../config/firebase.js';
 
 const DEMO_MASTER_EMAIL = (process.env.DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
@@ -137,10 +138,17 @@ export const switchDemoRole = onCall(async (request) => {
         className: 7,
         shift: 1,
         email: targetEmail,
-        parentIds: [],
+        parentIds: ['parent-1'],
         status: 'active',
         createdAt: new Date().toISOString(),
       }, { merge: true });
+    }
+
+    if (targetRole === 'parent') {
+      const studentRef = db.collection('students').doc('student-1');
+      await studentRef.set({
+        parentIds: FieldValue.arrayUnion(targetUser.uid, 'parent-1'),
+      }, { merge: true }).catch(() => {});
     }
 
     if (targetRole === 'teacher') {
