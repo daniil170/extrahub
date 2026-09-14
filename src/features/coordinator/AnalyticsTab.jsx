@@ -49,6 +49,8 @@ const COLORS = {
 export function AnalyticsTab() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState(null);
+  const [slowNetwork, setSlowNetwork] = useState(false);
   const [activities, setActivities] = useState([]);
   const [groups, setGroups] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -62,6 +64,11 @@ export function AnalyticsTab() {
   const loadData = async () => {
     try {
       setLoading(true);
+      setLoadError(null);
+      setSlowNetwork(false);
+
+      // Show "taking longer than usual" warning after 8 seconds
+      const slowTimer = setTimeout(() => setSlowNetwork(true), 8000);
 
       const [actsSnap, grpsSnap, paysSnap, studsSnap, attSnap] = await Promise.all([
         getDocs(collection(db, COLLECTIONS.ACTIVITIES)),
@@ -73,6 +80,9 @@ export function AnalyticsTab() {
         getDocs(collection(db, COLLECTIONS.ATTENDANCE)).catch(() => ({ docs: [] })),
       ]);
 
+      clearTimeout(slowTimer);
+      setSlowNetwork(false);
+
       setActivities(actsSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
       setGroups(grpsSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
       setPayments(paysSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
@@ -80,9 +90,11 @@ export function AnalyticsTab() {
       setAttendanceRecords(attSnap.docs ? attSnap.docs.map((d) => ({ id: d.id, ...d.data() })) : []);
     } catch (err) {
       console.error('Failed to load analytics data from Firestore:', err);
+      setLoadError(err.message || 'Не удалось загрузить данные аналитики');
     } finally {
       setLoading(false);
       setRefreshing(false);
+      setSlowNetwork(false);
     }
   };
 
@@ -315,6 +327,53 @@ export function AnalyticsTab() {
     return (
       <div style={{ textAlign: 'center', padding: '60px 0' }}>
         <Spinner size="lg" label="Сбор и расчет аналитических данных платформы..." />
+        {slowNetwork && (
+          <div
+            style={{
+              marginTop: '20px',
+              padding: '12px 20px',
+              backgroundColor: 'var(--warning-light)',
+              border: '1px solid var(--warning)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--warning)',
+              fontSize: '13px',
+              maxWidth: '420px',
+              margin: '20px auto 0',
+            }}
+          >
+            ⚠️ Загрузка занимает дольше обычного. Возможно, слабый сигнал сети. Пожалуйста, подождите...
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <div style={{ fontSize: '48px', marginBottom: '12px' }}>📡</div>
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
+          Не удалось загрузить данные
+        </div>
+        <div style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
+          {loadError}
+        </div>
+        <button
+          type="button"
+          onClick={handleRefresh}
+          style={{
+            padding: '10px 24px',
+            borderRadius: 'var(--radius-sm)',
+            backgroundColor: 'var(--primary)',
+            color: '#fff',
+            border: 'none',
+            fontSize: '14px',
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          Повторить загрузку
+        </button>
       </div>
     );
   }

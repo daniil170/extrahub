@@ -191,11 +191,9 @@ export function subscribeDashboardData({ userId, role, studentId }, onUpdate, on
           if (role === 'parent') {
             return (
               childIds.has(e.studentId) ||
-              e.approvedByParentId === userId ||
+              (userId && e.approvedByParentId === userId) ||
               e.approvedByParentId === 'parent-by-token' ||
-              e.approvedByParentId === 'parent-1' ||
-              e.status === 'active' ||
-              e.status === 'pending_parent_approval'
+              e.approvedByParentId === 'parent-1'
             );
           }
           return e.studentId === currentTargetId || (userId && e.studentId === userId);

@@ -43,8 +43,11 @@ export function useEquipmentIssues() {
 
   useEffect(() => {
     loadData();
-    const unsubscribe = subscribeEquipmentIssues(() => {
-      loadData();
+    const unsubscribe = subscribeEquipmentIssues((updatedIssues) => {
+      // Subscriber provides updated data directly — no need to re-call loadData
+      if (Array.isArray(updatedIssues)) {
+        setIssues(updatedIssues);
+      }
     });
     return () => unsubscribe();
   }, [loadData]);

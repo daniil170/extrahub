@@ -276,7 +276,7 @@ export function DemoRoleSwitcher() {
             alignItems: 'center',
           }}
         >
-          {isOpen ? <ChevronDown size={17} /> : <ChevronUp size={17} />}
+          {isOpen ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
         </button>
       </div>
 
