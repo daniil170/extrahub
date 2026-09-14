@@ -19,7 +19,6 @@ import {
   DEMO_PAYMENTS,
   DEMO_ATTENDANCE_HISTORY,
   DEMO_NOTIFICATIONS,
-  DEMO_ACHIEVEMENTS,
   DEMO_EQUIPMENT_ISSUES,
 } from '../src/shared/data/demoData.js';
 
@@ -38,7 +37,6 @@ async function main() {
   console.log(`  • Student Enrolls:   ${DEMO_ENROLLMENTS.length} (Active, Hold with timer, Waitlist, Cancelled)`);
   console.log(`  • Payments:          ${DEMO_PAYMENTS.length} (Paid, Pending, Overdue in ₸)`);
   console.log(`  • Attendance Dates:  ${Object.keys(DEMO_ATTENDANCE_HISTORY).length} (Multi-week records with 4 statuses)`);
-  console.log(`  • Achievements:      ${DEMO_ACHIEVEMENTS.length}`);
   console.log(`  • Equipment Issues:  ${DEMO_EQUIPMENT_ISSUES.length} (Critical, High, Medium, Low breakdown requests)`);
   console.log(`  • Notifications:     ${Object.values(DEMO_NOTIFICATIONS).flat().length} (Tailored for 6 roles)\n`);
 

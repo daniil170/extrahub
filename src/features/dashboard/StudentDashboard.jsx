@@ -10,10 +10,6 @@ import {
   User,
   Info,
   AlertTriangle,
-  Trophy,
-  Award,
-  Star,
-  Medal,
   GraduationCap,
 } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
@@ -21,9 +17,6 @@ import { useParentDashboard } from './useParentDashboard.js';
 import { subscribeStudentExamApplications } from '../exam/api.js';
 import { Card, Badge, Button, Spinner, Modal, PageHeader, CountdownTimer } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
-import { DEMO_ACHIEVEMENTS } from '../../shared/data/demoData.js';
-
-const ACHIEVEMENT_ICONS = [Trophy, Award, Star, Medal];
 
 export function StudentDashboard() {
   const { user } = useAuth();
@@ -54,13 +47,11 @@ export function StudentDashboard() {
     };
   }, [user?.id]);
 
-  const mockAchievements = DEMO_ACHIEVEMENTS;
-
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '48px' }}>
       <PageHeader
         title={`Личный кабинет ученика: ${user?.fullName || 'Ученик'}`}
-        subtitle="Ваши секции, расписание занятий, статус оплат и награды"
+        subtitle="Ваши секции, расписание занятий и статус оплат"
       />
 
       {/* Toast alert */}
@@ -453,7 +444,7 @@ export function StudentDashboard() {
             )}
           </div>
 
-          {/* Right Column: Payments and Achievements */}
+          {/* Right Column: Payments */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {/* Payment Section */}
             <div>
@@ -539,66 +530,6 @@ export function StudentDashboard() {
                 >
                   <Info size={13} style={{ flexShrink: 0, color: 'var(--text-muted)' }} />
                   <span>Оплата производится родителями в администрации школы.</span>
-                </div>
-              </Card>
-            </div>
-
-            {/* Achievements Section */}
-            <div>
-              <h2
-                style={{
-                  fontSize: '17px',
-                  fontWeight: 600,
-                  fontFamily: 'var(--font-heading)',
-                  margin: '0 0 16px',
-                  color: 'var(--text-primary)',
-                }}
-              >
-                Награды и достижения
-              </h2>
-
-              <Card style={{ borderRadius: 'var(--radius-md)' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  {mockAchievements.map((ach, idx) => {
-                    const IconComp = ACHIEVEMENT_ICONS[idx % ACHIEVEMENT_ICONS.length];
-                    return (
-                      <div
-                        key={ach.id}
-                        style={{ display: 'flex', gap: '12px', alignItems: 'center' }}
-                      >
-                        <div
-                          style={{
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: 'var(--radius-sm)',
-                            backgroundColor: 'var(--bg-subtle)',
-                            border: '1px solid var(--border-color)',
-                            color: 'var(--primary)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                          }}
-                        >
-                          <IconComp size={18} />
-                        </div>
-                        <div>
-                          <div
-                            style={{
-                              fontWeight: 600,
-                              fontSize: '13px',
-                              color: 'var(--text-primary)',
-                            }}
-                          >
-                            {ach.title.replace(/\p{Extended_Pictographic}/gu, '').trim()}
-                          </div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                            {ach.desc}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               </Card>
             </div>

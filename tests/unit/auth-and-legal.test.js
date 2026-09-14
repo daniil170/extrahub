@@ -154,5 +154,15 @@ describe('Auth Redesign and Legal Pages Test Suite', () => {
       expect(content).toContain('backdropFilter');
       expect(content).toContain('aria-busy="true"');
     });
+
+    it('StudentDashboard completely omits awards and achievements', () => {
+      const studentPath = path.resolve(__dirname, '../../src/features/dashboard/StudentDashboard.jsx');
+      const content = fs.readFileSync(studentPath, 'utf8');
+
+      expect(content).not.toContain('Награды и достижения');
+      expect(content).not.toContain('mockAchievements');
+      expect(content).not.toContain('ACHIEVEMENT_ICONS');
+      expect(content).not.toContain('DEMO_ACHIEVEMENTS');
+    });
   });
 });

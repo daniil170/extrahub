@@ -944,32 +944,7 @@ export const DEMO_ATTENDANCE_HISTORY = {
   },
 };
 
-export const DEMO_ACHIEVEMENTS = [
-  {
-    id: 'ach-1',
-    title: 'Первые шаги',
-    desc: 'Успешная запись и посещение первого школьного кружка',
-    icon: 'star',
-  },
-  {
-    id: 'ach-2',
-    title: '100% дисциплина',
-    desc: 'Ни одного пропуска занятий по робототехнике за первый месяц',
-    icon: 'trophy',
-  },
-  {
-    id: 'ach-3',
-    title: 'Победитель хакатона',
-    desc: '1-е место в школьном турнире мобильных роботов Arduino',
-    icon: 'medal',
-  },
-  {
-    id: 'ach-4',
-    title: 'Активный дебатёр',
-    desc: 'Победа в раунде дебатов на английском языке',
-    icon: 'award',
-  },
-];
+export const DEMO_ACHIEVEMENTS = [];
 
 export const DEMO_NOTIFICATIONS = {
   student: [
@@ -994,9 +969,9 @@ export const DEMO_NOTIFICATIONS = {
     {
       id: 'notif-s3',
       role: 'student',
-      type: 'achievement',
-      title: 'Новая награда получена!',
-      text: 'Поздравляем! Вам присвоен бейдж «100% дисциплина» за идеальное посещение кружка по робототехнике.',
+      type: 'attendance_alert',
+      title: 'Расписание обновлено',
+      text: 'В группе «Робототехника и Arduino» опубликовано обновленное расписание практических занятий.',
       isRead: false,
       sentAt: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
     },
