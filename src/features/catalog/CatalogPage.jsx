@@ -16,6 +16,7 @@ import { EnrollmentModal } from '../enrollment/EnrollmentModal.jsx';
 import { ActivityDetailsModal } from './ActivityDetailsModal.jsx';
 import { Card, Badge, Button, Spinner, PageHeader, CapacityBadge, Modal } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 export function CatalogPage() {
   const navigate = useNavigate();
@@ -96,7 +97,7 @@ export function CatalogPage() {
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '40px' }}>
       <PageHeader
         title="Каталог кружков и секций"
-        subtitle="Выберите интересные направления для дополнительного развития вашего ребёнка"
+        subtitle={`Официальные программы дополнительного образования и внеучебные секции ${schoolConfig.name}`}
       />
 
       {/* Filters and Search Bar */}

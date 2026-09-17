@@ -187,35 +187,37 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
               Extra<span style={{ color: 'var(--primary)' }}>Hub</span>
             </span>
 
-            {/* Co-Branding Separator & School Badge */}
+            {/* Modern SaaS-style vertical separator */}
             <span
               style={{
-                color: 'var(--text-muted)',
-                fontSize: '13px',
-                fontWeight: 400,
-                margin: '0 2px',
-                userSelect: 'none',
+                display: 'inline-block',
+                width: '1px',
+                height: '18px',
+                backgroundColor: 'var(--border-color)',
+                margin: '0 4px',
+                opacity: 0.8,
               }}
-            >
-              ×
-            </span>
+              aria-hidden="true"
+            />
+
+            {/* School Co-Branding Lockup */}
             <div
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
-                padding: '2px 8px',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--bg-subtle)',
-                border: '1px solid var(--border-color)',
-                maxWidth: '220px',
+                gap: '8px',
               }}
             >
               {schoolConfig.logoUrl && (
                 <img
                   src={schoolConfig.logoUrl}
                   alt={schoolConfig.name}
-                  style={{ width: '16px', height: '16px', objectFit: 'contain' }}
+                  style={{
+                    width: '22px',
+                    height: '22px',
+                    objectFit: 'contain',
+                    flexShrink: 0,
+                  }}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
@@ -223,13 +225,11 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
               )}
               <span
                 style={{
-                  fontSize: '12px',
+                  fontSize: '13px',
                   fontWeight: 600,
                   color: 'var(--text-secondary)',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
                   letterSpacing: '-0.01em',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {schoolConfig.name}

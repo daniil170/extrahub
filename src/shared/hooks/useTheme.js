@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 const THEME_STORAGE_KEY = 'extrahub_theme';
 
@@ -30,6 +31,7 @@ export function useTheme() {
     setThemeState(newTheme);
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', newTheme);
+      schoolConfig.applyBrandTheme(newTheme);
     }
     if (typeof window !== 'undefined' && window.localStorage) {
       try {

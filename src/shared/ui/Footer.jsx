@@ -82,25 +82,36 @@ export function Footer() {
                   ExtraHub
                 </span>
               </Link>
-
-              <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>×</span>
+              {/* Modern vertical separator */}
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '1px',
+                  height: '20px',
+                  backgroundColor: 'var(--border-color)',
+                  margin: '0 4px',
+                  opacity: 0.8,
+                }}
+                aria-hidden="true"
+              />
 
               <div
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  padding: '3px 8px',
-                  borderRadius: 'var(--radius-sm)',
-                  backgroundColor: 'var(--bg-subtle)',
-                  border: '1px solid var(--border-color)',
+                  gap: '8px',
                 }}
               >
                 {schoolConfig.logoUrl && (
                   <img
                     src={schoolConfig.logoUrl}
                     alt={schoolConfig.name}
-                    style={{ width: '18px', height: '18px', objectFit: 'contain' }}
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      objectFit: 'contain',
+                      flexShrink: 0,
+                    }}
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
@@ -108,7 +119,7 @@ export function Footer() {
                 )}
                 <span
                   style={{
-                    fontSize: '12.5px',
+                    fontSize: '14px',
                     fontWeight: 600,
                     color: 'var(--text-primary)',
                     letterSpacing: '-0.01em',

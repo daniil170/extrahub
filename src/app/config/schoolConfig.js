@@ -15,11 +15,10 @@ const SCHOOL_DOMAIN =
 const SCHOOL_LOGO_URL =
   import.meta.env.VITE_SCHOOL_LOGO_URL || '/schools/pifagor-logo.png';
 
-// 2. School Brand Colors (Optional override over ExtraHub design system)
-// Pifagor brand colors: Deep Navy (#1E1B4B) + Energetic Green (#009639)
-const SCHOOL_PRIMARY_COLOR = import.meta.env.VITE_SCHOOL_PRIMARY_COLOR || '#0e7c6b';
-const SCHOOL_ACCENT_COLOR = import.meta.env.VITE_SCHOOL_ACCENT_COLOR || '#009639';
-const SCHOOL_BRAND_NAVY = '#1e1b4b';
+// 2. School Brand Colors (Pifagor High School: Emerald Green #009639 + Deep Navy #161A38)
+const SCHOOL_PRIMARY_COLOR = import.meta.env.VITE_SCHOOL_PRIMARY_COLOR || '#009639';
+const SCHOOL_ACCENT_COLOR = import.meta.env.VITE_SCHOOL_ACCENT_COLOR || '#161a38';
+const SCHOOL_BRAND_NAVY = '#161a38';
 
 // 3. Shift Configuration
 // Supports customizable shifts per school (e.g. 1 shift, 2 shifts, or customized time slots)
@@ -78,17 +77,32 @@ export const schoolConfig = {
   },
 
   // Apply custom CSS brand properties to document root if specified
-  applyBrandTheme: () => {
+  applyBrandTheme: (currentTheme) => {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
-    if (SCHOOL_PRIMARY_COLOR && SCHOOL_PRIMARY_COLOR !== '#0e7c6b') {
-      root.style.setProperty('--school-primary', SCHOOL_PRIMARY_COLOR);
-    }
-    if (SCHOOL_ACCENT_COLOR) {
-      root.style.setProperty('--school-accent', SCHOOL_ACCENT_COLOR);
-    }
+    const isDark = currentTheme ? currentTheme === 'dark' : root.getAttribute('data-theme') === 'dark';
+
+    // 1. School Specific Accent & Palette Vars
+    root.style.setProperty('--school-primary', SCHOOL_PRIMARY_COLOR);
+    root.style.setProperty('--school-accent', SCHOOL_ACCENT_COLOR);
     root.style.setProperty('--school-navy', SCHOOL_BRAND_NAVY);
     root.style.setProperty('--school-green', '#009639');
+
+    // 2. Override platform primary color if configured
+    if (SCHOOL_PRIMARY_COLOR) {
+      if (SCHOOL_PRIMARY_COLOR === '#009639') {
+        const primaryVal = isDark ? '#10b981' : '#009639';
+        const hoverVal = isDark ? '#34d399' : '#007a2e';
+        root.style.setProperty('--primary', primaryVal);
+        root.style.setProperty('--primary-hover', hoverVal);
+        root.style.setProperty('--primary-light', isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(0, 150, 57, 0.08)');
+        root.style.setProperty('--primary-border', isDark ? 'rgba(16, 185, 129, 0.4)' : 'rgba(0, 150, 57, 0.35)');
+        root.style.setProperty('--primary-glow', isDark ? 'rgba(16, 185, 129, 0.25)' : 'rgba(0, 150, 57, 0.18)');
+      } else {
+        root.style.setProperty('--primary', SCHOOL_PRIMARY_COLOR);
+        root.style.setProperty('--primary-hover', SCHOOL_PRIMARY_COLOR);
+      }
+    }
   },
 };
 
