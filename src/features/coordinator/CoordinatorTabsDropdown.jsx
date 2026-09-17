@@ -18,14 +18,14 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
   }, []);
 
   return (
-    <div style={{ marginBottom: '24px' }}>
-      {/* Dropdown Selector */}
+    <div style={{ marginBottom: '24px', position: 'relative', zIndex: 40 }}>
+      {/* Dropdown Container */}
       <div
         ref={dropdownRef}
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: '460px',
+          maxWidth: '420px',
         }}
       >
         <label
@@ -56,10 +56,10 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '10px 16px',
-            backgroundColor: 'var(--bg-card)',
+            backgroundColor: '#ffffff',
             border: '2px solid var(--primary)',
             borderRadius: 'var(--radius-md)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
             cursor: 'pointer',
             fontSize: '14px',
             fontWeight: 600,
@@ -74,10 +74,10 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '28px',
-                height: '28px',
+                width: '30px',
+                height: '30px',
                 borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--primary-light, rgba(37, 99, 235, 0.1))',
+                backgroundColor: 'var(--primary-light, rgba(14, 124, 107, 0.1))',
                 color: 'var(--primary)',
               }}
             >
@@ -96,7 +96,7 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
           />
         </button>
 
-        {/* Dropdown Menu Popup */}
+        {/* Dropdown Menu Popup with Solid Background and High z-index */}
         {isOpen && (
           <ul
             role="listbox"
@@ -105,11 +105,11 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
               top: 'calc(100% + 6px)',
               left: 0,
               right: 0,
-              backgroundColor: 'var(--bg-card)',
+              backgroundColor: '#ffffff',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border-color)',
-              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-              zIndex: 50,
+              boxShadow: '0 12px 28px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.08)',
+              zIndex: 9999,
               margin: 0,
               padding: '6px',
               listStyle: 'none',
@@ -120,7 +120,7 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
             {tabs.map((tab) => {
               const isSelected = tab.id === activeTab;
               return (
-                <li key={tab.id}>
+                <li key={tab.id} style={{ margin: 0, padding: 0 }}>
                   <button
                     type="button"
                     role="option"
@@ -137,7 +137,7 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-sm)',
                       border: 'none',
-                      backgroundColor: isSelected ? 'var(--primary-light, rgba(37, 99, 235, 0.08))' : 'transparent',
+                      backgroundColor: isSelected ? 'var(--primary-light, rgba(14, 124, 107, 0.1))' : 'transparent',
                       color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
                       fontWeight: isSelected ? 600 : 500,
                       fontSize: '14px',
@@ -146,7 +146,7 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
                       transition: 'background-color 0.12s ease',
                     }}
                     onMouseEnter={(e) => {
-                      if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
+                      if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-subtle, #f4f4f2)';
                     }}
                     onMouseLeave={(e) => {
                       if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
@@ -173,46 +173,6 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
             })}
           </ul>
         )}
-      </div>
-
-      {/* Quick Navigation Pills */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          marginTop: '12px',
-          flexWrap: 'wrap',
-        }}
-      >
-        {tabs.map((tab) => {
-          const isSelected = tab.id === activeTab;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => onSelectTab(tab.id)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-full, 9999px)',
-                border: isSelected ? '1px solid var(--primary)' : '1px solid var(--border-color)',
-                backgroundColor: isSelected ? 'var(--primary)' : 'var(--bg-card)',
-                color: isSelected ? '#ffffff' : 'var(--text-secondary)',
-                fontSize: '13px',
-                fontWeight: isSelected ? 600 : 500,
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                {tab.icon}
-              </span>
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
       </div>
     </div>
   );
