@@ -31,8 +31,8 @@ export function StaffInvitesTab() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
 
-  // Forms state
-  const [inviteRole, setInviteRole] = useState(isAdmin ? 'coordinator' : 'teacher');
+  // Forms state (admin-only feature)
+  const [inviteRole, setInviteRole] = useState('teacher');
   const [email, setEmail] = useState('');
   const [selectedActivityId, setSelectedActivityId] = useState('');
   const [activities, setActivities] = useState([]);
@@ -134,6 +134,16 @@ export function StaffInvitesTab() {
     setTimeout(() => setCopied(false), 2500);
   };
 
+  if (!isAdmin) {
+    return (
+      <Card style={{ padding: '32px', textAlign: 'center' }}>
+        <p style={{ color: 'var(--text-muted)', margin: 0 }}>
+          Управление приглашениями сотрудников доступно только администраторам школы.
+        </p>
+      </Card>
+    );
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       {/* Creation card */}
@@ -157,33 +167,7 @@ export function StaffInvitesTab() {
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
               Роль сотрудника <span style={{ color: 'var(--danger)' }}>*</span>
             </label>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              {isAdmin && (
-                <label
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: `1px solid ${inviteRole === 'coordinator' ? 'var(--primary)' : 'var(--border-color)'}`,
-                    backgroundColor: inviteRole === 'coordinator' ? 'var(--primary-light)' : 'transparent',
-                    cursor: 'pointer',
-                    fontSize: '13.5px',
-                    fontWeight: inviteRole === 'coordinator' ? 600 : 400,
-                  }}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="coordinator"
-                    checked={inviteRole === 'coordinator'}
-                    onChange={() => setInviteRole('coordinator')}
-                  />
-                  <Shield size={16} /> Координатор школы
-                </label>
-              )}
-
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <label
                 style={{
                   display: 'flex',
@@ -208,31 +192,53 @@ export function StaffInvitesTab() {
                 <BookOpen size={16} /> Преподаватель кружка
               </label>
 
-              {isAdmin && (
-                <label
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: `1px solid ${inviteRole === 'technician' ? 'var(--primary)' : 'var(--border-color)'}`,
-                    backgroundColor: inviteRole === 'technician' ? 'var(--primary-light)' : 'transparent',
-                    cursor: 'pointer',
-                    fontSize: '13.5px',
-                    fontWeight: inviteRole === 'technician' ? 600 : 400,
-                  }}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="technician"
-                    checked={inviteRole === 'technician'}
-                    onChange={() => setInviteRole('technician')}
-                  />
-                  <Wrench size={16} /> Техник по ремонту
-                </label>
-              )}
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: `1px solid ${inviteRole === 'coordinator' ? 'var(--primary)' : 'var(--border-color)'}`,
+                  backgroundColor: inviteRole === 'coordinator' ? 'var(--primary-light)' : 'transparent',
+                  cursor: 'pointer',
+                  fontSize: '13.5px',
+                  fontWeight: inviteRole === 'coordinator' ? 600 : 400,
+                }}
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value="coordinator"
+                  checked={inviteRole === 'coordinator'}
+                  onChange={() => setInviteRole('coordinator')}
+                />
+                <Shield size={16} /> Координатор школы
+              </label>
+
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: `1px solid ${inviteRole === 'technician' ? 'var(--primary)' : 'var(--border-color)'}`,
+                  backgroundColor: inviteRole === 'technician' ? 'var(--primary-light)' : 'transparent',
+                  cursor: 'pointer',
+                  fontSize: '13.5px',
+                  fontWeight: inviteRole === 'technician' ? 600 : 400,
+                }}
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value="technician"
+                  checked={inviteRole === 'technician'}
+                  onChange={() => setInviteRole('technician')}
+                />
+                <Wrench size={16} /> Техник по ремонту
+              </label>
             </div>
           </div>
 

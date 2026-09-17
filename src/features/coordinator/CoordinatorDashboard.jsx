@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3, CreditCard, UserPlus, GraduationCap, TrendingUp } from 'lucide-react';
+import { BarChart3, CreditCard, UserPlus, GraduationCap, TrendingUp, Users } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { PageHeader } from '../../shared/ui/index.js';
 import { CapacityOverview } from './CapacityOverview.jsx';
@@ -7,10 +7,11 @@ import { PaymentManagement } from './PaymentManagement.jsx';
 import { StaffInvitesTab } from './StaffInvitesTab.jsx';
 import { ExamApplicationsTab } from './ExamApplicationsTab.jsx';
 import { AnalyticsTab } from './AnalyticsTab.jsx';
+import { TeachersTab } from './TeachersTab.jsx';
 
 export function CoordinatorDashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('capacity'); // 'capacity' | 'payments' | 'invites' | 'exams' | 'analytics'
+  const [activeTab, setActiveTab] = useState('capacity'); // 'capacity' | 'teachers' | 'payments' | 'invites' | 'exams' | 'analytics'
   const isAdmin = user?.role === 'admin';
 
   return (
@@ -22,7 +23,7 @@ export function CoordinatorDashboard() {
         subtitle={
           isAdmin
             ? 'Администрирование школьных программ, мониторинг заполняемости групп и управление сотрудниками'
-            : 'Мониторинг загрузки кружков, управление вместимостью групп и приглашение преподавателей'
+            : 'Мониторинг загрузки кружков, управление вместимостью групп и просмотр статистики'
         }
       />
 
@@ -60,6 +61,32 @@ export function CoordinatorDashboard() {
           <span>Мониторинг загрузки и группы</span>
         </button>
 
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('teachers')}
+            style={{
+              padding: '12px 20px',
+              border: 'none',
+              background: 'none',
+              fontSize: '14px',
+              fontWeight: activeTab === 'teachers' ? 600 : 500,
+              color: activeTab === 'teachers' ? 'var(--primary)' : 'var(--text-secondary)',
+              borderBottom: `2px solid ${activeTab === 'teachers' ? 'var(--primary)' : 'transparent'}`,
+              marginBottom: '-2px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Users size={16} />
+            <span>Учителя</span>
+          </button>
+        )}
+
         <button
           type="button"
           onClick={() => setActiveTab('payments')}
@@ -84,29 +111,31 @@ export function CoordinatorDashboard() {
           <span>Выставление и учёт оплаты</span>
         </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('invites')}
-          style={{
-            padding: '12px 20px',
-            border: 'none',
-            background: 'none',
-            fontSize: '14px',
-            fontWeight: activeTab === 'invites' ? 600 : 500,
-            color: activeTab === 'invites' ? 'var(--primary)' : 'var(--text-secondary)',
-            borderBottom: `2px solid ${activeTab === 'invites' ? 'var(--primary)' : 'transparent'}`,
-            marginBottom: '-2px',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <UserPlus size={16} />
-          <span>Приглашения сотрудников</span>
-        </button>
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('invites')}
+            style={{
+              padding: '12px 20px',
+              border: 'none',
+              background: 'none',
+              fontSize: '14px',
+              fontWeight: activeTab === 'invites' ? 600 : 500,
+              color: activeTab === 'invites' ? 'var(--primary)' : 'var(--text-secondary)',
+              borderBottom: `2px solid ${activeTab === 'invites' ? 'var(--primary)' : 'transparent'}`,
+              marginBottom: '-2px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <UserPlus size={16} />
+            <span>Приглашения сотрудников</span>
+          </button>
+        )}
 
         <button
           type="button"
@@ -159,8 +188,9 @@ export function CoordinatorDashboard() {
 
       {/* Active Tab View */}
       {activeTab === 'capacity' && <CapacityOverview />}
+      {isAdmin && activeTab === 'teachers' && <TeachersTab />}
       {activeTab === 'payments' && <PaymentManagement />}
-      {activeTab === 'invites' && <StaffInvitesTab />}
+      {isAdmin && activeTab === 'invites' && <StaffInvitesTab />}
       {activeTab === 'exams' && <ExamApplicationsTab />}
       {activeTab === 'analytics' && <AnalyticsTab />}
     </div>

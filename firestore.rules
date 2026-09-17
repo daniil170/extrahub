@@ -279,8 +279,8 @@ service cloud.firestore {
     match /invites/{inviteId} {
       // Landing page token check can read invite
       allow read: if true;
-      // Creation and updates are managed by Cloud Functions / Admin SDK / Coordinator / Admin
-      allow create, update, delete: if isCoordinator() || isAdmin();
+      // Creation and updates are managed by Cloud Functions / Admin SDK / Admin
+      allow create, update, delete: if isAdmin();
     }
 
     // ==========================================

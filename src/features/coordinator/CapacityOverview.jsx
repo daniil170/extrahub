@@ -13,10 +13,11 @@ import {
   Trash2,
   Eye,
   SlidersHorizontal,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useCoordinatorOverview } from './useCoordinatorOverview.js';
 import { Card, Badge, Button, Spinner } from '../../shared/ui/index.js';
-import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
+import { formatCurrency, formatDaysOfWeek, exportToExcel } from '../../shared/utils/index.js';
 import { EditCapacityModal } from './EditCapacityModal.jsx';
 import { CreateGroupModal } from './CreateGroupModal.jsx';
 import { CreateActivityModal } from './CreateActivityModal.jsx';
@@ -68,6 +69,38 @@ export function CapacityOverview() {
     closeDeleteModal,
     confirmDelete,
   } = useCoordinatorOverview();
+
+  const handleExportToExcel = () => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const data = groups.map((g, idx) => {
+      const act = activities.find((a) => a.id === g.activityId) || {};
+      const cap = Number(g.capacity) || 0;
+      const enrolled = Number(g.enrolledCount) || 0;
+      const fillRate = cap > 0 ? Math.round((enrolled / cap) * 100) : 0;
+
+      return {
+        '№': idx + 1,
+        'Кружок': g.activityTitle || act.title || 'Кружок',
+        'Категория': g.category || act.category || 'Внеурочная деятельность',
+        'Стоимость (₸/мес)': typeof act.price === 'number' ? act.price : 0,
+        'Локация / Кабинет': g.location || act.location || 'Школьный корпус',
+        'Преподаватель': act.teacherName || '—',
+        'Группа': g.name || 'Группа',
+        'Расписание': `${formatDaysOfWeek(g.daysOfWeek)} ${g.startTime || '15:30'}–${g.endTime || '17:00'}`,
+        'Вместимость (мест)': cap,
+        'Записано (учеников)': enrolled,
+        'Заполненность (%)': fillRate,
+        'Статус мест': fillRate >= 100 ? '100% заполнено' : fillRate >= 80 ? 'Заканчиваются' : 'Свободно',
+        'В листе ожидания (чел.)': g.waitlistCount || 0,
+      };
+    });
+
+    exportToExcel({
+      filename: `extrahub-activities-and-groups-${todayStr}`,
+      sheetName: 'Кружки и группы',
+      data: data.length > 0 ? data : [{ 'Сообщение': 'Нет данных о группах' }],
+    });
+  };
 
   if (loading) {
     return (
@@ -326,6 +359,22 @@ export function CapacityOverview() {
                 <span>Режим работы</span>
               </button>
             </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportToExcel}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontWeight: 600,
+              }}
+              title="Выгрузить реестр кружков и групп в Excel (.xlsx)"
+            >
+              <FileSpreadsheet size={15} color="var(--primary)" />
+              <span>Экспорт в Excel</span>
+            </Button>
 
             {viewMode === 'manage' && (
               <Button

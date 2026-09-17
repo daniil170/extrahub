@@ -29,22 +29,15 @@ export const createStaffInvite = onCall(async (request) => {
     );
   }
 
-  // Permission checks
-  if (targetRole === 'coordinator' && callerRole !== 'admin') {
-    throw new HttpsError('permission-denied', 'Только администратор может приглашать координатора');
-  }
-
-  if (targetRole === 'technician' && callerRole !== 'admin') {
-    throw new HttpsError('permission-denied', 'Только администратор может приглашать техника');
+  // Permission checks - only admin can create staff invites
+  if (callerRole !== 'admin') {
+    throw new HttpsError(
+      'permission-denied',
+      'Только администратор может приглашать сотрудников (координаторов, преподавателей, техников)'
+    );
   }
 
   if (targetRole === 'teacher') {
-    if (callerRole !== 'coordinator' && callerRole !== 'admin') {
-      throw new HttpsError(
-        'permission-denied',
-        'Только координатор или администратор может приглашать преподавателя'
-      );
-    }
     if (!activityId) {
       throw new HttpsError(
         'invalid-argument',
