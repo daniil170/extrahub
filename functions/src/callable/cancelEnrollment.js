@@ -42,7 +42,10 @@ export const cancelEnrollment = onCall(async (request) => {
   const userData = userDoc.exists ? userDoc.data() : {};
   const userRole = callerClaims.role || userData.role;
 
-  const isDemoEmail = callerEmail.startsWith('demo.') && callerEmail.endsWith('@pifagorschool.kz');
+  const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+  const isDemoEmail =
+    callerEmail.startsWith('demo.') &&
+    (callerEmail.endsWith('@pifagorschool.kz') || callerEmail.endsWith(`@${allowedDomain}`));
   const isDemoMaster = Boolean(callerClaims.isDemoMaster) || callerEmail === 'daniilivakin30@gmail.com' || isDemoEmail;
   const isStaff = userRole === 'coordinator' || userRole === 'admin' || isDemoMaster;
 

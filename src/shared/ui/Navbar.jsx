@@ -12,6 +12,7 @@ import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
 import { NotificationCenter } from '../../features/notifications/index.js';
 import { useTheme } from '../hooks/index.js';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 /**
  * Role to personal cabinet link mapping
@@ -156,12 +157,12 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
           justifyContent: 'space-between',
         }}
       >
-        {/* Left: Brand logo & Desktop Links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {/* Left: Brand logo, Co-Branding & Desktop Links */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <NavLink
             to="/about"
             onClick={() => setMobileMenuOpen(false)}
-            title="О платформе ExtraHub"
+            title={`О платформе ExtraHub × ${schoolConfig.name}`}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -185,6 +186,55 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
             >
               Extra<span style={{ color: 'var(--primary)' }}>Hub</span>
             </span>
+
+            {/* Co-Branding Separator & School Badge */}
+            <span
+              style={{
+                color: 'var(--text-muted)',
+                fontSize: '13px',
+                fontWeight: 400,
+                margin: '0 2px',
+                userSelect: 'none',
+              }}
+            >
+              ×
+            </span>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--bg-subtle)',
+                border: '1px solid var(--border-color)',
+                maxWidth: '220px',
+              }}
+            >
+              {schoolConfig.logoUrl && (
+                <img
+                  src={schoolConfig.logoUrl}
+                  alt={schoolConfig.name}
+                  style={{ width: '16px', height: '16px', objectFit: 'contain' }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              )}
+              <span
+                style={{
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: 'var(--text-secondary)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                {schoolConfig.name}
+              </span>
+            </div>
           </NavLink>
 
           <nav className="nav-desktop-links" style={{ display: 'flex', alignItems: 'center' }}>

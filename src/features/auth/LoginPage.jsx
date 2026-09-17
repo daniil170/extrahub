@@ -8,6 +8,7 @@ import { useTheme } from '../../shared/hooks/index.js';
 import { Button, Alert, Spinner } from '../../shared/ui/index.js';
 import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 import './auth.css';
 
 export function LoginPage() {
@@ -135,7 +136,7 @@ export function LoginPage() {
                 required
                 autoComplete="email"
                 inputMode="email"
-                placeholder="user@pifagorschool.kz"
+                placeholder={`user@${schoolConfig.domain}`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}

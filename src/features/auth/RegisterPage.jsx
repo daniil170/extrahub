@@ -22,9 +22,10 @@ import { useTheme } from '../../shared/hooks/index.js';
 import { Button, Alert, Spinner } from '../../shared/ui/index.js';
 import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 import './auth.css';
 
-const ALLOWED_EMAIL_DOMAIN = import.meta.env.VITE_ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+const ALLOWED_EMAIL_DOMAIN = schoolConfig.allowedEmailDomain;
 const DEMO_MASTER_EMAIL = (import.meta.env.VITE_DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com')
   .trim()
   .toLowerCase();
@@ -40,7 +41,7 @@ export function RegisterPage() {
   // Step 1: Personal Info
   const [fullName, setFullName] = useState('');
   const [className, setClassName] = useState('7');
-  const [shift, setShift] = useState(1);
+  const [shift, setShift] = useState(schoolConfig.shifts[0]?.id || 1);
 
   // Step 2: Account & Security
   const [email, setEmail] = useState('');
@@ -290,8 +291,11 @@ export function RegisterPage() {
                     onChange={(e) => setShift(Number(e.target.value))}
                     className="auth-select"
                   >
-                    <option value={1}>1 смена</option>
-                    <option value={2}>2 смена</option>
+                    {schoolConfig.shifts.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name || s.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

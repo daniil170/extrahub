@@ -46,8 +46,10 @@ export const switchDemoRole = onCall(async (request) => {
   }
 
   const callerClaims = request.auth.token || {};
-  const callerEmail = (callerClaims.email || '').trim().toLowerCase();
-  const isDemoEmail = callerEmail.startsWith('demo.') && callerEmail.endsWith('@pifagorschool.kz');
+  const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+  const isDemoEmail =
+    callerEmail.startsWith('demo.') &&
+    (callerEmail.endsWith('@pifagorschool.kz') || callerEmail.endsWith(`@${allowedDomain}`));
   const isDemoMaster = Boolean(callerClaims.isDemoMaster) || callerEmail === DEMO_MASTER_EMAIL || isDemoEmail;
 
   if (!isDemoMaster) {

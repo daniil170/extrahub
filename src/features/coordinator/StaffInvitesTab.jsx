@@ -23,8 +23,9 @@ import {
   BookOpen,
   Wrench,
 } from 'lucide-react';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
-const ALLOWED_EMAIL_DOMAIN = import.meta.env.VITE_ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+const ALLOWED_EMAIL_DOMAIN = schoolConfig.allowedEmailDomain;
 const DEMO_MASTER_EMAIL = (import.meta.env.VITE_DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
 
 export function StaffInvitesTab() {

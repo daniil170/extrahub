@@ -3,6 +3,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { Sparkles, BookOpen, Target, AlertTriangle, Check } from 'lucide-react';
 import { db } from '../../app/config/firebase.js';
 import { Modal, Button } from '../../shared/ui/index.js';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 const CATEGORIES = [
   'Технологии',
@@ -78,7 +79,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
   const [activityType, setActivityType] = useState('club'); // 'club' | 'olympic_reserve'
   const [subject, setSubject] = useState('Информатика');
   const [allowedClasses, setAllowedClasses] = useState([7, 8, 9, 10, 11]);
-  const [allowedShifts, setAllowedShifts] = useState([1, 2]);
+  const [allowedShifts, setAllowedShifts] = useState(() => schoolConfig.shifts.map((s) => s.id));
   const [requiresExam, setRequiresExam] = useState(false);
   const [description, setDescription] = useState('');
   const [ageGroup, setAgeGroup] = useState('10–14 лет (5–8 класс)');
@@ -132,7 +133,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
     setActivityType('olympic_reserve');
     setSubject('Информатика');
     setAllowedClasses([7, 8, 9, 10, 11]);
-    setAllowedShifts([1, 2]);
+    setAllowedShifts(schoolConfig.shifts.map((s) => s.id));
     setRequiresExam(true);
     setDescription(
       'Интенсивная подготовка сборной школы к республиканским и международным олимпиадам по информатике (IOI, Жаутыковская олимпиада). Алгоритмы, структуры данных и олимпиадные контесты.'
@@ -495,34 +496,27 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
               Доступные смены
             </label>
-            <div style={{ display: 'flex', gap: '14px', alignItems: 'center', height: '40px' }}>
-              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13.5px', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={allowedShifts.includes(1)}
-                  onChange={() => {
-                    setAllowedShifts((prev) =>
-                      prev.includes(1) ? prev.filter((s) => s !== 1) : [...prev, 1].sort()
-                    );
-                  }}
-                  style={{ accentColor: 'var(--primary)' }}
-                />
-                <span>1 смена</span>
-              </label>
-
-              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13.5px', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={allowedShifts.includes(2)}
-                  onChange={() => {
-                    setAllowedShifts((prev) =>
-                      prev.includes(2) ? prev.filter((s) => s !== 2) : [...prev, 2].sort()
-                    );
-                  }}
-                  style={{ accentColor: 'var(--primary)' }}
-                />
-                <span>2 смена</span>
-              </label>
+            <div style={{ display: 'flex', gap: '14px', alignItems: 'center', height: '40px', flexWrap: 'wrap' }}>
+              {schoolConfig.shifts.map((shiftObj) => (
+                <label
+                  key={shiftObj.id}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13.5px', cursor: 'pointer' }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={allowedShifts.includes(shiftObj.id)}
+                    onChange={() => {
+                      setAllowedShifts((prev) =>
+                        prev.includes(shiftObj.id)
+                          ? prev.filter((s) => s !== shiftObj.id)
+                          : [...prev, shiftObj.id].sort()
+                      );
+                    }}
+                    style={{ accentColor: 'var(--primary)' }}
+                  />
+                  <span>{shiftObj.name || `${shiftObj.id} смена`}</span>
+                </label>
+              ))}
             </div>
           </div>
 

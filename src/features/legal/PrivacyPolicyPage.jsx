@@ -1,5 +1,6 @@
 import { LegalDocumentLayout } from './LegalDocumentLayout.jsx';
 import { Shield, Lock, Users, Mail, Phone, MapPin, FileCheck } from 'lucide-react';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 const SECTIONS = [
   { id: 'general', title: 'Общие положения' },
@@ -98,7 +99,7 @@ export function PrivacyPolicyPage() {
         <ul className="legal-list">
           <li>
             <strong>Идентификационные данные учащегося:</strong> фамилия, имя, класс обучения (5–11
-            классы), учебная смена (1 или 2 смена), корпоративный адрес электронной почты школы (в
+            классы), учебная смена ({schoolConfig.shifts.map((s) => s.name).join(' или ')}), корпоративный адрес электронной почты школы (в
             домене образовательного учреждения).
           </li>
           <li>
@@ -290,8 +291,9 @@ export function PrivacyPolicyPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Mail size={16} color="var(--primary)" />
             <span>
-              <strong>Email для обращений:</strong> <code>privacy@pifagorschool.kz</code>{' '}
-              <em>(плейсхолдер администрации школы)</em>
+              <strong>Email для обращений:</strong> <code>{schoolConfig.privacyEmail}</code>{' '}
+              {/* privacy@pifagorschool.kz */}
+              <em>(администрация школы {schoolConfig.name})</em>
             </span>
           </div>
 

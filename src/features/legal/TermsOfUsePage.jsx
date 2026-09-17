@@ -1,4 +1,5 @@
 import { LegalDocumentLayout } from './LegalDocumentLayout.jsx';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 const SECTIONS = [
   { id: 'general-terms', title: 'Предмет соглашения и стороны' },
@@ -53,7 +54,7 @@ export function TermsOfUsePage() {
           <li>
             <strong>Учащиеся школы:</strong> регистрируются самостоятельно исключительно с
             использованием корпоративной школьной почты (доменное имя школы, например{' '}
-            <code>@pifagorschool.kz</code>). Регистрация с публичных почтовых сервисов (mail.ru,
+            <code>@{schoolConfig.domain}</code> {/* @pifagorschool.kz */}). Регистрация с публичных почтовых сервисов (mail.ru,
             gmail.com и др.) заблокирована на уровне серверной валидации.
           </li>
           <li>
@@ -206,8 +207,9 @@ export function TermsOfUsePage() {
         </p>
         <p className="legal-paragraph">
           Вопросы, предложения или претензии относительно работы сервиса направляются по адресу
-          координатора внеурочной деятельности школы: <code>support@pifagorschool.kz</code>{' '}
-          <em>(плейсхолдер)</em>.
+          координатора внеурочной деятельности школы: <code>{schoolConfig.supportEmail}</code>{' '}
+          {/* support@pifagorschool.kz */}
+          <em>(администрация школы {schoolConfig.name})</em>.
         </p>
       </section>
     </LegalDocumentLayout>

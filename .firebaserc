@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "extrahub-c95af"
-  }
+  },
+  "targets": {
+    "extrahub-c95af": {
+      "hosting": {
+        "pifagor": [
+          "extrahub-c95af"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

@@ -5,8 +5,9 @@ import { auth } from '../../app/config/firebase.js';
 import { fetchInviteDetails, registerViaInviteCall } from './api.js';
 import { Card, Button, PageHeader, Alert, Spinner } from '../../shared/ui/index.js';
 import { ShieldCheck, BookOpen, AlertCircle, Wrench, User, Lock, Mail } from 'lucide-react';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
-const ALLOWED_EMAIL_DOMAIN = import.meta.env.VITE_ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
+const ALLOWED_EMAIL_DOMAIN = schoolConfig.allowedEmailDomain;
 const DEMO_MASTER_EMAIL = (import.meta.env.VITE_DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com')
   .trim()
   .toLowerCase();

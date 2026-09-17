@@ -15,6 +15,7 @@ import {
 import { useTheme } from '../hooks/index.js';
 import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 export function Footer() {
   const { isDark } = useTheme();
@@ -46,33 +47,77 @@ export function Footer() {
         >
           {/* Column 1: Brand & Slogan */}
           <div>
-            <Link
-              to="/catalog"
+            <div
               style={{
-                display: 'inline-flex',
+                display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
-                textDecoration: 'none',
+                gap: '8px',
+                flexWrap: 'wrap',
                 marginBottom: '16px',
               }}
             >
-              <img
-                src={isDark ? logoDarkImg : logoImg}
-                alt="ExtraHub Logo"
-                style={{ width: '32px', height: '32px', objectFit: 'contain' }}
-              />
-              <span
+              <Link
+                to="/catalog"
                 style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontWeight: 700,
-                  fontSize: '20px',
-                  color: 'var(--primary)',
-                  letterSpacing: '-0.4px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  textDecoration: 'none',
                 }}
               >
-                ExtraHub
-              </span>
-            </Link>
+                <img
+                  src={isDark ? logoDarkImg : logoImg}
+                  alt="ExtraHub Logo"
+                  style={{ width: '28px', height: '28px', objectFit: 'contain' }}
+                />
+                <span
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 700,
+                    fontSize: '18px',
+                    color: 'var(--primary)',
+                    letterSpacing: '-0.4px',
+                  }}
+                >
+                  ExtraHub
+                </span>
+              </Link>
+
+              <span style={{ color: 'var(--text-muted)', fontSize: '14px' }}>×</span>
+
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: 'var(--bg-subtle)',
+                  border: '1px solid var(--border-color)',
+                }}
+              >
+                {schoolConfig.logoUrl && (
+                  <img
+                    src={schoolConfig.logoUrl}
+                    alt={schoolConfig.name}
+                    style={{ width: '18px', height: '18px', objectFit: 'contain' }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                )}
+                <span
+                  style={{
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {schoolConfig.name}
+                </span>
+              </div>
+            </div>
 
             <p
               style={{
@@ -388,7 +433,7 @@ export function Footer() {
           }}
         >
           <div>
-            © ExtraHub 2026. <strong>Все права защищены</strong>.
+            © ExtraHub 2026 × {schoolConfig.name}. <strong>Все права защищены</strong>.
           </div>
           <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', alignItems: 'center' }}>
             <Link to="/privacy-policy" style={{ color: 'inherit' }} className="footer-link">

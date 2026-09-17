@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Card, Badge, Button } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 export function ActivityViewMode({ activities, groups, onOpenDetails }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -207,9 +208,12 @@ export function ActivityViewMode({ activities, groups, onOpenDetails }) {
                 cursor: 'pointer',
               }}
             >
-              <option value="all">Все смены (1 и 2)</option>
-              <option value="1">1 смена</option>
-              <option value="2">2 смена</option>
+              <option value="all">Все смены</option>
+              {schoolConfig.shifts.map((s) => (
+                <option key={s.id} value={String(s.id)}>
+                  {s.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>

@@ -23,6 +23,9 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Button } from '../../shared/ui/index.js';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
+import logoImg from '../../assets/logo.png';
+import pifagorLogo from '../../assets/pifagor-logo.png';
 import './AboutPage.css';
 
 /**
@@ -420,6 +423,79 @@ export function AboutPage() {
           <div className="about-stat-item">
             <div className="about-stat-number">0</div>
             <div className="about-stat-label">потерянных бумажных списков и хаоса в чатах</div>
+          </div>
+        </div>
+      </section>
+
+      {/* STRATEGIC PARTNERSHIP & SCHOOL CO-BRANDING */}
+      <section className="about-section about-reveal" style={{ paddingTop: 0, paddingBottom: '40px' }}>
+        <div className="about-partnership-card">
+          <div className="about-partnership-header">
+            <div className="about-partnership-logos">
+              <div className="about-partnership-logo-box" title="ExtraHub Platform">
+                <img src={logoImg} alt="ExtraHub" />
+              </div>
+              <span className="about-partnership-x">×</span>
+              <div className="about-partnership-logo-box" title={schoolConfig.name}>
+                <img src={pifagorLogo} alt={schoolConfig.name} />
+              </div>
+              <div>
+                <div style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.01em' }}>
+                  ExtraHub × {schoolConfig.name}
+                </div>
+                <div style={{ fontSize: '12px', opacity: 0.75 }}>
+                  Стратегическое технологическое партнерство
+                </div>
+              </div>
+            </div>
+
+            <div className="about-partnership-badge">
+              <Sparkles size={13} />
+              <span>Боевой запуск: Вторник</span>
+            </div>
+          </div>
+
+          <div style={{ maxWidth: '820px' }}>
+            <h3 style={{ fontSize: 'clamp(20px, 2.6vw, 26px)', fontWeight: 700, marginBottom: '12px', lineHeight: 1.25 }}>
+              Специализированная цифровая среда для Pifagor High School
+            </h3>
+            <p style={{ fontSize: '14.5px', lineHeight: 1.6, opacity: 0.9, margin: 0 }}>
+              Платформа полностью кастомизирована под регламенты и бренд школы «Пифагор»: сменность обучения ({schoolConfig.shifts.map((s) => s.name).join(' и ')}),
+              вступительные экзамены в олимпиадный резерв, корпоративная авторизация @{schoolConfig.domain},
+              а также мгновенный 24-часовой холд мест и прозрачные расчеты в казахстанских тенге (₸).
+            </p>
+          </div>
+
+          <div className="about-partnership-grid">
+            <div className="about-partnership-feature-item">
+              <div className="about-partnership-icon-title">
+                <ShieldCheck size={18} color="#009639" />
+                <span>100% изоляция данных</span>
+              </div>
+              <p className="about-partnership-desc">
+                Все записи учеников, списки родителей и журнал посещаемости размещены в изолированном облачном проекте без смешивания с другими школами.
+              </p>
+            </div>
+
+            <div className="about-partnership-feature-item">
+              <div className="about-partnership-icon-title">
+                <Clock size={18} color="#009639" />
+                <span>Защита от овербукинга</span>
+              </div>
+              <p className="about-partnership-desc">
+                Cloud-транзакции с гарантией нулевых коллизий мест даже при одновременной записи 50 родителей в одну секунду.
+              </p>
+            </div>
+
+            <div className="about-partnership-feature-item">
+              <div className="about-partnership-icon-title">
+                <Layers size={18} color="#009639" />
+                <span>Учёт школьных смен</span>
+              </div>
+              <p className="about-partnership-desc">
+                Умная валидация расписания автоматически блокирует запись на кружки, конфликтующие со временем уроков ученика в его смене.
+              </p>
+            </div>
           </div>
         </div>
       </section>

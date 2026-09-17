@@ -462,3 +462,151 @@
   margin-top: 32px;
   flex-wrap: wrap;
 }
+
+/* ==========================================================================
+   Co-Branding & School Partnership Showcase (Pifagor High School x ExtraHub)
+   ========================================================================== */
+.about-partnership-card {
+  width: 100%;
+  border-radius: var(--radius-lg, 12px);
+  background: linear-gradient(145deg, #101528 0%, #161a38 50%, #0d1224 100%);
+  border: 1px solid rgba(0, 150, 57, 0.35);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 150, 57, 0.12);
+  padding: 48px 40px;
+  box-sizing: border-box;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme='light'] .about-partnership-card {
+  background: linear-gradient(145deg, #f8faf9 0%, #eef5f1 50%, #f0f7f3 100%);
+  border: 1px solid rgba(0, 150, 57, 0.25);
+  box-shadow: 0 12px 32px -8px rgba(16, 21, 40, 0.08), 0 0 24px rgba(0, 150, 57, 0.08);
+  color: #12151a;
+}
+
+.about-partnership-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 24px;
+}
+
+[data-theme='light'] .about-partnership-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.about-partnership-logos {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.about-partnership-logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.about-partnership-logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.about-partnership-x {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  color: #009639;
+}
+
+.about-partnership-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background-color: rgba(0, 150, 57, 0.16);
+  border: 1px solid rgba(0, 150, 57, 0.4);
+  color: #10b981;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+[data-theme='light'] .about-partnership-badge {
+  background-color: rgba(0, 150, 57, 0.1);
+  color: #009639;
+}
+
+.about-partnership-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.about-partnership-feature-item {
+  padding: 20px;
+  border-radius: var(--radius-md, 8px);
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+[data-theme='light'] .about-partnership-feature-item {
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.about-partnership-feature-item:hover {
+  transform: translateY(-2px);
+  border-color: #009639;
+}
+
+.about-partnership-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #ffffff;
+}
+
+[data-theme='light'] .about-partnership-icon-title {
+  color: #161644;
+}
+
+.about-partnership-desc {
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0;
+}
+
+[data-theme='light'] .about-partnership-desc {
+  color: #525866;
+}
+
+@media (max-width: 640px) {
+  .about-partnership-card {
+    padding: 28px 18px;
+  }
+}

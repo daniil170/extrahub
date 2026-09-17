@@ -3,6 +3,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../../app/config/firebase.js';
 import { getDocument, COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { createUser } from '../../entities/user/model.js';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 import { AuthContext } from './context.js';
 
 const AUTH_CACHE_KEY = 'extrahub_auth_cache';
@@ -41,12 +42,17 @@ export function AuthProvider({ children }) {
           let resolvedRole = claimRole || profile?.role || 'student';
 
           // Strictly guarantee explicit demo accounts always resolve to their designated role
-          if (emailLower === 'demo.student@pifagorschool.kz') resolvedRole = 'student';
-          else if (emailLower === 'demo.parent@pifagorschool.kz') resolvedRole = 'parent';
-          else if (emailLower === 'demo.teacher@pifagorschool.kz') resolvedRole = 'teacher';
-          else if (emailLower === 'demo.coordinator@pifagorschool.kz') resolvedRole = 'coordinator';
-          else if (emailLower === 'demo.technician@pifagorschool.kz') resolvedRole = 'technician';
-          else if (emailLower === 'demo.admin@pifagorschool.kz') resolvedRole = 'admin';
+          const schoolDomain = schoolConfig.domain;
+          const isDemoMatch = (role) =>
+            emailLower === `demo.${role}@pifagorschool.kz` ||
+            emailLower === `demo.${role}@${schoolDomain}`;
+
+          if (isDemoMatch('student')) resolvedRole = 'student';
+          else if (isDemoMatch('parent')) resolvedRole = 'parent';
+          else if (isDemoMatch('teacher')) resolvedRole = 'teacher';
+          else if (isDemoMatch('coordinator')) resolvedRole = 'coordinator';
+          else if (isDemoMatch('technician')) resolvedRole = 'technician';
+          else if (isDemoMatch('admin')) resolvedRole = 'admin';
 
           const resolvedName =
             profile?.fullName ||
@@ -55,7 +61,8 @@ export function AuthProvider({ children }) {
             'Пользователь';
 
           const isDemoEmail = Boolean(
-            emailLower.startsWith('demo.') && emailLower.endsWith('@pifagorschool.kz')
+            emailLower.startsWith('demo.') &&
+              (emailLower.endsWith('@pifagorschool.kz') || emailLower.endsWith(`@${schoolDomain}`))
           );
 
           const isDemoMaster = Boolean(

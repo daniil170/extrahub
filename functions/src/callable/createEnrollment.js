@@ -46,7 +46,7 @@ export const createEnrollment = onCall(async (request) => {
         fullName: def.fullName,
         className: def.className,
         shift: def.shift,
-        email: `${studentId}@pifagorschool.kz`,
+        email: `${studentId}@${process.env.ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz'}`,
         parentIds: [callerUid],
         status: 'active',
         createdAt: new Date().toISOString(),
@@ -174,93 +174,131 @@ export const createEnrollment = onCall(async (request) => {
     }
   }
 
-  // Run enrollment creation in transaction
-  return await db.runTransaction(async (transaction) => {
-    const currentGroupDoc = await transaction.get(groupRef);
-    if (!currentGroupDoc.exists) {
-      throw new HttpsError('not-found', 'Группа активности не найдена');
+  // Run enrollment creation in transaction with contention retry
+  const executeEnrollmentTransaction = async () => {
+    return await db.runTransaction(
+      async (transaction) => {
+        const currentGroupDoc = await transaction.get(groupRef);
+        if (!currentGroupDoc.exists) {
+          throw new HttpsError('not-found', 'Группа активности не найдена');
+        }
+
+        const currentGroup = currentGroupDoc.data();
+        const enrolledCount = currentGroup.enrolledCount || 0;
+        const capacity = currentGroup.capacity || 0;
+        const nowStr = new Date().toISOString();
+
+        // Check if spots are available
+        if (enrolledCount < capacity) {
+          // 1. Allocate spot & hold
+          const enrollmentRef = db.collection('enrollments').doc();
+          const inviteRef = db.collection('parentInvites').doc();
+          const holdExpiresAt = calculateHoldExpiration(24);
+          const inviteToken = generateInviteToken();
+
+          transaction.set(enrollmentRef, {
+            id: enrollmentRef.id,
+            studentId,
+            groupId,
+            activityId: currentGroup.activityId || '',
+            status: 'pending_parent_approval',
+            holdExpiresAt: holdExpiresAt.toISOString(),
+            parentApprovedAt: null,
+            approvedByParentId: null,
+            enrolledAt: nowStr,
+            cancelledAt: null,
+          });
+
+          transaction.set(inviteRef, {
+            id: inviteRef.id,
+            studentId,
+            enrollmentId: enrollmentRef.id,
+            token: inviteToken,
+            status: 'active',
+            expiresAt: holdExpiresAt.toISOString(),
+            createdAt: nowStr,
+          });
+
+          // Explicitly update to enrolledCount + 1 to enforce transactional ordering
+          transaction.update(groupRef, {
+            enrolledCount: enrolledCount + 1,
+          });
+
+          return {
+            success: true,
+            waitlisted: false,
+            enrollmentId: enrollmentRef.id,
+            inviteToken,
+            holdExpiresAt: holdExpiresAt.toISOString(),
+          };
+        } else {
+          // 2. Group is full -> add to waitlist
+          const waitlistRef = db.collection('waitlist').doc();
+
+          // Calculate sequential position without race conditions:
+          // Use waitlistCount on group document if available, or initialize from existing waitlist
+          let nextPosition;
+          if (typeof currentGroup.waitlistCount === 'number') {
+            nextPosition = currentGroup.waitlistCount + 1;
+          } else {
+            const waitlistQueueSnap = await db
+              .collection('waitlist')
+              .where('groupId', '==', groupId)
+              .get();
+            let maxPos = 0;
+            waitlistQueueSnap.forEach((doc) => {
+              const pos = doc.data().position || 0;
+              if (pos > maxPos) maxPos = pos;
+            });
+            nextPosition = maxPos + 1;
+          }
+
+          // Atomically lock sequential queue counter on group document
+          transaction.update(groupRef, {
+            waitlistCount: nextPosition,
+          });
+
+          transaction.set(waitlistRef, {
+            id: waitlistRef.id,
+            studentId,
+            groupId,
+            position: nextPosition,
+            queuedAt: nowStr,
+          });
+
+          return {
+            success: true,
+            waitlisted: true,
+            waitlistId: waitlistRef.id,
+            position: nextPosition,
+          };
+        }
+      },
+      { maxAttempts: 15 }
+    );
+  };
+
+  // Contention retry wrapper with jitter
+  let attempts = 0;
+  const maxRetries = 5;
+  while (attempts < maxRetries) {
+    try {
+      return await executeEnrollmentTransaction();
+    } catch (txErr) {
+      attempts++;
+      const isContention =
+        txErr.code === 10 ||
+        txErr.code === 'aborted' ||
+        (txErr.message && txErr.message.includes('contention'));
+
+      if (isContention && attempts < maxRetries) {
+        const backoffMs = Math.floor(Math.random() * 60 + attempts * 40);
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+        continue;
+      }
+      throw txErr;
     }
-
-    const currentGroup = currentGroupDoc.data();
-    const enrolledCount = currentGroup.enrolledCount || 0;
-    const capacity = currentGroup.capacity || 0;
-    const nowStr = new Date().toISOString();
-
-    // Check if spots are available
-    if (enrolledCount < capacity) {
-      // 1. Allocate spot & hold
-      const enrollmentRef = db.collection('enrollments').doc();
-      const inviteRef = db.collection('parentInvites').doc();
-      const holdExpiresAt = calculateHoldExpiration(24);
-      const inviteToken = generateInviteToken();
-
-      transaction.set(enrollmentRef, {
-        id: enrollmentRef.id,
-        studentId,
-        groupId,
-        activityId: currentGroup.activityId || '',
-        status: 'pending_parent_approval',
-        holdExpiresAt: holdExpiresAt.toISOString(),
-        parentApprovedAt: null,
-        approvedByParentId: null,
-        enrolledAt: nowStr,
-        cancelledAt: null,
-      });
-
-      transaction.set(inviteRef, {
-        id: inviteRef.id,
-        studentId,
-        enrollmentId: enrollmentRef.id,
-        token: inviteToken,
-        status: 'active',
-        expiresAt: holdExpiresAt.toISOString(),
-        createdAt: nowStr,
-      });
-
-      transaction.update(groupRef, {
-        enrolledCount: FieldValue.increment(1),
-      });
-
-      return {
-        success: true,
-        waitlisted: false,
-        enrollmentId: enrollmentRef.id,
-        inviteToken,
-        holdExpiresAt: holdExpiresAt.toISOString(),
-      };
-    } else {
-      // 2. Group is full -> add to waitlist
-      const waitlistRef = db.collection('waitlist').doc();
-
-      // Determine queue position
-      const waitlistQueueSnap = await db
-        .collection('waitlist')
-        .where('groupId', '==', groupId)
-        .orderBy('position', 'desc')
-        .limit(1)
-        .get();
-
-      const lastPosition = waitlistQueueSnap.empty
-        ? 0
-        : waitlistQueueSnap.docs[0].data().position || 0;
-      const nextPosition = lastPosition + 1;
-
-      transaction.set(waitlistRef, {
-        id: waitlistRef.id,
-        studentId,
-        groupId,
-        position: nextPosition,
-        queuedAt: nowStr,
-      });
-
-      return {
-        success: true,
-        waitlisted: true,
-        waitlistId: waitlistRef.id,
-        position: nextPosition,
-      };
-    }
-  });
+  }
   } catch (err) {
     console.error('createEnrollment fatal error:', err);
     if (err instanceof HttpsError) {
