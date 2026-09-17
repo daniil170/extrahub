@@ -15,13 +15,29 @@ function extractGradeNumber(val) {
 function matchesAgeFilter(activityAgeGroup, filterValue) {
   if (!filterValue || filterValue === 'all') return true;
   const str = String(activityAgeGroup || '').toLowerCase();
+  if (filterValue === '1-4') {
+    return (
+      str.includes('1–4') ||
+      str.includes('1-4') ||
+      str.includes('1–10') ||
+      str.includes('1–11') ||
+      str.includes('2–6') ||
+      str.includes('7') ||
+      str.includes('8') ||
+      str.includes('9') ||
+      str.includes('10')
+    );
+  }
   if (filterValue === '5-8') {
     return (
       str.includes('5–8') ||
       str.includes('5-8') ||
       str.includes('5–10') ||
       str.includes('6–11') ||
-      str.includes('10') ||
+      str.includes('6–10') ||
+      str.includes('1–10') ||
+      str.includes('1–11') ||
+      str.includes('2–6') ||
       str.includes('11') ||
       str.includes('12') ||
       str.includes('13') ||
@@ -33,7 +49,9 @@ function matchesAgeFilter(activityAgeGroup, filterValue) {
       str.includes('9–11') ||
       str.includes('9-11') ||
       str.includes('6–11') ||
+      str.includes('6–10') ||
       str.includes('7–11') ||
+      str.includes('1–10') ||
       str.includes('1–11') ||
       str.includes('15') ||
       str.includes('16') ||

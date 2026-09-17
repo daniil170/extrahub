@@ -13,6 +13,11 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Soft warm canvas overlay texture */
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(0, 150, 57, 0.02) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(22, 26, 56, 0.02) 0px, transparent 50%);
+  background-attachment: fixed;
 }
 
 h1,

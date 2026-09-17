@@ -128,61 +128,65 @@ export async function promoteFromWaitlist(db, groupId) {
       continue;
     }
 
-  // Re-index remaining waitlist items sequentially
-  let remainingWaitlistDocs = [];
-  try {
-    const snap = await db
-      .collection('waitlist')
-      .where('groupId', '==', groupId)
-      .orderBy('position', 'asc')
-      .get();
-    remainingWaitlistDocs = snap.docs;
-  } catch (err) {
-    if (err.code === 9 || (err.message && err.message.includes('index'))) {
+    // Re-index remaining waitlist items sequentially
+    let remainingWaitlistDocs = [];
+    try {
       const snap = await db
         .collection('waitlist')
         .where('groupId', '==', groupId)
+        .orderBy('position', 'asc')
         .get();
-      remainingWaitlistDocs = snap.docs.sort(
-        (a, b) => (a.data().position || 0) - (b.data().position || 0)
-      );
-    } else {
-      throw err;
+      remainingWaitlistDocs = snap.docs;
+    } catch (err) {
+      if (err.code === 9 || (err.message && err.message.includes('index'))) {
+        const snap = await db
+          .collection('waitlist')
+          .where('groupId', '==', groupId)
+          .get();
+        remainingWaitlistDocs = snap.docs.sort(
+          (a, b) => (a.data().position || 0) - (b.data().position || 0)
+        );
+      } else {
+        throw err;
+      }
     }
+
+    if (remainingWaitlistDocs.length > 0) {
+      const batch = db.batch();
+      remainingWaitlistDocs.forEach((docSnap, index) => {
+        batch.update(docSnap.ref, { position: index + 1 });
+      });
+      await batch.commit();
+    }
+
+    // Create notifications for student and parents
+    const studentData = studentDoc.exists ? studentDoc.data() : {};
+    const parentIds = Array.isArray(studentData.parentIds) ? studentData.parentIds : [];
+    const recipientIds = Array.from(new Set([studentId, ...parentIds]));
+
+    const notifBatch = db.batch();
+    for (const uid of recipientIds) {
+      const notifRef = db.collection('notifications').doc();
+      notifBatch.set(notifRef, {
+        id: notifRef.id,
+        userId: uid,
+        type: 'waitlist_promoted',
+        text: 'Освободилось место в секции! Вам предоставлен резерв на 24 часа для подтверждения записи.',
+        channel: 'push',
+        isRead: false,
+        sentAt: nowStr,
+      });
+    }
+    await notifBatch.commit();
+
+    return {
+      promoted: true,
+      enrollmentId: enrollmentRef.id,
+      inviteToken,
+      studentId,
+    };
   }
 
-  if (remainingWaitlistDocs.length > 0) {
-    const batch = db.batch();
-    remainingWaitlistDocs.forEach((docSnap, index) => {
-      batch.update(docSnap.ref, { position: index + 1 });
-    });
-    await batch.commit();
-  }
-
-  // Create notifications for student and parents
-  const studentData = studentDoc.exists ? studentDoc.data() : {};
-  const parentIds = Array.isArray(studentData.parentIds) ? studentData.parentIds : [];
-  const recipientIds = Array.from(new Set([studentId, ...parentIds]));
-
-  const notifBatch = db.batch();
-  for (const uid of recipientIds) {
-    const notifRef = db.collection('notifications').doc();
-    notifBatch.set(notifRef, {
-      id: notifRef.id,
-      userId: uid,
-      type: 'waitlist_promoted',
-      text: 'Освободилось место в секции! Вам предоставлен резерв на 24 часа для подтверждения записи.',
-      channel: 'push',
-      isRead: false,
-      sentAt: nowStr,
-    });
-  }
-  await notifBatch.commit();
-
-  return {
-    promoted: true,
-    enrollmentId: enrollmentRef.id,
-    inviteToken,
-    studentId,
-  };
+  return { promoted: false, reason: 'exhausted_attempts' };
 }
+

@@ -9,6 +9,8 @@ import {
   BookOpen,
   ArrowRight,
   Lock,
+  Clock,
+  X,
 } from 'lucide-react';
 import { useCatalog } from './useCatalog.js';
 import { useEnrollment } from '../enrollment/useEnrollment.js';
@@ -17,6 +19,79 @@ import { ActivityDetailsModal } from './ActivityDetailsModal.jsx';
 import { Card, Badge, Button, Spinner, PageHeader, CapacityBadge, Modal } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 import { schoolConfig } from '../../app/config/schoolConfig.js';
+
+// Visual card cover mappings by category or activity keywords
+const ACTIVITY_IMAGES = {
+  robotics: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80',
+  chess: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=800&q=80',
+  art: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80',
+  theater: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
+  volleyball: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=800&q=80',
+  sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80',
+  science: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80',
+  math: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80',
+  languages: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80',
+  music: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80',
+  default: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80',
+};
+
+function getCardImage(act) {
+  if (act.imageUrl) return act.imageUrl;
+  const title = (act.title || '').toLowerCase();
+  const cat = (act.category || '').toLowerCase();
+
+  if (title.includes('робот') || title.includes('3d') || cat.includes('робот') || cat.includes('техн')) return ACTIVITY_IMAGES.robotics;
+  if (title.includes('шахмат') || cat.includes('шахмат')) return ACTIVITY_IMAGES.chess;
+  if (title.includes('театр') || title.includes('актер') || cat.includes('театр')) return ACTIVITY_IMAGES.theater;
+  if (title.includes('волей') || title.includes('баскет') || cat.includes('спорт')) return ACTIVITY_IMAGES.volleyball;
+  if (title.includes('мат') || title.includes('олимп') || cat.includes('точн')) return ACTIVITY_IMAGES.math;
+  if (title.includes('англ') || title.includes('дебат') || cat.includes('язык') || cat.includes('гуманит')) return ACTIVITY_IMAGES.languages;
+  if (title.includes('изо') || title.includes('живопис') || cat.includes('творч') || cat.includes('искус')) return ACTIVITY_IMAGES.art;
+  if (title.includes('музык') || title.includes('гитар') || title.includes('вок')) return ACTIVITY_IMAGES.music;
+
+  return ACTIVITY_IMAGES.default;
+}
+
+// Friendly avatars for educators
+const TEACHER_AVATARS = [
+  'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=160&q=80',
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80',
+  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=160&q=80',
+  'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=160&q=80',
+];
+
+function getTeacherAvatar(teacherName) {
+  if (!teacherName) return TEACHER_AVATARS[0];
+  let hash = 0;
+  for (let i = 0; i < teacherName.length; i++) {
+    hash = (hash << 5) - hash + teacherName.charCodeAt(i);
+    hash |= 0;
+  }
+  const index = Math.abs(hash) % TEACHER_AVATARS.length;
+  return TEACHER_AVATARS[index];
+}
+
+// Russian typographical quotes « »
+function formatGuillemets(title) {
+  if (!title) return '';
+  return title.replace(/"([^"]+)"/g, '«$1»');
+}
+
+// Clean label for age/grade display
+function cleanAgeGroup(ageGroup) {
+  if (!ageGroup) return 'Все классы';
+  if (ageGroup.includes('класс') || ageGroup.includes('лет')) return ageGroup;
+  return `${ageGroup} классы`;
+}
+
+// Spot counter pluralization
+function formatSpotsPlural(count) {
+  if (count === 1) return 'Осталось 1 место';
+  if (count >= 2 && count <= 4) return `Осталось ${count} места`;
+  return `Осталось ${count} мест`;
+}
 
 export function CatalogPage() {
   const navigate = useNavigate();
@@ -88,9 +163,10 @@ export function CatalogPage() {
   ];
 
   const ageOptions = [
-    { value: 'all', label: 'Все классы (5–11)' },
-    { value: '5-8', label: '5–8 классы (11–14 лет)' },
-    { value: '9-11', label: '9–11 классы (15–17 лет)' },
+    { value: 'all', label: 'Все классы' },
+    { value: '1-4', label: '1–4 классы' },
+    { value: '5-8', label: '5–8 классы' },
+    { value: '9-11', label: '9–11 классы' },
   ];
 
   return (
@@ -100,71 +176,83 @@ export function CatalogPage() {
         subtitle={`Официальные программы дополнительного образования и внеучебные секции ${schoolConfig.name}`}
       />
 
-      {/* Filters and Search Bar */}
+      {/* Filters and Search Bar: Modern soft pill/slab style (no harsh borders) */}
       <div
         style={{
           backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '20px',
-          marginBottom: '28px',
-          boxShadow: 'var(--shadow-sm)',
+          borderRadius: 'var(--radius-lg, 12px)',
+          padding: '20px 24px',
+          marginBottom: '32px',
+          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
         }}
       >
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 210px), 1fr))',
             gap: '14px',
             alignItems: 'center',
           }}
         >
-          {/* Search Input */}
-          <div style={{ position: 'relative' }}>
+          {/* Accent Broad Search Input */}
+          <div style={{ position: 'relative', gridColumn: 'span 1' }}>
             <input
               type="text"
-              placeholder="Поиск кружка, направления, темы..."
+              placeholder="Поиск кружка, направления, преподавателя..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 width: '100%',
-                padding: '10px 14px 10px 36px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
+                padding: '12px 14px 12px 42px',
+                borderRadius: 'var(--radius-md, 8px)',
+                border: 'none',
                 fontSize: '14px',
-                backgroundColor: 'var(--bg-primary)',
+                backgroundColor: 'var(--bg-subtle, #f4f4f2)',
                 color: 'var(--text-primary)',
                 outline: 'none',
                 boxSizing: 'border-box',
+                transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
+                e.currentTarget.style.boxShadow = '0 0 0 2px var(--primary)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--bg-subtle, #f4f4f2)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
             <Search
-              size={16}
+              size={18}
               style={{
                 position: 'absolute',
-                left: '12px',
+                left: '14px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: 'var(--text-muted)',
+                color: 'var(--primary)',
+                pointerEvents: 'none',
               }}
             />
           </div>
 
-          {/* Category Filter */}
+          {/* Category Filter - borderless soft background */}
           <div>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              aria-label="Фильтр по категории"
+              aria-label="Фильтр по направлению"
               style={{
                 width: '100%',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md, 8px)',
+                border: 'none',
                 fontSize: '14px',
-                backgroundColor: 'var(--bg-primary)',
+                fontWeight: 500,
+                backgroundColor: 'var(--bg-subtle, #f4f4f2)',
                 color: 'var(--text-primary)',
                 boxSizing: 'border-box',
+                cursor: 'pointer',
+                outline: 'none',
               }}
             >
               <option value="all">Все направления</option>
@@ -176,7 +264,7 @@ export function CatalogPage() {
             </select>
           </div>
 
-          {/* Day of Week Filter */}
+          {/* Day of Week Filter - borderless soft background */}
           <div>
             <select
               value={dayOfWeek}
@@ -184,13 +272,16 @@ export function CatalogPage() {
               aria-label="Фильтр по дню недели"
               style={{
                 width: '100%',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md, 8px)',
+                border: 'none',
                 fontSize: '14px',
-                backgroundColor: 'var(--bg-primary)',
+                fontWeight: 500,
+                backgroundColor: 'var(--bg-subtle, #f4f4f2)',
                 color: 'var(--text-primary)',
                 boxSizing: 'border-box',
+                cursor: 'pointer',
+                outline: 'none',
               }}
             >
               {daysOptions.map((d) => (
@@ -201,21 +292,24 @@ export function CatalogPage() {
             </select>
           </div>
 
-          {/* Age / Grade Filter */}
+          {/* Age / Grade Filter - borderless soft background */}
           <div>
             <select
               value={ageGroup}
               onChange={(e) => setAgeGroup(e.target.value)}
-              aria-label="Фильтр по возрасту и классу"
+              aria-label="Фильтр по классам"
               style={{
                 width: '100%',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md, 8px)',
+                border: 'none',
                 fontSize: '14px',
-                backgroundColor: 'var(--bg-primary)',
+                fontWeight: 500,
+                backgroundColor: 'var(--bg-subtle, #f4f4f2)',
                 color: 'var(--text-primary)',
                 boxSizing: 'border-box',
+                cursor: 'pointer',
+                outline: 'none',
               }}
             >
               {ageOptions.map((a) => (
@@ -227,25 +321,26 @@ export function CatalogPage() {
           </div>
         </div>
 
-        {/* Second row: Available Spots Toggle & Counter */}
+        {/* Second row: Available Spots Toggle, Count & Dynamic Reset Button */}
         <div
           style={{
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '12px',
+            gap: '14px',
             marginTop: '16px',
-            paddingTop: '14px',
-            borderTop: '1px solid var(--border-color)',
+            paddingTop: '16px',
+            borderTop: '1px solid rgba(0, 0, 0, 0.05)',
           }}
         >
           <label
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              fontSize: '14px',
+              gap: '9px',
+              fontSize: '13.5px',
+              fontWeight: 500,
               cursor: 'pointer',
               color: 'var(--text-primary)',
               userSelect: 'none',
@@ -256,8 +351,8 @@ export function CatalogPage() {
               checked={onlyAvailable}
               onChange={(e) => setOnlyAvailable(e.target.checked)}
               style={{
-                width: '16px',
-                height: '16px',
+                width: '17px',
+                height: '17px',
                 accentColor: 'var(--primary)',
                 cursor: 'pointer',
               }}
@@ -265,15 +360,40 @@ export function CatalogPage() {
             <span>Только со свободными местами</span>
           </label>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <span style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>
-              Найдено: <strong>{filteredActivities.length}</strong>
+              Найдено программ: <strong style={{ color: 'var(--text-primary)' }}>{filteredActivities.length}</strong>
             </span>
 
+            {/* Clear filters button (appears dynamically when filters are active) */}
             {hasActiveFilters && (
-              <Button size="sm" variant="outline" onClick={resetFilters}>
-                Сбросить фильтры
-              </Button>
+              <button
+                type="button"
+                onClick={resetFilters}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '999px',
+                  border: 'none',
+                  backgroundColor: 'rgba(220, 38, 38, 0.08)',
+                  color: 'var(--danger, #dc2626)',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.08)';
+                }}
+              >
+                <X size={14} />
+                <span>Очистить фильтры</span>
+              </button>
             )}
           </div>
         </div>
@@ -281,69 +401,83 @@ export function CatalogPage() {
 
       {loading && (
         <div style={{ padding: '60px 0', textAlign: 'center' }}>
-          <Spinner size="lg" label="Загрузка кружков в реальном времени..." />
+          <Spinner size="lg" label="Загрузка каталога программ..." />
         </div>
       )}
 
       {error && (
-        <Card
+        <div
           style={{
             backgroundColor: 'var(--danger-light)',
-            borderColor: 'var(--danger)',
+            borderRadius: 'var(--radius-md, 8px)',
+            padding: '16px 20px',
             marginBottom: '24px',
+            color: 'var(--danger)',
+            fontSize: '14px',
           }}
         >
-          <p style={{ color: 'var(--danger)', margin: 0 }}>Ошибка загрузки каталога: {error}</p>
-        </Card>
+          Ошибка загрузки каталога: {error}
+        </div>
       )}
 
-      {!loading && filteredActivities.length === 0 && (
-        <Card style={{ textAlign: 'center', padding: '48px 24px' }}>
+      {!loading && !error && filteredActivities.length === 0 && (
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '56px 24px',
+            backgroundColor: 'var(--bg-surface)',
+            borderRadius: 'var(--radius-lg, 12px)',
+            boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.04)',
+          }}
+        >
           <div
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: 'var(--radius-sm)',
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
               backgroundColor: 'var(--bg-subtle)',
               color: 'var(--text-muted)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: '14px',
+              marginBottom: '16px',
             }}
           >
-            <Search size={24} />
+            <Search size={26} />
           </div>
-          <h3 style={{ margin: '0 0 8px', fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>Ничего не найдено</h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '0 0 16px' }}>
-            Попробуйте изменить параметры поиска или сбросить фильтры.
+          <h3 style={{ margin: '0 0 8px', fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '18px' }}>
+            Ничего не найдено
+          </h3>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: '0 0 20px' }}>
+            Попробуйте скорректировать параметры поиска или сбросить активные фильтры.
           </p>
           <Button variant="outline" size="sm" onClick={resetFilters}>
-            Сбросить все фильтры
+            Очистить все фильтры
           </Button>
-        </Card>
+        </div>
       )}
 
       {!loading && filteredActivities.length > 0 && (
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
-            gap: '24px',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 330px), 1fr))',
+            gap: '28px',
           }}
         >
           {filteredActivities.map((act) => {
             const isFull = act.isFull;
             const remainingSpots = act.remainingSpots;
-            const totalEnrolled = act.totalEnrolled;
-            const totalCapacity = act.totalCapacity;
+            const previewImage = getCardImage(act);
+            const teacherAvatar = getTeacherAvatar(act.teacherName);
+            const titleWithGuillemets = formatGuillemets(act.title);
 
             return (
-              <Card
+              <div
                 key={act.id}
                 role="button"
                 tabIndex={0}
-                aria-label={`Подробнее о программе кружка ${act.title}`}
+                aria-label={`Подробнее о программе ${act.title}`}
                 onClick={() => handleOpenDetails(act)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
@@ -354,170 +488,372 @@ export function CatalogPage() {
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  height: '100%',
-                  borderRadius: 'var(--radius-md)',
-                  transition: 'box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease',
+                  backgroundColor: 'var(--bg-surface)',
+                  borderRadius: 'var(--radius-lg, 14px)',
+                  boxShadow: '0 6px 24px -4px rgba(0, 0, 0, 0.06)',
+                  border: 'none',
+                  overflow: 'hidden',
                   cursor: 'pointer',
-                  position: 'relative',
+                  transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 12px 32px -4px rgba(0, 0, 0, 0.12)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 6px 24px -4px rgba(0, 0, 0, 0.06)';
                 }}
               >
-                <div>
-                  {/* Top badges */}
+                {/* Visual Card Header with Photo Cover */}
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: '180px',
+                    overflow: 'hidden',
+                    backgroundColor: '#161a38',
+                  }}
+                >
+                  <img
+                    src={previewImage}
+                    alt={act.title}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.35s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'scale(1.04)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                  />
+                  {/* Subtle gradient vignette */}
                   <div
                     style={{
-                      display: 'flex',
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.65) 100%)',
+                    }}
+                  />
+
+                  {/* Top floating pill: Category • Age Group */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '12px',
+                      left: '12px',
+                      display: 'inline-flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '8px',
-                      marginBottom: '12px',
+                      gap: '6px',
+                      padding: '4px 10px',
+                      borderRadius: '999px',
+                      backgroundColor: 'rgba(22, 26, 56, 0.85)',
+                      backdropFilter: 'blur(8px)',
+                      color: '#ffffff',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
+                      letterSpacing: '0.01em',
                     }}
                   >
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                      <Badge variant="info">{act.category}</Badge>
-                      <Badge variant="default">{act.ageGroup}</Badge>
-                      {act.type === 'olympic_reserve' && (
-                        <Badge variant="warning">
-                          Резерв{act.subject ? `: ${act.subject}` : ''}
-                        </Badge>
-                      )}
-                      {act.requiresExam && (
-                        <Badge variant="secondary">Экзамен</Badge>
-                      )}
-                    </div>
-
-                    {/* Capacity Badge */}
-                    <CapacityBadge remaining={remainingSpots} isFull={isFull} />
+                    <span>{act.category || 'Кружок'}</span>
+                    <span style={{ opacity: 0.6 }}>•</span>
+                    <span>{cleanAgeGroup(act.ageGroup)}</span>
                   </div>
 
+                  {/* Top Right: Single Clear Spots Badge (using Pifagor accent) */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '12px',
+                      right: '12px',
+                    }}
+                  >
+                    {isFull ? (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          padding: '4px 10px',
+                          borderRadius: '999px',
+                          backgroundColor: 'rgba(220, 38, 38, 0.9)',
+                          color: '#ffffff',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          backdropFilter: 'blur(8px)',
+                        }}
+                      >
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ffffff' }} />
+                        Мест нет
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          padding: '4px 10px',
+                          borderRadius: '999px',
+                          backgroundColor: 'rgba(0, 150, 57, 0.9)',
+                          color: '#ffffff',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          backdropFilter: 'blur(8px)',
+                        }}
+                      >
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ffffff' }} />
+                        {formatSpotsPlural(remainingSpots)}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Badges on bottom of image for special statuses */}
+                  {(act.type === 'olympic_reserve' || act.requiresExam) && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '10px',
+                        left: '12px',
+                        display: 'flex',
+                        gap: '6px',
+                      }}
+                    >
+                      {act.type === 'olympic_reserve' && (
+                        <span
+                          style={{
+                            fontSize: '10.5px',
+                            fontWeight: 600,
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            backgroundColor: '#f59e0b',
+                            color: '#1a1e26',
+                          }}
+                        >
+                          Олимпиадный резерв{act.subject ? `: ${act.subject}` : ''}
+                        </span>
+                      )}
+                      {act.requiresExam && (
+                        <span
+                          style={{
+                            fontSize: '10.5px',
+                            fontWeight: 600,
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            backgroundColor: '#3b82f6',
+                            color: '#ffffff',
+                          }}
+                        >
+                          Вступительный экзамен
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Body Content */}
+                <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                  {/* Title with elegant Russian quotes */}
                   <h3
                     style={{
-                      fontSize: '17px',
-                      fontWeight: 600,
+                      fontSize: '17.5px',
+                      fontWeight: 700,
                       fontFamily: 'var(--font-heading)',
                       color: 'var(--text-primary)',
                       margin: '0 0 8px',
                       lineHeight: 1.35,
                     }}
                   >
-                    {act.title}
+                    {titleWithGuillemets}
                   </h3>
 
+                  {/* Description */}
                   <p
                     style={{
                       fontSize: '13px',
                       color: 'var(--text-secondary)',
-                      lineHeight: 1.5,
-                      marginBottom: '14px',
-                      minHeight: '40px',
+                      lineHeight: 1.55,
+                      marginBottom: '18px',
+                      minHeight: '38px',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
                     }}
                   >
                     {act.description}
                   </p>
 
-                  {/* Instructor & Location info */}
+                  {/* Instructor with Friendly Photo Avatar */}
                   <div
                     style={{
-                      fontSize: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      marginBottom: '14px',
+                    }}
+                  >
+                    <img
+                      src={teacherAvatar}
+                      alt={act.teacherName}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        border: '1.5px solid var(--border-color, #e5e5e3)',
+                        flexShrink: 0,
+                      }}
+                    />
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.2 }}>Преподаватель</div>
+                      <div
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          color: 'var(--text-primary)',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {act.teacherName}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Grouped Location & Schedule metadata */}
+                  <div
+                    style={{
+                      fontSize: '12.5px',
                       color: 'var(--text-secondary)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '6px',
-                      marginBottom: '12px',
-                      padding: '10px 12px',
-                      backgroundColor: 'var(--bg-subtle)',
-                      borderRadius: 'var(--radius-sm)',
-                      border: '1px solid var(--border-color)',
+                      marginBottom: '18px',
+                      lineHeight: 1.4,
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <User size={13} style={{ color: 'var(--text-muted)' }} />
-                      <span><strong>Преподаватель:</strong> {act.teacherName}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <MapPin size={15} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {act.location}
+                      </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <MapPin size={13} style={{ color: 'var(--text-muted)' }} />
-                      <span><strong>Локация:</strong> {act.location}</span>
-                    </div>
+
                     {act.groups && act.groups.length > 0 && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Calendar size={13} style={{ color: 'var(--text-muted)' }} />
-                        <span>
-                          <strong>Расписание:</strong>{' '}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Clock size={15} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {act.groups
-                            .map(
-                              (g) => `${formatDaysOfWeek(g.daysOfWeek)} ${g.startTime}–${g.endTime}`
-                            )
-                            .join(' | ')}
+                            .map((g) => `${formatDaysOfWeek(g.daysOfWeek)} ${g.startTime}–${g.endTime}`)
+                            .join(' • ')}
                         </span>
                       </div>
                     )}
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Users size={12} />
-                      <span>Занято: <strong>{totalEnrolled}</strong> из <strong>{totalCapacity}</strong> мест</span>
-                    </div>
                   </div>
 
-                  {/* Clickable prompt for curriculum / content */}
+                  {/* Program Curriculum Trigger Button */}
                   <div
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '6px',
-                      fontSize: '12px',
+                      fontSize: '12.5px',
                       color: 'var(--primary)',
                       fontWeight: 600,
-                      marginBottom: '14px',
+                      marginBottom: '20px',
+                      transition: 'gap 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.gap = '8px')}
+                    onMouseLeave={(e) => (e.currentTarget.style.gap = '6px')}
+                  >
+                    <BookOpen size={15} />
+                    <span>Программа курса</span>
+                    <ArrowRight size={14} />
+                  </div>
+
+                  {/* Card Footer: Price & Enroll Button (Aligned on common baseline with margin-top: auto) */}
+                  <div
+                    style={{
+                      marginTop: 'auto',
+                      paddingTop: '16px',
+                      borderTop: '1px solid rgba(0, 0, 0, 0.05)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px',
                     }}
                   >
-                    <BookOpen size={14} />
-                    <span>Программа курса</span>
-                    <ArrowRight size={13} />
-                  </div>
-                </div>
+                    <div>
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          color: 'var(--text-muted)',
+                          display: 'block',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
+                          fontWeight: 500,
+                        }}
+                      >
+                        Стоимость
+                      </span>
+                      <strong
+                        style={{
+                          fontSize: '19px',
+                          fontFamily: 'var(--font-heading)',
+                          color: 'var(--text-primary)',
+                          letterSpacing: '-0.02em',
+                        }}
+                      >
+                        {act.price === 0 ? 'Бесплатно' : formatCurrency(act.price)}
+                      </strong>
+                    </div>
 
-                {/* Card Footer: Price & Enroll Button */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingTop: '14px',
-                    borderTop: '1px solid var(--border-color)',
-                  }}
-                >
-                  <div>
-                    <span
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEnrollment(act);
+                      }}
                       style={{
-                        fontSize: '11px',
-                        color: 'var(--text-muted)',
-                        display: 'block',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
+                        padding: '9px 18px',
+                        borderRadius: 'var(--radius-md, 8px)',
+                        border: 'none',
+                        backgroundColor: isFull ? 'var(--bg-subtle)' : 'var(--primary)',
+                        color: isFull ? 'var(--text-primary)' : '#ffffff',
+                        fontSize: '13.5px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        boxShadow: isFull ? 'none' : '0 2px 10px rgba(0, 150, 57, 0.25)',
+                        whiteSpace: 'nowrap',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isFull) {
+                          e.currentTarget.style.filter = 'brightness(1.08)';
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isFull) {
+                          e.currentTarget.style.filter = 'none';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                        }
                       }}
                     >
-                      Стоимость
-                    </span>
-                    <strong style={{ fontSize: '18px', fontFamily: 'var(--font-heading)', color: 'var(--primary)' }}>
-                      {act.price === 0 ? 'Бесплатно' : formatCurrency(act.price)}
-                    </strong>
+                      {act.requiresExam
+                        ? 'Подать заявку'
+                        : isFull
+                          ? 'Лист ожидания'
+                          : 'Записаться'}
+                    </button>
                   </div>
-
-                  <Button
-                    size="sm"
-                    variant={isFull ? 'outline' : 'primary'}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEnrollment(act);
-                    }}
-                  >
-                    {act.requiresExam
-                      ? 'Подать заявку на экзамен'
-                      : isFull
-                        ? 'В лист ожидания'
-                        : 'Записаться'}
-                  </Button>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>

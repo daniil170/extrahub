@@ -200,7 +200,7 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
               aria-hidden="true"
             />
 
-            {/* School Co-Branding Lockup */}
+            {/* Co-Branding Partner Logo & Label */}
             <div
               style={{
                 display: 'inline-flex',

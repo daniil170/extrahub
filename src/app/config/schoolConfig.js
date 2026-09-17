@@ -15,10 +15,14 @@ const SCHOOL_DOMAIN =
 const SCHOOL_LOGO_URL =
   import.meta.env.VITE_SCHOOL_LOGO_URL || '/schools/pifagor-logo.png';
 
-// 2. School Brand Colors (Pifagor High School: Emerald Green #009639 + Deep Navy #161A38)
+// 2. ExtraHub & School Brand Colors (Partnership Co-Branding)
+// Pifagor Primary: Emerald Green (#009639) + Deep Navy (#161A38)
 const SCHOOL_PRIMARY_COLOR = import.meta.env.VITE_SCHOOL_PRIMARY_COLOR || '#009639';
 const SCHOOL_ACCENT_COLOR = import.meta.env.VITE_SCHOOL_ACCENT_COLOR || '#161a38';
 const SCHOOL_BRAND_NAVY = '#161a38';
+
+const EXTRAHUB_LOGO_URL = import.meta.env.VITE_EXTRAHUB_LOGO_URL || '/assets/logo.png';
+const EXTRAHUB_PRIMARY_COLOR = import.meta.env.VITE_EXTRAHUB_PRIMARY_COLOR || '#0e7c6b';
 
 // 3. Shift Configuration
 // Supports customizable shifts per school (e.g. 1 shift, 2 shifts, or customized time slots)
@@ -56,7 +60,9 @@ export const schoolConfig = {
   primaryColor: SCHOOL_PRIMARY_COLOR,
   accentColor: SCHOOL_ACCENT_COLOR,
   pifagorNavy: SCHOOL_BRAND_NAVY,
-  pifagorGreen: '#009639',
+  // ExtraHub Platform Branding
+  extrahubLogoUrl: EXTRAHUB_LOGO_URL,
+  extrahubPrimaryColor: EXTRAHUB_PRIMARY_COLOR,
 
   // Shifts
   shifts: parsedShifts,
@@ -87,10 +93,20 @@ export const schoolConfig = {
     root.style.setProperty('--school-accent', SCHOOL_ACCENT_COLOR);
     root.style.setProperty('--school-navy', SCHOOL_BRAND_NAVY);
     root.style.setProperty('--school-green', '#009639');
+    root.style.setProperty('--eh-brand-primary', EXTRAHUB_PRIMARY_COLOR);
 
     // 2. Override platform primary color if configured
     if (SCHOOL_PRIMARY_COLOR) {
-      if (SCHOOL_PRIMARY_COLOR === '#009639') {
+      if (SCHOOL_PRIMARY_COLOR === '#0047AB') {
+        // Pifagor Sapphire Blue
+        const primaryVal = isDark ? '#3b82f6' : '#0047ab';
+        const hoverVal = isDark ? '#60a5fa' : '#003580';
+        root.style.setProperty('--primary', primaryVal);
+        root.style.setProperty('--primary-hover', hoverVal);
+        root.style.setProperty('--primary-light', isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(0, 71, 171, 0.08)');
+        root.style.setProperty('--primary-border', isDark ? 'rgba(59, 130, 246, 0.4)' : 'rgba(0, 71, 171, 0.35)');
+        root.style.setProperty('--primary-glow', isDark ? 'rgba(59, 130, 246, 0.25)' : 'rgba(0, 71, 171, 0.18)');
+      } else if (SCHOOL_PRIMARY_COLOR === '#009639') {
         const primaryVal = isDark ? '#10b981' : '#009639';
         const hoverVal = isDark ? '#34d399' : '#007a2e';
         root.style.setProperty('--primary', primaryVal);
