@@ -100,6 +100,7 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
         {isOpen && (
           <ul
             role="listbox"
+            className="dropdown-menu-animated"
             style={{
               position: 'absolute',
               top: 'calc(100% + 6px)',
