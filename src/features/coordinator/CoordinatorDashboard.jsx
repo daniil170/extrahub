@@ -9,10 +9,53 @@ import { ExamApplicationsTab } from './ExamApplicationsTab.jsx';
 import { AnalyticsTab } from './AnalyticsTab.jsx';
 import { TeachersTab } from './TeachersTab.jsx';
 
+import { CoordinatorTabsDropdown } from './CoordinatorTabsDropdown.jsx';
+
 export function CoordinatorDashboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('capacity'); // 'capacity' | 'teachers' | 'payments' | 'invites' | 'exams' | 'analytics'
   const isAdmin = user?.role === 'admin';
+
+  const tabOptions = [
+    {
+      id: 'capacity',
+      label: 'Мониторинг загрузки и группы',
+      icon: <BarChart3 size={16} />,
+    },
+    ...(isAdmin
+      ? [
+          {
+            id: 'teachers',
+            label: 'Учителя',
+            icon: <Users size={16} />,
+          },
+        ]
+      : []),
+    {
+      id: 'payments',
+      label: 'Выставление и учёт оплаты',
+      icon: <CreditCard size={16} />,
+    },
+    ...(isAdmin
+      ? [
+          {
+            id: 'invites',
+            label: 'Приглашения сотрудников',
+            icon: <UserPlus size={16} />,
+          },
+        ]
+      : []),
+    {
+      id: 'exams',
+      label: 'Заявки на экзамен',
+      icon: <GraduationCap size={16} />,
+    },
+    {
+      id: 'analytics',
+      label: 'Аналитика и статистика',
+      icon: <TrendingUp size={16} />,
+    },
+  ];
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '48px' }}>
@@ -27,164 +70,12 @@ export function CoordinatorDashboard() {
         }
       />
 
-      {/* Main Feature Tabs */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          borderBottom: '2px solid var(--border-color)',
-          marginBottom: '24px',
-          overflowX: 'auto',
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => setActiveTab('capacity')}
-          style={{
-            padding: '12px 20px',
-            border: 'none',
-            background: 'none',
-            fontSize: '14px',
-            fontWeight: activeTab === 'capacity' ? 600 : 500,
-            color: activeTab === 'capacity' ? 'var(--primary)' : 'var(--text-secondary)',
-            borderBottom: `2px solid ${activeTab === 'capacity' ? 'var(--primary)' : 'transparent'}`,
-            marginBottom: '-2px',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <BarChart3 size={16} />
-          <span>Мониторинг загрузки и группы</span>
-        </button>
-
-        {isAdmin && (
-          <button
-            type="button"
-            onClick={() => setActiveTab('teachers')}
-            style={{
-              padding: '12px 20px',
-              border: 'none',
-              background: 'none',
-              fontSize: '14px',
-              fontWeight: activeTab === 'teachers' ? 600 : 500,
-              color: activeTab === 'teachers' ? 'var(--primary)' : 'var(--text-secondary)',
-              borderBottom: `2px solid ${activeTab === 'teachers' ? 'var(--primary)' : 'transparent'}`,
-              marginBottom: '-2px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <Users size={16} />
-            <span>Учителя</span>
-          </button>
-        )}
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('payments')}
-          style={{
-            padding: '12px 20px',
-            border: 'none',
-            background: 'none',
-            fontSize: '14px',
-            fontWeight: activeTab === 'payments' ? 600 : 500,
-            color: activeTab === 'payments' ? 'var(--primary)' : 'var(--text-secondary)',
-            borderBottom: `2px solid ${activeTab === 'payments' ? 'var(--primary)' : 'transparent'}`,
-            marginBottom: '-2px',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <CreditCard size={16} />
-          <span>Выставление и учёт оплаты</span>
-        </button>
-
-        {isAdmin && (
-          <button
-            type="button"
-            onClick={() => setActiveTab('invites')}
-            style={{
-              padding: '12px 20px',
-              border: 'none',
-              background: 'none',
-              fontSize: '14px',
-              fontWeight: activeTab === 'invites' ? 600 : 500,
-              color: activeTab === 'invites' ? 'var(--primary)' : 'var(--text-secondary)',
-              borderBottom: `2px solid ${activeTab === 'invites' ? 'var(--primary)' : 'transparent'}`,
-              marginBottom: '-2px',
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <UserPlus size={16} />
-            <span>Приглашения сотрудников</span>
-          </button>
-        )}
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('exams')}
-          style={{
-            padding: '12px 20px',
-            border: 'none',
-            background: 'none',
-            fontSize: '14px',
-            fontWeight: activeTab === 'exams' ? 600 : 500,
-            color: activeTab === 'exams' ? 'var(--primary)' : 'var(--text-secondary)',
-            borderBottom: `2px solid ${activeTab === 'exams' ? 'var(--primary)' : 'transparent'}`,
-            marginBottom: '-2px',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <GraduationCap size={16} />
-          <span>Заявки на экзамен</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('analytics')}
-          style={{
-            padding: '12px 20px',
-            border: 'none',
-            background: 'none',
-            fontSize: '14px',
-            fontWeight: activeTab === 'analytics' ? 600 : 500,
-            color: activeTab === 'analytics' ? 'var(--primary)' : 'var(--text-secondary)',
-            borderBottom: `2px solid ${activeTab === 'analytics' ? 'var(--primary)' : 'transparent'}`,
-            marginBottom: '-2px',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <TrendingUp size={16} />
-          <span>Аналитика и статистика</span>
-        </button>
-      </div>
+      {/* Dropdown Selector Navigation */}
+      <CoordinatorTabsDropdown
+        tabs={tabOptions}
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+      />
 
       {/* Active Tab View */}
       {activeTab === 'capacity' && <CapacityOverview />}

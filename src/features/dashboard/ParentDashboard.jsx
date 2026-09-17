@@ -17,6 +17,7 @@ import {
 import { useParentDashboard } from './useParentDashboard.js';
 import { Card, Badge, Button, Spinner, Modal, PageHeader, CountdownTimer } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
+import { ChildStatsCard } from './ChildStatsCard.jsx';
 
 export function ParentDashboard() {
   const {
@@ -163,8 +164,16 @@ export function ParentDashboard() {
       )}
 
       {!loading && (
-        <div className="dashboard-grid">
-          {/* Left Column: My Activities & Enrollments */}
+        <>
+          {/* Child Overview & Progress Analytics Card */}
+          <ChildStatsCard
+            child={activeChild}
+            activeEnrollments={activeEnrollments}
+            payments={payments}
+          />
+
+          <div className="dashboard-grid">
+            {/* Left Column: My Activities & Enrollments */}
           <div>
             <div
               style={{
@@ -625,7 +634,8 @@ export function ParentDashboard() {
             </Card>
           </div>
         </div>
-      )}
+      </>
+    )}
 
       {/* Cancel Confirmation Modal */}
       <Modal
