@@ -16,11 +16,15 @@ import {
   Clock,
   Sparkles,
   BookOpen,
+  Eye,
+  Layers,
 } from 'lucide-react';
 import { useCoordinatorOverview } from './useCoordinatorOverview.js';
 import { Card, Badge, Button, Spinner } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek, exportToExcel } from '../../shared/utils/index.js';
 import { EditCapacityModal } from './EditCapacityModal.jsx';
+import { ActivityViewMode } from './ActivityViewMode.jsx';
+import { ActivityDetailsModal } from '../catalog/ActivityDetailsModal.jsx';
 import { DEMO_ACHIEVEMENTS, DEMO_ATTENDANCE_HISTORY } from '../../shared/data/demoData.js';
 
 export function GroupMonitoringTab() {
@@ -41,7 +45,8 @@ export function GroupMonitoringTab() {
 
   const [groupSearch, setGroupSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'full' | 'available' | 'waitlist'
-  const [successTab, setSuccessTab] = useState('summary'); // 'summary' | 'achievements'
+  const [activeViewSection, setActiveViewSection] = useState('groups'); // 'groups' | 'analytics_cards' | 'achievements'
+  const [detailsActivity, setDetailsActivity] = useState(null);
 
   // Calculate realistic attendance & mastery metrics per activity / group
   const activityMonitoringStats = useMemo(() => {
@@ -376,7 +381,7 @@ export function GroupMonitoringTab() {
         </Card>
       </div>
 
-      {/* SECTION 1: Статистика по кружкам и успехам учеников */}
+      {/* SECTION 1: Переключение режимов мониторинга и аналитики */}
       <Card>
         <div
           style={{
@@ -398,11 +403,11 @@ export function GroupMonitoringTab() {
               </h3>
             </div>
             <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Сводная аналитика освоения учебных программ, посещаемости и подтверждённых достижений
+              Сводная аналитика освоения программ, детальные карточки с групповой аналитикой и достижения
             </p>
           </div>
 
-          {/* Subtabs: Summary Table vs Achievements */}
+          {/* Subtabs: Summary Table vs Detailed Analytics Cards vs Achievements */}
           <div
             style={{
               display: 'inline-flex',
@@ -410,11 +415,12 @@ export function GroupMonitoringTab() {
               padding: '3px',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border-color)',
+              flexWrap: 'wrap',
             }}
           >
             <button
               type="button"
-              onClick={() => setSuccessTab('summary')}
+              onClick={() => setActiveViewSection('groups')}
               style={{
                 padding: '6px 14px',
                 borderRadius: 'var(--radius-sm)',
@@ -422,16 +428,37 @@ export function GroupMonitoringTab() {
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                backgroundColor: successTab === 'summary' ? 'var(--bg-surface)' : 'transparent',
-                color: successTab === 'summary' ? 'var(--primary)' : 'var(--text-secondary)',
-                boxShadow: successTab === 'summary' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                backgroundColor: activeViewSection === 'groups' ? 'var(--bg-surface)' : 'transparent',
+                color: activeViewSection === 'groups' ? 'var(--primary)' : 'var(--text-secondary)',
+                boxShadow: activeViewSection === 'groups' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
               }}
             >
-              Сводка по кружкам
+              Сводная таблица
             </button>
             <button
               type="button"
-              onClick={() => setSuccessTab('achievements')}
+              onClick={() => setActiveViewSection('analytics_cards')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-sm)',
+                border: 'none',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                backgroundColor: activeViewSection === 'analytics_cards' ? 'var(--bg-surface)' : 'transparent',
+                color: activeViewSection === 'analytics_cards' ? 'var(--primary)' : 'var(--text-secondary)',
+                boxShadow: activeViewSection === 'analytics_cards' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+              }}
+            >
+              <Eye size={14} />
+              <span>Аналитика по группам (карточки)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveViewSection('achievements')}
               style={{
                 padding: '6px 14px',
                 borderRadius: 'var(--radius-sm)',
@@ -439,9 +466,9 @@ export function GroupMonitoringTab() {
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                backgroundColor: successTab === 'achievements' ? 'var(--bg-surface)' : 'transparent',
-                color: successTab === 'achievements' ? 'var(--primary)' : 'var(--text-secondary)',
-                boxShadow: successTab === 'achievements' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                backgroundColor: activeViewSection === 'achievements' ? 'var(--bg-surface)' : 'transparent',
+                color: activeViewSection === 'achievements' ? 'var(--primary)' : 'var(--text-secondary)',
+                boxShadow: activeViewSection === 'achievements' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
               }}
             >
               Достижения учеников ({DEMO_ACHIEVEMENTS.length})
@@ -449,7 +476,8 @@ export function GroupMonitoringTab() {
           </div>
         </div>
 
-        {successTab === 'summary' ? (
+        {/* View 1: Summary Table */}
+        {activeViewSection === 'groups' && (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13.5px', textAlign: 'left' }}>
               <thead>
@@ -562,7 +590,21 @@ export function GroupMonitoringTab() {
               </tbody>
             </table>
           </div>
-        ) : (
+        )}
+
+        {/* View 2: Analytics Cards with Group-by-group Analytics */}
+        {activeViewSection === 'analytics_cards' && (
+          <div>
+            <ActivityViewMode
+              activities={activities}
+              groups={groups}
+              onOpenDetails={(act) => setDetailsActivity(act)}
+            />
+          </div>
+        )}
+
+        {/* View 3: Student Achievements */}
+        {activeViewSection === 'achievements' && (
           <div
             style={{
               display: 'grid',
@@ -934,6 +976,14 @@ export function GroupMonitoringTab() {
           })}
         </div>
       </div>
+
+      {/* Activity Details Modal (for Syllabus in view mode) */}
+      <ActivityDetailsModal
+        isOpen={Boolean(detailsActivity)}
+        onClose={() => setDetailsActivity(null)}
+        activity={detailsActivity}
+        onEnroll={null}
+      />
 
       {/* Edit Capacity Modal */}
       <EditCapacityModal
