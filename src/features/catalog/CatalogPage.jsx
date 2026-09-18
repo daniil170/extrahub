@@ -11,6 +11,13 @@ import {
   Lock,
   Clock,
   X,
+  Palette,
+  Sparkles,
+  Trophy,
+  Cpu,
+  Compass,
+  Globe,
+  Bookmark,
 } from 'lucide-react';
 import { useCatalog } from './useCatalog.js';
 import { useEnrollment } from '../enrollment/useEnrollment.js';
@@ -20,57 +27,84 @@ import { Card, Badge, Button, Spinner, PageHeader, CapacityBadge, Modal } from '
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 import { schoolConfig } from '../../app/config/schoolConfig.js';
 
-// Visual card cover mappings by category or activity keywords
-const ACTIVITY_IMAGES = {
-  robotics: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80',
-  chess: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=800&q=80',
-  art: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80',
-  theater: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
-  volleyball: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=800&q=80',
-  sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80',
-  science: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80',
-  math: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80',
-  languages: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80',
-  music: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80',
-  default: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80',
+// Category visual palette (pastel backgrounds + high-contrast text) and vector icons
+const CATEGORY_STYLES = {
+  art: {
+    bg: '#fdf2f8',
+    color: '#9d174d',
+    border: '#fbcfe8',
+    icon: Palette,
+  },
+  theater: {
+    bg: '#f5f3ff',
+    color: '#6d28d9',
+    border: '#ddd6fe',
+    icon: Sparkles,
+  },
+  sports: {
+    bg: '#eff6ff',
+    color: '#1d4ed8',
+    border: '#bfdbfe',
+    icon: Trophy,
+  },
+  science: {
+    bg: '#f0fdf4',
+    color: '#15803d',
+    border: '#bbf7d0',
+    icon: Cpu,
+  },
+  math: {
+    bg: '#eef2ff',
+    color: '#4338ca',
+    border: '#c7d2fe',
+    icon: Compass,
+  },
+  languages: {
+    bg: '#fefce8',
+    color: '#a16207',
+    border: '#fef08a',
+    icon: Globe,
+  },
+  music: {
+    bg: '#faf5ff',
+    color: '#7e22ce',
+    border: '#e9d5ff',
+    icon: Sparkles,
+  },
+  default: {
+    bg: '#f1f5f9',
+    color: '#334155',
+    border: '#e2e8f0',
+    icon: Bookmark,
+  },
 };
 
-function getCardImage(act) {
-  if (act.imageUrl) return act.imageUrl;
-  const title = (act.title || '').toLowerCase();
-  const cat = (act.category || '').toLowerCase();
+function getCategoryStyle(categoryName = '', title = '') {
+  const cat = (categoryName || '').toLowerCase();
+  const t = (title || '').toLowerCase();
 
-  if (title.includes('робот') || title.includes('3d') || cat.includes('робот') || cat.includes('техн')) return ACTIVITY_IMAGES.robotics;
-  if (title.includes('шахмат') || cat.includes('шахмат')) return ACTIVITY_IMAGES.chess;
-  if (title.includes('театр') || title.includes('актер') || cat.includes('театр')) return ACTIVITY_IMAGES.theater;
-  if (title.includes('волей') || title.includes('баскет') || cat.includes('спорт')) return ACTIVITY_IMAGES.volleyball;
-  if (title.includes('мат') || title.includes('олимп') || cat.includes('точн')) return ACTIVITY_IMAGES.math;
-  if (title.includes('англ') || title.includes('дебат') || cat.includes('язык') || cat.includes('гуманит')) return ACTIVITY_IMAGES.languages;
-  if (title.includes('изо') || title.includes('живопис') || cat.includes('творч') || cat.includes('искус')) return ACTIVITY_IMAGES.art;
-  if (title.includes('музык') || title.includes('гитар') || title.includes('вок')) return ACTIVITY_IMAGES.music;
-
-  return ACTIVITY_IMAGES.default;
-}
-
-// Friendly avatars for educators
-const TEACHER_AVATARS = [
-  'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=160&q=80',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80',
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=160&q=80',
-  'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=160&q=80',
-];
-
-function getTeacherAvatar(teacherName) {
-  if (!teacherName) return TEACHER_AVATARS[0];
-  let hash = 0;
-  for (let i = 0; i < teacherName.length; i++) {
-    hash = (hash << 5) - hash + teacherName.charCodeAt(i);
-    hash |= 0;
+  if (cat.includes('искус') || cat.includes('творч') || cat.includes('изо') || t.includes('живопис')) {
+    return CATEGORY_STYLES.art;
   }
-  const index = Math.abs(hash) % TEACHER_AVATARS.length;
-  return TEACHER_AVATARS[index];
+  if (cat.includes('театр') || t.includes('актер') || t.includes('сцен')) {
+    return CATEGORY_STYLES.theater;
+  }
+  if (cat.includes('спорт') || t.includes('волей') || t.includes('баскет') || t.includes('футб')) {
+    return CATEGORY_STYLES.sports;
+  }
+  if (cat.includes('техн') || cat.includes('робот') || t.includes('робот') || t.includes('3d') || cat.includes('наук')) {
+    return CATEGORY_STYLES.science;
+  }
+  if (cat.includes('точн') || cat.includes('мат') || t.includes('мат') || t.includes('олимп')) {
+    return CATEGORY_STYLES.math;
+  }
+  if (cat.includes('язык') || cat.includes('гуманит') || t.includes('англ') || t.includes('дебат')) {
+    return CATEGORY_STYLES.languages;
+  }
+  if (cat.includes('музык') || t.includes('гитар') || t.includes('вок')) {
+    return CATEGORY_STYLES.music;
+  }
+  return CATEGORY_STYLES.default;
 }
 
 // Russian typographical quotes « »
@@ -79,18 +113,11 @@ function formatGuillemets(title) {
   return title.replace(/"([^"]+)"/g, '«$1»');
 }
 
-// Clean label for age/grade display
+// Clean label for age/grade display (e.g. "7–16 лет • 1–10 класс")
 function cleanAgeGroup(ageGroup) {
-  if (!ageGroup) return 'Все классы';
+  if (!ageGroup) return '1–11 классы';
   if (ageGroup.includes('класс') || ageGroup.includes('лет')) return ageGroup;
   return `${ageGroup} классы`;
-}
-
-// Spot counter pluralization
-function formatSpotsPlural(count) {
-  if (count === 1) return 'Осталось 1 место';
-  if (count >= 2 && count <= 4) return `Осталось ${count} места`;
-  return `Осталось ${count} мест`;
 }
 
 export function CatalogPage() {
@@ -468,9 +495,29 @@ export function CatalogPage() {
           {filteredActivities.map((act) => {
             const isFull = act.isFull;
             const remainingSpots = act.remainingSpots;
-            const previewImage = getCardImage(act);
-            const teacherAvatar = getTeacherAvatar(act.teacherName);
+            const totalCapacity = act.totalCapacity || (act.groups || []).reduce((acc, g) => acc + (Number(g.capacity) || 0), 0);
+            const totalEnrolled = act.totalEnrolled || (act.groups || []).reduce((acc, g) => acc + (Number(g.enrolledCount) || 0), 0);
             const titleWithGuillemets = formatGuillemets(act.title);
+            const categoryStyle = getCategoryStyle(act.category, act.title);
+            const CategoryIcon = categoryStyle.icon;
+
+            // Capacity percentage & progress bar styling
+            const capacityRatio = totalCapacity > 0 ? (totalCapacity - remainingSpots) / totalCapacity : 0;
+            const percentageUsed = Math.min(100, Math.max(0, Math.round(capacityRatio * 100)));
+
+            let progressColor = 'var(--primary)';
+            let capacityTextColor = 'var(--text-secondary)';
+            let capacityStatusText = `Свободно ${remainingSpots} из ${totalCapacity} мест`;
+
+            if (isFull || remainingSpots <= 0) {
+              progressColor = '#94a3b8'; // neutral muted slate for full group
+              capacityTextColor = 'var(--text-muted)';
+              capacityStatusText = `Мест нет (${totalCapacity} из ${totalCapacity} занято)`;
+            } else if (remainingSpots <= 3) {
+              progressColor = '#f59e0b'; // amber warning for scarce spots
+              capacityTextColor = '#b45309';
+              capacityStatusText = `Осталось всего ${remainingSpots} ${remainingSpots === 1 ? 'место' : 'места'} из ${totalCapacity}`;
+            }
 
             return (
               <div
@@ -490,368 +537,340 @@ export function CatalogPage() {
                   flexDirection: 'column',
                   backgroundColor: 'var(--bg-surface)',
                   borderRadius: 'var(--radius-lg, 14px)',
-                  boxShadow: '0 6px 24px -4px rgba(0, 0, 0, 0.06)',
-                  border: 'none',
+                  border: '1px solid #f1f5f9',
+                  boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
                   overflow: 'hidden',
                   cursor: 'pointer',
-                  transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  padding: '24px',
+                  transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease',
+                  boxSizing: 'border-box',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 12px 32px -4px rgba(0, 0, 0, 0.12)';
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0 12px 28px -4px rgba(0, 0, 0, 0.09)';
+                  e.currentTarget.style.borderColor = '#cbd5e1';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 6px 24px -4px rgba(0, 0, 0, 0.06)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px -2px rgba(0, 0, 0, 0.05)';
+                  e.currentTarget.style.borderColor = '#f1f5f9';
                 }}
               >
-                {/* Visual Card Header with Photo Cover */}
+                {/* 1. Header: Category badge & Age/Grade tag */}
                 <div
                   style={{
-                    position: 'relative',
-                    width: '100%',
-                    height: '180px',
-                    overflow: 'hidden',
-                    backgroundColor: '#161a38',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '10px',
+                    marginBottom: '14px',
                   }}
                 >
-                  <img
-                    src={previewImage}
-                    alt={act.title}
+                  {/* Category Pill with Soft Pastel Background and Vector Icon */}
+                  <span
                     style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      transition: 'transform 0.35s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'scale(1.04)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'scale(1)';
-                    }}
-                  />
-                  {/* Subtle gradient vignette */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.65) 100%)',
-                    }}
-                  />
-
-                  {/* Top floating pill: Category • Age Group */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '12px',
-                      left: '12px',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '6px',
+                      gap: '5px',
                       padding: '4px 10px',
                       borderRadius: '999px',
-                      backgroundColor: 'rgba(22, 26, 56, 0.85)',
-                      backdropFilter: 'blur(8px)',
-                      color: '#ffffff',
-                      fontSize: '11.5px',
+                      backgroundColor: categoryStyle.bg,
+                      color: categoryStyle.color,
+                      border: `1px solid ${categoryStyle.border}`,
+                      fontSize: '12px',
                       fontWeight: 600,
                       letterSpacing: '0.01em',
                     }}
                   >
+                    <CategoryIcon size={13} style={{ flexShrink: 0 }} />
                     <span>{act.category || 'Кружок'}</span>
-                    <span style={{ opacity: 0.6 }}>•</span>
-                    <span>{cleanAgeGroup(act.ageGroup)}</span>
-                  </div>
+                  </span>
 
-                  {/* Top Right: Single Clear Spots Badge (using Pifagor accent) */}
-                  <div
+                  {/* Age / Grade Label */}
+                  <span
                     style={{
-                      position: 'absolute',
-                      top: '12px',
-                      right: '12px',
+                      fontSize: '12px',
+                      fontWeight: 500,
+                      color: 'var(--text-muted)',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    {isFull ? (
+                    {cleanAgeGroup(act.ageGroup)}
+                  </span>
+                </div>
+
+                {/* Special Tags: Olympic reserve or Exam required */}
+                {(act.type === 'olympic_reserve' || act.requiresExam) && (
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                    {act.type === 'olympic_reserve' && (
                       <span
                         style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          padding: '4px 10px',
-                          borderRadius: '999px',
-                          backgroundColor: 'rgba(220, 38, 38, 0.9)',
-                          color: '#ffffff',
-                          fontSize: '11.5px',
+                          fontSize: '11px',
                           fontWeight: 600,
-                          backdropFilter: 'blur(8px)',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          backgroundColor: '#fef3c7',
+                          color: '#92400e',
+                          border: '1px solid #fde68a',
                         }}
                       >
-                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ffffff' }} />
-                        Мест нет
+                        Олимпиадный резерв{act.subject ? `: ${act.subject}` : ''}
                       </span>
-                    ) : (
+                    )}
+                    {act.requiresExam && (
                       <span
                         style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          padding: '4px 10px',
-                          borderRadius: '999px',
-                          backgroundColor: 'rgba(0, 150, 57, 0.9)',
-                          color: '#ffffff',
-                          fontSize: '11.5px',
+                          fontSize: '11px',
                           fontWeight: 600,
-                          backdropFilter: 'blur(8px)',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          backgroundColor: '#eff6ff',
+                          color: '#1e40af',
+                          border: '1px solid #dbeafe',
                         }}
                       >
-                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ffffff' }} />
-                        {formatSpotsPlural(remainingSpots)}
+                        Вступительный экзамен
                       </span>
                     )}
                   </div>
+                )}
 
-                  {/* Badges on bottom of image for special statuses */}
-                  {(act.type === 'olympic_reserve' || act.requiresExam) && (
-                    <div
+                {/* 2. Title in Russian Guillemets */}
+                <h3
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-heading)',
+                    color: 'var(--text-primary)',
+                    margin: '0 0 10px',
+                    lineHeight: 1.35,
+                    letterSpacing: '-0.015em',
+                  }}
+                >
+                  {titleWithGuillemets}
+                </h3>
+
+                {/* 3. Short Description with 2-line clamp */}
+                <p
+                  style={{
+                    fontSize: '13px',
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.55,
+                    marginBottom: '18px',
+                    minHeight: '40px',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {act.description}
+                </p>
+
+                {/* 4. Metadata Block (Airy, clean, zero avatar photo maintenance) */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    fontSize: '12.5px',
+                    color: 'var(--text-secondary)',
+                    marginBottom: '20px',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {/* Instructor (clean profile icon + label) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <User size={15} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                    <span style={{ color: 'var(--text-muted)' }}>Преподаватель:</span>
+                    <strong
                       style={{
-                        position: 'absolute',
-                        bottom: '10px',
-                        left: '12px',
-                        display: 'flex',
-                        gap: '6px',
+                        fontWeight: 600,
+                        color: 'var(--text-primary)',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
-                      {act.type === 'olympic_reserve' && (
-                        <span
-                          style={{
-                            fontSize: '10.5px',
-                            fontWeight: 600,
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                            backgroundColor: '#f59e0b',
-                            color: '#1a1e26',
-                          }}
-                        >
-                          Олимпиадный резерв{act.subject ? `: ${act.subject}` : ''}
-                        </span>
-                      )}
-                      {act.requiresExam && (
-                        <span
-                          style={{
-                            fontSize: '10.5px',
-                            fontWeight: 600,
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                            backgroundColor: '#3b82f6',
-                            color: '#ffffff',
-                          }}
-                        >
-                          Вступительный экзамен
-                        </span>
-                      )}
+                      {act.teacherName}
+                    </strong>
+                  </div>
+
+                  {/* Location */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <MapPin size={15} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                    <span style={{ color: 'var(--text-muted)' }}>Локация:</span>
+                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {act.location}
+                    </span>
+                  </div>
+
+                  {/* Schedule */}
+                  {act.groups && act.groups.length > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Clock size={15} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                      <span style={{ color: 'var(--text-muted)' }}>Расписание:</span>
+                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {act.groups
+                          .map((g) => `${formatDaysOfWeek(g.daysOfWeek)} ${g.startTime}–${g.endTime}`)
+                          .join(' • ')}
+                      </span>
                     </div>
                   )}
                 </div>
 
-                {/* Card Body Content */}
-                <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                  {/* Title with elegant Russian quotes */}
-                  <h3
-                    style={{
-                      fontSize: '17.5px',
-                      fontWeight: 700,
-                      fontFamily: 'var(--font-heading)',
-                      color: 'var(--text-primary)',
-                      margin: '0 0 8px',
-                      lineHeight: 1.35,
-                    }}
-                  >
-                    {titleWithGuillemets}
-                  </h3>
-
-                  {/* Description */}
-                  <p
-                    style={{
-                      fontSize: '13px',
-                      color: 'var(--text-secondary)',
-                      lineHeight: 1.55,
-                      marginBottom: '18px',
-                      minHeight: '38px',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {act.description}
-                  </p>
-
-                  {/* Instructor with Friendly Photo Avatar */}
+                {/* 5. Capacity Block (X of Y spots + Progress Bar) */}
+                <div
+                  style={{
+                    padding: '12px 14px',
+                    backgroundColor: 'var(--bg-subtle, #f8fafc)',
+                    borderRadius: 'var(--radius-md, 8px)',
+                    marginBottom: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '7px',
+                  }}
+                >
                   <div
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      marginBottom: '14px',
-                    }}
-                  >
-                    <img
-                      src={teacherAvatar}
-                      alt={act.teacherName}
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                        border: '1.5px solid var(--border-color, #e5e5e3)',
-                        flexShrink: 0,
-                      }}
-                    />
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: 1.2 }}>Преподаватель</div>
-                      <div
-                        style={{
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          color: 'var(--text-primary)',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {act.teacherName}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Grouped Location & Schedule metadata */}
-                  <div
-                    style={{
-                      fontSize: '12.5px',
-                      color: 'var(--text-secondary)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '6px',
-                      marginBottom: '18px',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <MapPin size={15} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {act.location}
-                      </span>
-                    </div>
-
-                    {act.groups && act.groups.length > 0 && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Clock size={15} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {act.groups
-                            .map((g) => `${formatDaysOfWeek(g.daysOfWeek)} ${g.startTime}–${g.endTime}`)
-                            .join(' • ')}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Program Curriculum Trigger Button */}
-                  <div
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontSize: '12.5px',
-                      color: 'var(--primary)',
-                      fontWeight: 600,
-                      marginBottom: '20px',
-                      transition: 'gap 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.gap = '8px')}
-                    onMouseLeave={(e) => (e.currentTarget.style.gap = '6px')}
-                  >
-                    <BookOpen size={15} />
-                    <span>Программа курса</span>
-                    <ArrowRight size={14} />
-                  </div>
-
-                  {/* Card Footer: Price & Enroll Button (Aligned on common baseline with margin-top: auto) */}
-                  <div
-                    style={{
-                      marginTop: 'auto',
-                      paddingTop: '16px',
-                      borderTop: '1px solid rgba(0, 0, 0, 0.05)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      gap: '12px',
+                      fontSize: '12px',
                     }}
                   >
-                    <div>
-                      <span
-                        style={{
-                          fontSize: '11px',
-                          color: 'var(--text-muted)',
-                          display: 'block',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.04em',
-                          fontWeight: 500,
-                        }}
-                      >
-                        Стоимость
-                      </span>
-                      <strong
-                        style={{
-                          fontSize: '19px',
-                          fontFamily: 'var(--font-heading)',
-                          color: 'var(--text-primary)',
-                          letterSpacing: '-0.02em',
-                        }}
-                      >
-                        {act.price === 0 ? 'Бесплатно' : formatCurrency(act.price)}
-                      </strong>
-                    </div>
+                    <span style={{ fontWeight: 600, color: capacityTextColor }}>
+                      {capacityStatusText}
+                    </span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                      {totalCapacity > 0 ? `${percentageUsed}% заполнено` : ''}
+                    </span>
+                  </div>
 
-                    <button
-                      type="button"
+                  {/* 4-5px Rounded Progress Bar */}
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '5px',
+                      borderRadius: '999px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${percentageUsed}%`,
+                        height: '100%',
+                        borderRadius: '999px',
+                        backgroundColor: progressColor,
+                        transition: 'width 0.3s ease',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* 6. Footer (Fixed to bottom with margin-top: auto) */}
+                <div
+                  style={{
+                    marginTop: 'auto',
+                    paddingTop: '16px',
+                    borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '12px',
+                  }}
+                >
+                  {/* Left: Program link + Price */}
+                  <div>
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={(e) => {
                         e.stopPropagation();
-                        openEnrollment(act);
+                        handleOpenDetails(act);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.stopPropagation();
+                          handleOpenDetails(act);
+                        }
                       }}
                       style={{
-                        padding: '9px 18px',
-                        borderRadius: 'var(--radius-md, 8px)',
-                        border: 'none',
-                        backgroundColor: isFull ? 'var(--bg-subtle)' : 'var(--primary)',
-                        color: isFull ? 'var(--text-primary)' : '#ffffff',
-                        fontSize: '13.5px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '11.5px',
+                        color: 'var(--primary)',
                         fontWeight: 600,
                         cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                        boxShadow: isFull ? 'none' : '0 2px 10px rgba(0, 150, 57, 0.25)',
-                        whiteSpace: 'nowrap',
+                        marginBottom: '4px',
+                        transition: 'gap 0.15s ease',
                       }}
-                      onMouseEnter={(e) => {
-                        if (!isFull) {
-                          e.currentTarget.style.filter = 'brightness(1.08)';
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isFull) {
-                          e.currentTarget.style.filter = 'none';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }
+                      onMouseEnter={(e) => (e.currentTarget.style.gap = '6px')}
+                      onMouseLeave={(e) => (e.currentTarget.style.gap = '4px')}
+                    >
+                      <BookOpen size={13} />
+                      <span>Программа</span>
+                      <ArrowRight size={12} />
+                    </div>
+
+                    <strong
+                      style={{
+                        fontSize: '19px',
+                        fontFamily: 'var(--font-heading)',
+                        color: 'var(--text-primary)',
+                        letterSpacing: '-0.02em',
+                        display: 'block',
                       }}
                     >
-                      {act.requiresExam
-                        ? 'Подать заявку'
-                        : isFull
-                          ? 'Лист ожидания'
-                          : 'Записаться'}
-                    </button>
+                      {act.price === 0 ? 'Бесплатно' : formatCurrency(act.price)}
+                    </strong>
                   </div>
+
+                  {/* Right: Main Action Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEnrollment(act);
+                    }}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: 'var(--radius-md, 8px)',
+                      border: isFull ? '1px solid var(--border-color, #e2e8f0)' : 'none',
+                      backgroundColor: isFull ? 'var(--bg-subtle, #f1f5f9)' : 'var(--primary)',
+                      color: isFull ? 'var(--text-secondary, #475569)' : '#ffffff',
+                      fontSize: '13.5px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      boxShadow: isFull ? 'none' : '0 2px 10px rgba(0, 150, 57, 0.22)',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isFull) {
+                        e.currentTarget.style.filter = 'brightness(1.08)';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      } else {
+                        e.currentTarget.style.backgroundColor = '#e2e8f0';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isFull) {
+                        e.currentTarget.style.filter = 'none';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      } else {
+                        e.currentTarget.style.backgroundColor = 'var(--bg-subtle, #f1f5f9)';
+                      }
+                    }}
+                  >
+                    {act.requiresExam
+                      ? 'Подать заявку'
+                      : isFull
+                        ? 'В лист ожидания'
+                        : 'Записаться'}
+                  </button>
                 </div>
               </div>
             );
