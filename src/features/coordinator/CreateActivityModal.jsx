@@ -57,7 +57,6 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
   const [allowedShifts, setAllowedShifts] = useState(() => schoolConfig.shifts.map((s) => s.id));
   const [requiresExam, setRequiresExam] = useState(false);
   const [description, setDescription] = useState('');
-  const [ageGroup, setAgeGroup] = useState('10–14 лет (5–8 класс)');
   const [price, setPrice] = useState(24000);
   const [location, setLocation] = useState('Кабинет 204');
   const [teacherId, setTeacherId] = useState('');
@@ -204,7 +203,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
       allowedShifts: allowedShifts.map(Number),
       requiresExam: Boolean(requiresExam),
       description: description.trim(),
-      ageGroup: ageGroup.trim() || `${allowedClasses.join(', ')} классы`,
+      ageGroup: allowedClasses.length > 0 ? `${allowedClasses.join(', ')} классы` : 'Все классы',
       price: Number(price) || 0,
       location: location.trim() || 'Школьный корпус',
       teacherId: teacherId.trim(),
@@ -550,37 +549,6 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
                 </option>
               ))}
             </select>
-          </div>
-
-          {/* Age Group */}
-          <div>
-            <label
-              style={{
-                display: 'block',
-                fontSize: '13px',
-                fontWeight: 600,
-                color: 'var(--text-secondary)',
-                marginBottom: '5px',
-              }}
-            >
-              Возрастная группа
-            </label>
-            <input
-              type="text"
-              value={ageGroup}
-              onChange={(e) => setAgeGroup(e.target.value)}
-              placeholder="Например: 10–14 лет (5–8 класс)"
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-color)',
-                fontSize: '14px',
-                backgroundColor: 'var(--bg-primary)',
-                color: 'var(--text-primary)',
-                boxSizing: 'border-box',
-              }}
-            />
           </div>
 
           {/* Price (in Tenge) */}
