@@ -1,5 +1,7 @@
 export * from './CoordinatorDashboard.jsx';
 export * from './CapacityOverview.jsx';
+export * from './GroupMonitoringTab.jsx';
+export * from './CurriculumProgramsTab.jsx';
 export * from './PaymentManagement.jsx';
 export * from './EditCapacityModal.jsx';
 export * from './CreateGroupModal.jsx';

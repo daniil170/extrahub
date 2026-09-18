@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { BarChart3, CreditCard, UserPlus, GraduationCap, TrendingUp, Users } from 'lucide-react';
+import { BarChart3, CreditCard, UserPlus, GraduationCap, TrendingUp, Users, BookOpen } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { PageHeader } from '../../shared/ui/index.js';
+import { GroupMonitoringTab } from './GroupMonitoringTab.jsx';
+import { CurriculumProgramsTab } from './CurriculumProgramsTab.jsx';
 import { CapacityOverview } from './CapacityOverview.jsx';
 import { PaymentManagement } from './PaymentManagement.jsx';
 import { StaffInvitesTab } from './StaffInvitesTab.jsx';
@@ -13,14 +15,19 @@ import { CoordinatorTabsDropdown } from './CoordinatorTabsDropdown.jsx';
 
 export function CoordinatorDashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('capacity'); // 'capacity' | 'teachers' | 'payments' | 'invites' | 'exams' | 'analytics'
+  const [activeTab, setActiveTab] = useState('group_monitoring'); // 'group_monitoring' | 'activities' | 'teachers' | 'payments' | 'invites' | 'exams' | 'analytics'
   const isAdmin = user?.role === 'admin';
 
   const tabOptions = [
     {
-      id: 'capacity',
-      label: 'Мониторинг загрузки и группы',
+      id: 'group_monitoring',
+      label: 'Мониторинг групп',
       icon: <BarChart3 size={16} />,
+    },
+    {
+      id: 'activities',
+      label: 'Создание учебных программ',
+      icon: <BookOpen size={16} />,
     },
     ...(isAdmin
       ? [
@@ -65,20 +72,21 @@ export function CoordinatorDashboard() {
         }`}
         subtitle={
           isAdmin
-            ? 'Администрирование школьных программ, мониторинг заполняемости групп и управление сотрудниками'
-            : 'Мониторинг загрузки кружков, управление вместимостью групп и просмотр статистики'
+            ? 'Администрирование школьных программ, оперативный мониторинг групп и успеваемости, управление сотрудниками'
+            : 'Оперативный мониторинг групп, статистика по кружкам и создание учебных программ'
         }
       />
 
       {/* Dropdown Selector Navigation */}
       <CoordinatorTabsDropdown
         tabs={tabOptions}
-        activeTab={activeTab}
+        activeTab={activeTab === 'capacity' ? 'group_monitoring' : activeTab}
         onSelectTab={setActiveTab}
       />
 
       {/* Active Tab View */}
-      {activeTab === 'capacity' && <CapacityOverview />}
+      {(activeTab === 'group_monitoring' || activeTab === 'capacity') && <GroupMonitoringTab />}
+      {activeTab === 'activities' && <CurriculumProgramsTab />}
       {isAdmin && activeTab === 'teachers' && <TeachersTab />}
       {activeTab === 'payments' && <PaymentManagement />}
       {isAdmin && activeTab === 'invites' && <StaffInvitesTab />}
