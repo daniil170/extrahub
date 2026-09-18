@@ -46,6 +46,7 @@ export const switchDemoRole = onCall(async (request) => {
   }
 
   const callerClaims = request.auth.token || {};
+  const callerEmail = (callerClaims.email || '').toLowerCase();
   const allowedDomain = process.env.ALLOWED_EMAIL_DOMAIN || 'pifagorschool.kz';
   const isDemoEmail =
     callerEmail.startsWith('demo.') &&
