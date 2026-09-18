@@ -8,6 +8,7 @@ import { useTheme } from '../../shared/hooks/index.js';
 import { Button, Alert, Spinner } from '../../shared/ui/index.js';
 import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
+import pifagorLogo from '../../assets/pifagor-logo.png';
 import { schoolConfig } from '../../app/config/schoolConfig.js';
 import './auth.css';
 
@@ -27,12 +28,27 @@ export function LoginPage() {
     return (
       <div className="auth-page-wrapper">
         <div className="auth-card" style={{ textAlign: 'center' }}>
-          <div style={{ marginBottom: '16px' }}>
-            <img
-              src={isDark ? logoDarkImg : logoImg}
-              alt="ExtraHub Logo"
-              style={{ width: '44px', height: '44px', objectFit: 'contain' }}
-            />
+          <div
+            className="auth-brand-pair"
+            style={{ marginBottom: '16px', justifyContent: 'center' }}
+          >
+            <div className="auth-brand-item">
+              <img
+                src={isDark ? logoDarkImg : logoImg}
+                alt="ExtraHub Logo"
+                className="auth-brand-logo"
+              />
+              <span className="auth-logo-title">ExtraHub</span>
+            </div>
+            <span className="auth-brand-separator">×</span>
+            <div className="auth-brand-item">
+              <img
+                src={pifagorLogo}
+                alt={schoolConfig.name}
+                className="auth-brand-logo school-logo"
+              />
+              <span className="auth-school-title">{schoolConfig.name}</span>
+            </div>
           </div>
           <h3 className="auth-title">Вы уже вошли в систему</h3>
           <p className="auth-subtitle" style={{ marginBottom: '20px' }}>
@@ -93,16 +109,29 @@ export function LoginPage() {
         {/* Brand Header */}
         <div className="auth-header">
           <Link to="/catalog" className="auth-logo-link">
-            <img
-              src={isDark ? logoDarkImg : logoImg}
-              alt="ExtraHub Logo"
-              style={{ width: '36px', height: '36px', objectFit: 'contain' }}
-            />
-            <span className="auth-logo-title">ExtraHub</span>
+            <div className="auth-brand-pair">
+              <div className="auth-brand-item">
+                <img
+                  src={isDark ? logoDarkImg : logoImg}
+                  alt="ExtraHub Logo"
+                  className="auth-brand-logo"
+                />
+                <span className="auth-logo-title">ExtraHub</span>
+              </div>
+              <span className="auth-brand-separator">×</span>
+              <div className="auth-brand-item">
+                <img
+                  src={pifagorLogo}
+                  alt={schoolConfig.name}
+                  className="auth-brand-logo school-logo"
+                />
+                <span className="auth-school-title">{schoolConfig.name}</span>
+              </div>
+            </div>
           </Link>
           <h1 className="auth-title">Добро пожаловать</h1>
           <p className="auth-subtitle">
-            Единая цифровая платформа внеурочной деятельности и школьных кружков
+            Единая цифровая платформа внеурочной деятельности для {schoolConfig.name}
           </p>
         </div>
 

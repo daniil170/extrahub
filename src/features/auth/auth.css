@@ -55,17 +55,57 @@
 .auth-logo-link {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
   text-decoration: none;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+}
+
+.auth-brand-pair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.auth-brand-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-brand-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.auth-brand-logo.school-logo {
+  border-radius: var(--radius-xs, 4px);
+}
+
+.auth-brand-separator {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+  opacity: 0.7;
+  user-select: none;
 }
 
 .auth-logo-title {
   font-family: var(--font-heading);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--primary);
   letter-spacing: -0.02em;
+}
+
+.auth-school-title {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 .auth-title {
