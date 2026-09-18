@@ -129,7 +129,7 @@ export async function promoteFromWaitlist(db, groupId) {
     }
 
     // Re-index remaining waitlist items sequentially
-    let remainingWaitlistDocs = [];
+    let remainingWaitlistDocs;
     try {
       const snap = await db
         .collection('waitlist')
