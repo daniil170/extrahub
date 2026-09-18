@@ -15,7 +15,6 @@ import {
 import { Card, Badge, Button } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
 import { schoolConfig } from '../../app/config/schoolConfig.js';
-import { DEMO_ACHIEVEMENTS } from '../../shared/data/demoData.js';
 
 export function ActivityViewMode({ activities, groups, onOpenDetails }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,10 +48,8 @@ export function ActivityViewMode({ activities, groups, onOpenDetails }) {
       const totalWaitlist = actGroups.reduce((sum, g) => sum + (Number(g.waitlistCount) || 0), 0);
       const percent = totalCapacity > 0 ? Math.round((totalEnrolled / totalCapacity) * 100) : 0;
 
-      // Realistic academic progress & attendance metrics for group analytics
-      const hash = (act.title || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const avgAttendance = 89 + (hash % 10); // 89% - 98%
-      const studentMastery = 91 + (hash % 8); // 91% - 98%
+      const avgAttendance = 0;
+      const studentMastery = 0;
 
       // Enrich individual groups with rich group analytics
       const enrichedGroups = actGroups.map((grp, idx) => {
@@ -62,9 +59,8 @@ export function ActivityViewMode({ activities, groups, onOpenDetails }) {
         const grpAvailable = Math.max(0, grpCap - grpEnrolled);
         const grpWaitlist = Number(grp.waitlistCount) || 0;
 
-        // Group specific micro-metrics
-        const grpAttendance = Math.min(100, avgAttendance + ((idx % 2 === 0) ? 1 : -1));
-        const grpMastery = Math.min(100, studentMastery + ((idx % 2 === 0) ? -1 : 1));
+        const grpAttendance = 0;
+        const grpMastery = 0;
 
         let grpStatusBadge = {
           label: `Свободно: ${grpAvailable} мест`,

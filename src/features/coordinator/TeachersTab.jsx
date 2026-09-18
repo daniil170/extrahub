@@ -23,12 +23,6 @@ import {
 } from 'lucide-react';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
-import {
-  DEMO_TEACHERS,
-  DEMO_ACTIVITIES,
-  DEMO_ACTIVITY_GROUPS,
-  DEMO_ATTENDANCE_HISTORY,
-} from '../../shared/data/demoData.js';
 import { Card, Badge, Spinner, Button } from '../../shared/ui/index.js';
 import { formatDate } from '../../shared/utils/index.js';
 import { exportToExcel } from '../../shared/utils/excelExport.js';
@@ -55,42 +49,14 @@ export function TeachersTab() {
           getDocs(collection(db, COLLECTIONS.ATTENDANCE)).catch(() => ({ docs: [] })),
         ]);
 
-        // Teachers: from Firestore, merged/fallback with DEMO_TEACHERS
         const firestoreTeachers = teachersSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        const demoTeacherList = Object.values(DEMO_TEACHERS || {});
-
-        const teachersMap = new Map();
-        // Seed demo teachers first
-        demoTeacherList.forEach((t) => {
-          teachersMap.set(t.id, {
-            ...t,
-            role: 'teacher',
-            status: 'active',
-            createdAt: '2026-08-20T10:00:00.000Z',
-          });
-        });
-        // Override / add real Firestore teachers
-        firestoreTeachers.forEach((t) => {
-          teachersMap.set(t.id, {
-            ...teachersMap.get(t.id),
-            ...t,
-          });
-        });
-
-        // Activities
         const firestoreActs = actsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        const mergedActs = firestoreActs.length > 0 ? firestoreActs : DEMO_ACTIVITIES;
-
-        // Groups
         const firestoreGrps = grpsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        const mergedGrps = firestoreGrps.length > 0 ? firestoreGrps : DEMO_ACTIVITY_GROUPS;
-
-        // Attendance
         const firestoreAtt = attSnap.docs ? attSnap.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
 
-        setTeachers(Array.from(teachersMap.values()));
-        setActivities(mergedActs);
-        setGroups(mergedGrps);
+        setTeachers(firestoreTeachers);
+        setActivities(firestoreActs);
+        setGroups(firestoreGrps);
         setAttendanceRecords(firestoreAtt);
       } catch (err) {
         console.error('Failed to load teachers data:', err);
@@ -116,20 +82,6 @@ export function TeachersTab() {
       }
     });
 
-    // Also parse DEMO_ATTENDANCE_HISTORY if needed
-    Object.entries(DEMO_ATTENDANCE_HISTORY || {}).forEach(([key, studentMap]) => {
-      const groupId = key.split('_')[0];
-      if (!groupAttMap[groupId]) {
-        groupAttMap[groupId] = { total: 0, present: 0 };
-      }
-      Object.values(studentMap).forEach((st) => {
-        groupAttMap[groupId].total += 1;
-        if (st === 'present' || st === 'late') {
-          groupAttMap[groupId].present += 1;
-        }
-      });
-    });
-
     return teachers.map((teacher) => {
       // Find activities linked to this teacher
       const linkedActs = activities.filter(
@@ -151,14 +103,7 @@ export function TeachersTab() {
 
         // Group attendance
         const attStats = groupAttMap[g.id];
-        let groupAttRate;
-        if (attStats && attStats.total > 0) {
-          groupAttRate = Math.round((attStats.present / attStats.total) * 100);
-        } else {
-          // Realistic baseline derived from group occupancy and teacher hash
-          const hash = (g.name || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-          groupAttRate = Math.min(100, Math.max(75, 82 + (hash % 17)));
-        }
+        const groupAttRate = attStats && attStats.total > 0 ? Math.round((attStats.present / attStats.total) * 100) : 0;
 
         return {
           ...g,

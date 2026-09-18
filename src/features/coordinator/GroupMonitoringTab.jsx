@@ -25,7 +25,6 @@ import { formatCurrency, formatDaysOfWeek, exportToExcel } from '../../shared/ut
 import { EditCapacityModal } from './EditCapacityModal.jsx';
 import { ActivityViewMode } from './ActivityViewMode.jsx';
 import { ActivityDetailsModal } from '../catalog/ActivityDetailsModal.jsx';
-import { DEMO_ACHIEVEMENTS, DEMO_ATTENDANCE_HISTORY } from '../../shared/data/demoData.js';
 
 export function GroupMonitoringTab() {
   const {
@@ -48,7 +47,7 @@ export function GroupMonitoringTab() {
   const [activeViewSection, setActiveViewSection] = useState('groups'); // 'groups' | 'analytics_cards' | 'achievements'
   const [detailsActivity, setDetailsActivity] = useState(null);
 
-  // Calculate realistic attendance & mastery metrics per activity / group
+  // Calculate attendance & mastery metrics per activity / group (strictly real data)
   const activityMonitoringStats = useMemo(() => {
     return activities.map((act) => {
       const actGroups = groups.filter((g) => g.activityId === act.id);
@@ -57,14 +56,9 @@ export function GroupMonitoringTab() {
       const fillRate = totalCap > 0 ? Math.round((totalEnr / totalCap) * 100) : 0;
       const totalWaitlist = actGroups.reduce((sum, g) => sum + (Number(g.waitlistCount) || 0), 0);
 
-      // Student achievements for this activity
-      const relatedAchievements = DEMO_ACHIEVEMENTS.filter((ach) => ach.activityId === act.id);
-
-      // Stable deterministic pseudo-metrics for attendance & success
-      const hash = (act.title || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const avgAttendance = 88 + (hash % 11); // 88% - 98%
-      const successRate = 90 + (hash % 9); // 90% - 98%
-      const certsIssued = Math.max(1, (hash % 7) + relatedAchievements.length);
+      const avgAttendance = 0;
+      const successRate = 0;
+      const certsIssued = 0;
 
       return {
         ...act,
@@ -76,7 +70,7 @@ export function GroupMonitoringTab() {
         avgAttendance,
         successRate,
         certsIssued,
-        achievementsCount: relatedAchievements.length,
+        achievementsCount: 0,
       };
     });
   }, [activities, groups]);
@@ -89,21 +83,9 @@ export function GroupMonitoringTab() {
     const fullCount = summary.fullGroupsCount || 0;
     const waitlist = summary.totalWaitlistCount || 0;
 
-    const avgAttendance = activityMonitoringStats.length > 0
-      ? Math.round(
-          activityMonitoringStats.reduce((acc, a) => acc + a.avgAttendance, 0) /
-            activityMonitoringStats.length
-        )
-      : 95;
-
-    const avgSuccess = activityMonitoringStats.length > 0
-      ? Math.round(
-          activityMonitoringStats.reduce((acc, a) => acc + a.successRate, 0) /
-            activityMonitoringStats.length
-        )
-      : 96;
-
-    const totalAchievements = DEMO_ACHIEVEMENTS.length;
+    const avgAttendance = 0;
+    const avgSuccess = 0;
+    const totalAchievements = 0;
 
     return {
       totalEnrolled,
@@ -115,7 +97,7 @@ export function GroupMonitoringTab() {
       avgSuccess,
       totalAchievements,
     };
-  }, [summary, activityMonitoringStats]);
+  }, [summary]);
 
   // Filter groups for live table / list
   const filteredGroups = useMemo(() => {
