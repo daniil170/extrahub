@@ -80,6 +80,7 @@ export function useCatalog() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState('all');
+  const [activityType, setActivityType] = useState('all'); // 'all' | 'circle' | 'club' | 'olympic_reserve'
   const [dayOfWeek, setDayOfWeek] = useState('all');
   const [ageGroup, setAgeGroup] = useState('all');
   const [onlyAvailable, setOnlyAvailable] = useState(false);
@@ -138,22 +139,38 @@ export function useCatalog() {
         return false;
       }
 
-      // 3. Day of week
+      // 3. Activity Type: 'circle' | 'club' | 'olympic_reserve'
+      if (activityType !== 'all') {
+        if (activityType === 'olympic_reserve' && act.type !== 'olympic_reserve') {
+          return false;
+        }
+        if (activityType === 'club' && act.type !== 'club') {
+          return false;
+        }
+        if (
+          activityType === 'circle' &&
+          (act.type === 'club' || act.type === 'olympic_reserve')
+        ) {
+          return false;
+        }
+      }
+
+      // 4. Day of week
       if (!matchesDayFilter(act.groups, dayOfWeek)) {
         return false;
       }
 
-      // 4. Age / grade
+      // 5. Age / grade
       if (!matchesAgeFilter(act.ageGroup, ageGroup)) {
         return false;
       }
 
-      // 5. Only available spots
+      // 6. Only available spots
       if (onlyAvailable && act.remainingSpots <= 0) {
         return false;
       }
 
-      // 6. Student-specific class and shift filtering (only for role === 'student')
+      // 7. Student-specific class and shift filtering (only for role === 'student')
       if (user?.role === 'student') {
         const studentClass = extractGradeNumber(user.className);
         const studentShift =
@@ -186,11 +203,12 @@ export function useCatalog() {
 
       return true;
     });
-  }, [activities, debouncedSearch, category, dayOfWeek, ageGroup, onlyAvailable, user]);
+  }, [activities, debouncedSearch, category, activityType, dayOfWeek, ageGroup, onlyAvailable, user]);
 
   const hasActiveFilters =
     Boolean(searchQuery.trim()) ||
     category !== 'all' ||
+    activityType !== 'all' ||
     dayOfWeek !== 'all' ||
     ageGroup !== 'all' ||
     onlyAvailable;
@@ -199,6 +217,7 @@ export function useCatalog() {
     setSearchQuery('');
     setDebouncedSearch('');
     setCategory('all');
+    setActivityType('all');
     setDayOfWeek('all');
     setAgeGroup('all');
     setOnlyAvailable(false);
@@ -215,6 +234,8 @@ export function useCatalog() {
     setSearchQuery,
     category,
     setCategory,
+    activityType,
+    setActivityType,
     dayOfWeek,
     setDayOfWeek,
     ageGroup,

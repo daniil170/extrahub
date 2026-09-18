@@ -6,6 +6,7 @@ import {
   MapPin,
   Award,
   Layers,
+  Users,
 } from 'lucide-react';
 import { Card, Badge, Button } from '../../shared/ui/index.js';
 import { formatCurrency, formatDaysOfWeek } from '../../shared/utils/index.js';
@@ -14,7 +15,7 @@ import { schoolConfig } from '../../app/config/schoolConfig.js';
 export function ActivityViewMode({ activities, groups, onOpenDetails }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedType, setSelectedType] = useState('all'); // 'all' | 'club' | 'olympic_reserve'
+  const [selectedType, setSelectedType] = useState('all'); // 'all' | 'circle' | 'club' | 'olympic_reserve'
   const [selectedShift, setSelectedShift] = useState('all'); // 'all' | '1' | '2'
 
   // Extract unique categories
@@ -54,11 +55,10 @@ export function ActivityViewMode({ activities, groups, onOpenDetails }) {
 
   // Filter activities
   const filteredActivities = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-
     return combinedActivities.filter((act) => {
       // 1. Search Query
-      if (q) {
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
         const titleMatch = (act.title || '').toLowerCase().includes(q);
         const descMatch = (act.description || '').toLowerCase().includes(q);
         const teacherMatch = (act.teacherName || '').toLowerCase().includes(q);
@@ -74,7 +74,13 @@ export function ActivityViewMode({ activities, groups, onOpenDetails }) {
       // 3. Type
       if (selectedType !== 'all') {
         if (selectedType === 'olympic_reserve' && act.type !== 'olympic_reserve') return false;
-        if (selectedType === 'club' && act.type === 'olympic_reserve') return false;
+        if (selectedType === 'club' && act.type !== 'club') return false;
+        if (
+          selectedType === 'circle' &&
+          (act.type === 'club' || act.type === 'olympic_reserve')
+        ) {
+          return false;
+        }
       }
 
       // 4. Shift
@@ -186,7 +192,8 @@ export function ActivityViewMode({ activities, groups, onOpenDetails }) {
               }}
             >
               <option value="all">Все типы программ</option>
-              <option value="club">Обычные кружки</option>
+              <option value="circle">Обычные кружки (секции)</option>
+              <option value="club">Клубы</option>
               <option value="olympic_reserve">Олимпийский резерв</option>
             </select>
           </div>
@@ -298,7 +305,13 @@ export function ActivityViewMode({ activities, groups, onOpenDetails }) {
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   borderRadius: 'var(--radius-md)',
-                  borderTop: `4px solid ${act.type === 'olympic_reserve' ? '#f59e0b' : 'var(--primary)'}`,
+                  borderTop: `4px solid ${
+                    act.type === 'olympic_reserve'
+                      ? '#f59e0b'
+                      : act.type === 'club'
+                      ? '#10b981'
+                      : 'var(--primary)'
+                  }`,
                   boxShadow: 'var(--shadow-sm)',
                   transition: 'box-shadow 0.2s ease, transform 0.2s ease',
                 }}
@@ -322,6 +335,22 @@ export function ActivityViewMode({ activities, groups, onOpenDetails }) {
                       >
                         <Award size={12} />
                         Олимп. резерв{act.subject ? `: ${act.subject}` : ''}
+                      </Badge>
+                    )}
+                    {act.type === 'club' && (
+                      <Badge
+                        variant="secondary"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                          color: '#059669',
+                          borderColor: 'rgba(16, 185, 129, 0.25)',
+                        }}
+                      >
+                        <Users size={12} />
+                        Клуб
                       </Badge>
                     )}
                     {act.requiresExam && (

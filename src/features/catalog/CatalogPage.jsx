@@ -131,6 +131,8 @@ export function CatalogPage() {
     setSearchQuery,
     category,
     setCategory,
+    activityType,
+    setActivityType,
     dayOfWeek,
     setDayOfWeek,
     ageGroup,
@@ -178,6 +180,13 @@ export function CatalogPage() {
       openEnrollment(act, preferredGroup?.id);
     }
   };
+
+  const typeOptions = [
+    { value: 'all', label: 'Все форматы' },
+    { value: 'circle', label: 'Обычные кружки' },
+    { value: 'club', label: 'Клубы' },
+    { value: 'olympic_reserve', label: 'Олимп. резерв' },
+  ];
 
   const daysOptions = [
     { value: 'all', label: 'Все дни' },
@@ -346,6 +355,34 @@ export function CatalogPage() {
               ))}
             </select>
           </div>
+
+          {/* Program Type Filter - borderless soft background */}
+          <div>
+            <select
+              value={activityType}
+              onChange={(e) => setActivityType(e.target.value)}
+              aria-label="Фильтр по типу программы"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-md, 8px)',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: 500,
+                backgroundColor: 'var(--bg-subtle, #f4f4f2)',
+                color: 'var(--text-primary)',
+                boxSizing: 'border-box',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              {typeOptions.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Second row: Available Spots Toggle, Count & Dynamic Reset Button */}
@@ -500,6 +537,9 @@ export function CatalogPage() {
             const titleWithGuillemets = formatGuillemets(act.title);
             const categoryStyle = getCategoryStyle(act.category, act.title);
             const CategoryIcon = categoryStyle.icon;
+            const hasSyllabus =
+              Array.isArray(act.syllabus) &&
+              act.syllabus.some((m) => Boolean(m?.title?.trim() || m?.description?.trim()));
 
             // Capacity percentage & progress bar styling
             const capacityRatio = totalCapacity > 0 ? (totalCapacity - remainingSpots) / totalCapacity : 0;
@@ -663,8 +703,8 @@ export function CatalogPage() {
                   </div>
                 </div>
 
-                {/* Special Tags: Olympic reserve or Exam required */}
-                {(act.type === 'olympic_reserve' || act.requiresExam) && (
+                {/* Special Tags: Olympic reserve, Club, or Exam required */}
+                {(act.type === 'olympic_reserve' || act.type === 'club' || act.requiresExam) && (
                   <div style={{ display: 'flex', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
                     {act.type === 'olympic_reserve' && (
                       <span
@@ -679,6 +719,21 @@ export function CatalogPage() {
                         }}
                       >
                         Олимпиадный резерв{act.subject ? `: ${act.subject}` : ''}
+                      </span>
+                    )}
+                    {act.type === 'club' && (
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                          color: '#059669',
+                          border: '1px solid rgba(16, 185, 129, 0.25)',
+                        }}
+                      >
+                        Клуб
                       </span>
                     )}
                     {act.requiresExam && (
@@ -845,39 +900,41 @@ export function CatalogPage() {
                     gap: '12px',
                   }}
                 >
-                  {/* Left: Program link + Price */}
+                  {/* Left: Program link (if syllabus present) + Price */}
                   <div>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenDetails(act);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                    {hasSyllabus && (
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
                           e.stopPropagation();
                           handleOpenDetails(act);
-                        }
-                      }}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        fontSize: '11.5px',
-                        color: 'var(--primary)',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        marginBottom: '4px',
-                        transition: 'gap 0.15s ease',
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.gap = '6px')}
-                      onMouseLeave={(e) => (e.currentTarget.style.gap = '4px')}
-                    >
-                      <BookOpen size={13} />
-                      <span>Программа</span>
-                      <ArrowRight size={12} />
-                    </div>
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.stopPropagation();
+                            handleOpenDetails(act);
+                          }
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          fontSize: '11.5px',
+                          color: 'var(--primary)',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          marginBottom: '4px',
+                          transition: 'gap 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.gap = '6px')}
+                        onMouseLeave={(e) => (e.currentTarget.style.gap = '4px')}
+                      >
+                        <BookOpen size={13} />
+                        <span>Программа</span>
+                        <ArrowRight size={12} />
+                      </div>
+                    )}
 
                     <strong
                       style={{

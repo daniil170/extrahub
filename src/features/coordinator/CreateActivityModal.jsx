@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { Sparkles, BookOpen, Target, AlertTriangle, Check } from 'lucide-react';
+import { BookOpen, Target, AlertTriangle, Check } from 'lucide-react';
 import { db } from '../../app/config/firebase.js';
 import { Modal, Button } from '../../shared/ui/index.js';
 import { schoolConfig } from '../../app/config/schoolConfig.js';
@@ -25,37 +25,12 @@ const SUBJECTS = [
   'География',
 ];
 
-const DEFAULT_MODULES = [
-  {
-    module: 'Модуль 1',
-    title: 'Введение и основы направления',
-    description: 'Базовые понятия, инструменты, техника безопасности и первые шаги.',
-    hours: '6 ак. ч.',
-  },
-  {
-    module: 'Модуль 2',
-    title: 'Практические основы и базовые кейсы',
-    description: 'Отработка навыков на типовых задачах под кураторством преподавателя.',
-    hours: '8 ак. ч.',
-  },
-  {
-    module: 'Модуль 3',
-    title: 'Углубленная индивидуальная работа',
-    description: 'Разбор сложных сценариев, решение нестандартных задач и эксперименты.',
-    hours: '10 ак. ч.',
-  },
-  {
-    module: 'Модуль 4',
-    title: 'Командный проект и реализация',
-    description: 'Командная работа над реальным проектом от задумки до прототипа.',
-    hours: '12 ак. ч.',
-  },
-  {
-    module: 'Модуль 5',
-    title: 'Итоговая защита и презентация',
-    description: 'Защита готовых проектов перед родителями и жюри, вручение сертификатов.',
-    hours: '6 ак. ч.',
-  },
+const DEFAULT_EMPTY_MODULES = [
+  { module: 'Модуль 1', title: '', description: '', hours: '' },
+  { module: 'Модуль 2', title: '', description: '', hours: '' },
+  { module: 'Модуль 3', title: '', description: '', hours: '' },
+  { module: 'Модуль 4', title: '', description: '', hours: '' },
+  { module: 'Модуль 5', title: '', description: '', hours: '' },
 ];
 
 const DEFAULT_OUTCOMES = [
@@ -76,7 +51,7 @@ const DAYS = [
 export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Технологии');
-  const [activityType, setActivityType] = useState('club'); // 'club' | 'olympic_reserve'
+  const [activityType, setActivityType] = useState('circle'); // 'circle' | 'club' | 'olympic_reserve'
   const [subject, setSubject] = useState('Информатика');
   const [allowedClasses, setAllowedClasses] = useState([7, 8, 9, 10, 11]);
   const [allowedShifts, setAllowedShifts] = useState(() => schoolConfig.shifts.map((s) => s.id));
@@ -85,9 +60,9 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
   const [ageGroup, setAgeGroup] = useState('10–14 лет (5–8 класс)');
   const [price, setPrice] = useState(24000);
   const [location, setLocation] = useState('Кабинет 204');
-  const [teacherId, setTeacherId] = useState('teacher-1');
+  const [teacherId, setTeacherId] = useState('');
   const [teachersList, setTeachersList] = useState([]);
-  const [teacherName, setTeacherName] = useState('Алия Сериковна Ахметова');
+  const [teacherName, setTeacherName] = useState('');
   const [teacherBio, setTeacherBio] = useState('');
   const [targetAudience, setTargetAudience] = useState('');
   const [requirements, setRequirements] = useState('');
@@ -100,17 +75,36 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
         if (list.length > 0) {
           setTeachersList(list);
           setTeacherId(list[0].id);
-          setTeacherName(list[0].fullName || list[0].displayName || 'Преподаватель');
+          setTeacherName(list[0].fullName || list[0].displayName || list[0].email || 'Преподаватель');
+        } else {
+          const fallbackList = [
+            { id: 'teacher-1', fullName: 'Алия Сериковна Ахметова', email: 'aliya.akhmetova@school.kz' },
+            { id: 'teacher-2', fullName: 'Серик Сакенович Нурпеисов', email: 'serik.nurpeisov@school.kz' },
+            { id: 'teacher-3', fullName: 'Данияр Бауржанович Омаров', email: 'daniyar.omarov@school.kz' },
+            { id: 'teacher-4', fullName: 'Динара Маратовна Касымова', email: 'dinara.kassymova@school.kz' },
+          ];
+          setTeachersList(fallbackList);
+          setTeacherId(fallbackList[0].id);
+          setTeacherName(fallbackList[0].fullName);
         }
       } catch (err) {
-        console.warn('Could not fetch teachers list:', err);
+        console.warn('Could not fetch teachers list, using default list:', err);
+        const fallbackList = [
+          { id: 'teacher-1', fullName: 'Алия Сериковна Ахметова', email: 'aliya.akhmetova@school.kz' },
+          { id: 'teacher-2', fullName: 'Серик Сакенович Нурпеисов', email: 'serik.nurpeisov@school.kz' },
+          { id: 'teacher-3', fullName: 'Данияр Бауржанович Омаров', email: 'daniyar.omarov@school.kz' },
+          { id: 'teacher-4', fullName: 'Динара Маратовна Касымова', email: 'dinara.kassymova@school.kz' },
+        ];
+        setTeachersList(fallbackList);
+        setTeacherId(fallbackList[0].id);
+        setTeacherName(fallbackList[0].fullName);
       }
     }
     fetchTeachers();
   }, []);
 
-  // 5 Modules
-  const [syllabus, setSyllabus] = useState(DEFAULT_MODULES);
+  // 5 Modules (Optional)
+  const [syllabus, setSyllabus] = useState(DEFAULT_EMPTY_MODULES);
 
   // Learning Outcomes (min 3)
   const [outcomes, setOutcomes] = useState(DEFAULT_OUTCOMES);
@@ -126,67 +120,6 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
 
   // Validation errors
   const [errors, setErrors] = useState({});
-
-  const handleFillDemoData = () => {
-    setTitle('Олимпийский резерв: Олимпиадное программирование');
-    setCategory('Технологии');
-    setActivityType('olympic_reserve');
-    setSubject('Информатика');
-    setAllowedClasses([7, 8, 9, 10, 11]);
-    setAllowedShifts(schoolConfig.shifts.map((s) => s.id));
-    setRequiresExam(true);
-    setDescription(
-      'Интенсивная подготовка сборной школы к республиканским и международным олимпиадам по информатике (IOI, Жаутыковская олимпиада). Алгоритмы, структуры данных и олимпиадные контесты.'
-    );
-    setAgeGroup('7–11 классы');
-    setPrice(0);
-    setLocation('Кабинет 304 (IT-лаборатория)');
-    setTeacherName('Серик Сакенович Нурпеисов');
-    setTeacherBio(
-      'Серик Сакенович — главный тренер олимпиадной сборной школы, призёр Республиканской олимпиады.'
-    );
-    setTargetAudience('Для призёров школьных этапов и мотивированных учеников 7–11 классов.');
-    setRequirements('Уверенное знание базового синтаксиса Python или C++. Обязательна сдача вступительного экзамена.');
-    setSyllabus([
-      {
-        module: 'Модуль 1',
-        title: 'Теория чисел и базовая комбинаторика',
-        description: 'НОД, алгоритм Евклида, решето Эратосфена, бинарное возведение в степень.',
-        hours: '6 ак. ч.',
-      },
-      {
-        module: 'Модуль 2',
-        title: 'Линейные структуры данных и сортировки',
-        description: 'Стек, очередь, дек, быстрая сортировка, бинарный поиск по ответу.',
-        hours: '8 ак. ч.',
-      },
-      {
-        module: 'Модуль 3',
-        title: 'Графы: поиск в глубину и ширину (DFS, BFS)',
-        description: 'Компоненты связности, топологическая сортировка, поиск циклов.',
-        hours: '10 ак. ч.',
-      },
-      {
-        module: 'Модуль 4',
-        title: 'Динамическое программирование',
-        description: 'Одномерное и двумерное ДП, рюкзак, наибольшая возрастающая подпоследовательность.',
-        hours: '12 ак. ч.',
-      },
-      {
-        module: 'Модуль 5',
-        title: 'Разбор олимпиадных задач прошлых лет',
-        description: 'Решение задач областных и республиканских этапов олимпиад.',
-        hours: '8 ак. ч.',
-      },
-    ]);
-    setCreateInitialGroup(true);
-    setGroupName('Группа FabLab-1');
-    setGroupCapacity(14);
-    setGroupDays([2, 4]);
-    setGroupStartTime('16:00');
-    setGroupEndTime('17:30');
-    setErrors({});
-  };
 
   const handleModuleChange = (index, field, value) => {
     setSyllabus((prev) => {
@@ -226,8 +159,8 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
     if (price < 0 || isNaN(Number(price))) {
       newErrors.price = 'Стоимость должна быть неотрицательным числом (0 = бесплатно)';
     }
-    if (!teacherName.trim()) {
-      newErrors.teacherName = 'Укажите ФИО преподавателя';
+    if (!teacherId || !teacherId.trim()) {
+      newErrors.teacherId = 'Выберите преподавателя из списка';
     }
     if (outcomes.length < 3) {
       newErrors.outcomes = 'Добавьте минимум 3 ключевых результата обучения';
@@ -253,6 +186,15 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
     e.preventDefault();
     if (!validate()) return;
 
+    const cleanedSyllabus = syllabus
+      .filter((m) => Boolean(m.title?.trim() || m.description?.trim()))
+      .map((m) => ({
+        module: m.module || '',
+        title: (m.title || '').trim(),
+        description: (m.description || '').trim(),
+        hours: (m.hours || '').trim(),
+      }));
+
     const activityData = {
       title: title.trim(),
       category,
@@ -265,12 +207,12 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
       ageGroup: ageGroup.trim() || `${allowedClasses.join(', ')} классы`,
       price: Number(price) || 0,
       location: location.trim() || 'Школьный корпус',
-      teacherId: teacherId || 'teacher-1',
-      teacherName: teacherName.trim(),
+      teacherId: teacherId.trim(),
+      teacherName: teacherName.trim() || 'Преподаватель школы',
       teacherBio: teacherBio.trim(),
       targetAudience: targetAudience.trim(),
       requirements: requirements.trim(),
-      syllabus,
+      syllabus: cleanedSyllabus,
       learningOutcomes: outcomes,
     };
 
@@ -286,7 +228,7 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
         requiresExam: Boolean(requiresExam),
         allowedClasses: allowedClasses.map(Number),
         allowedShifts: allowedShifts.map(Number),
-        teacherId: teacherId || 'teacher-1',
+        teacherId: teacherId.trim(),
       };
     }
 
@@ -301,34 +243,6 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
       maxWidth="720px"
     >
       <form onSubmit={handleSubmit}>
-        {/* Header toolbar with Demo Auto-fill */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: 'var(--bg-subtle)',
-            padding: '10px 14px',
-            borderRadius: 'var(--radius-md)',
-            marginBottom: '18px',
-            border: '1px solid var(--border-color)',
-          }}
-        >
-          <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-            Для быстрого показа на школьном демо:
-          </span>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={handleFillDemoData}
-            style={{ fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-          >
-            <Sparkles size={14} />
-            <span>Заполнить демо-данными</span>
-          </Button>
-        </div>
-
         {/* General Info Grid */}
         <div
           style={{
@@ -346,24 +260,48 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 type="button"
+                onClick={() => setActivityType('circle')}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: `1.5px solid ${activityType === 'circle' ? 'var(--primary)' : 'var(--border-color)'}`,
+                  backgroundColor: activityType === 'circle' ? 'rgba(14, 165, 233, 0.08)' : 'var(--bg-primary)',
+                  color: activityType === 'circle' ? 'var(--primary)' : 'var(--text-primary)',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span>Обычный кружок (секция)</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setActivityType('club')}
                 style={{
                   flex: 1,
                   padding: '10px 14px',
                   borderRadius: 'var(--radius-sm)',
-                  border: `1.5px solid ${activityType === 'club' ? 'var(--primary)' : 'var(--border-color)'}`,
-                  backgroundColor: activityType === 'club' ? 'rgba(14, 165, 233, 0.08)' : 'var(--bg-primary)',
-                  color: activityType === 'club' ? 'var(--primary)' : 'var(--text-primary)',
+                  border: `1.5px solid ${activityType === 'club' ? '#10b981' : 'var(--border-color)'}`,
+                  backgroundColor: activityType === 'club' ? 'rgba(16, 185, 129, 0.08)' : 'var(--bg-primary)',
+                  color: activityType === 'club' ? '#10b981' : 'var(--text-primary)',
                   fontWeight: 600,
-                  fontSize: '13.5px',
+                  fontSize: '13px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
+                  gap: '6px',
+                  transition: 'all 0.15s ease',
                 }}
               >
-                <span>Обычный кружок (секция)</span>
+                <span>Клуб</span>
               </button>
 
               <button
@@ -377,12 +315,13 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
                   backgroundColor: activityType === 'olympic_reserve' ? 'rgba(249, 115, 22, 0.08)' : 'var(--bg-primary)',
                   color: activityType === 'olympic_reserve' ? 'var(--accent-coral, #f97316)' : 'var(--text-primary)',
                   fontWeight: 600,
-                  fontSize: '13.5px',
+                  fontSize: '13px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
+                  gap: '6px',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 <span>Олимпийский резерв</span>
@@ -716,84 +655,59 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
             />
           </div>
 
-          {/* Teacher Selection & Name */}
+          {/* Teacher Selection */}
           <div style={{ gridColumn: '1 / -1' }}>
-            {teachersList.length > 0 && (
-              <div style={{ marginBottom: '10px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontSize: '12.5px',
-                    fontWeight: 600,
-                    color: 'var(--text-secondary)',
-                    marginBottom: '4px',
-                  }}
-                >
-                  Назначить преподавателя из системы:
-                </label>
-                <select
-                  value={teacherId}
-                  onChange={(e) => {
-                    const selId = e.target.value;
-                    setTeacherId(selId);
-                    const found = teachersList.find((t) => t.id === selId);
-                    if (found) {
-                      setTeacherName(found.fullName || found.displayName || '');
-                    }
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '9px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid var(--border-color)',
-                    fontSize: '13.5px',
-                    backgroundColor: 'var(--bg-surface)',
-                    color: 'var(--text-primary)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {teachersList.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.fullName || t.email} ({t.email})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
             <label
               style={{
                 display: 'block',
                 fontSize: '13px',
                 fontWeight: 600,
                 color: 'var(--text-secondary)',
-                marginBottom: '5px',
+                marginBottom: '6px',
               }}
             >
-              ФИО преподавателя <span style={{ color: 'var(--danger)' }}>*</span>
+              Назначить преподавателя из системы <span style={{ color: 'var(--danger)' }}>*</span>
             </label>
-            <input
-              type="text"
-              value={teacherName}
+            <select
+              value={teacherId}
               onChange={(e) => {
-                setTeacherName(e.target.value);
-                if (errors.teacherName) setErrors((prev) => ({ ...prev, teacherName: null }));
+                const selId = e.target.value;
+                setTeacherId(selId);
+                const found = teachersList.find((t) => t.id === selId);
+                if (found) {
+                  setTeacherName(found.fullName || found.displayName || found.email || '');
+                } else {
+                  setTeacherName('');
+                }
+                if (errors.teacherId) setErrors((prev) => ({ ...prev, teacherId: null }));
               }}
-              placeholder="Например: Садыков Нурлан Бауржанович"
               style={{
                 width: '100%',
                 padding: '10px 12px',
                 borderRadius: 'var(--radius-sm)',
-                border: errors.teacherName ? '1.5px solid var(--danger)' : '1px solid var(--border-color)',
+                border: errors.teacherId ? '1.5px solid var(--danger)' : '1px solid var(--border-color)',
                 fontSize: '14px',
                 backgroundColor: 'var(--bg-primary)',
                 color: 'var(--text-primary)',
+                cursor: 'pointer',
                 boxSizing: 'border-box',
               }}
-            />
-            {errors.teacherName && (
+            >
+              <option value="">-- Выберите преподавателя --</option>
+              {teachersList.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.fullName || t.name || t.displayName || t.email} {t.email ? `(${t.email})` : ''}
+                </option>
+              ))}
+            </select>
+            {errors.teacherId && (
               <div style={{ color: 'var(--danger)', fontSize: '12px', marginTop: '4px' }}>
-                {errors.teacherName}
+                {errors.teacherId}
+              </div>
+            )}
+            {teacherName && teacherId && (
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '5px' }}>
+                Выбранный преподаватель: <strong style={{ color: 'var(--text-primary)' }}>{teacherName}</strong>
               </div>
             )}
           </div>
@@ -859,10 +773,10 @@ export function CreateActivityModal({ isOpen, onClose, onSave, isCreating }) {
           >
             <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <BookOpen size={16} color="var(--primary)" />
-              <span>Программа курса (5 учебных модулей)</span>
+              <span>Программа курса (опционально)</span>
             </div>
             <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              Отобразится в деталях карточки каталога
+              Заполните от 0 до 5 модулей при наличии
             </span>
           </div>
 

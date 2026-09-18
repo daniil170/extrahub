@@ -24,33 +24,10 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
   const remainingSpots = activity.remainingSpots;
   const groups = activity.groups || [];
 
-  // Default syllabus fallback if activity has no custom syllabus
-  const syllabus =
-    activity.syllabus && activity.syllabus.length > 0
-      ? activity.syllabus
-      : [
-          {
-            module: 'Модуль 1',
-            title: 'Введение и основы направления',
-            description:
-              'Знакомство с дисциплиной, базовые понятия, организация рабочего процесса и техника безопасности.',
-            hours: '6 ак. ч.',
-          },
-          {
-            module: 'Модуль 2',
-            title: 'Теоретические концепции и практические приёмы',
-            description:
-              'Углубленное изучение ключевых тем программы, разбор примеров и выполнение практических заданий.',
-            hours: '12 ак. ч.',
-          },
-          {
-            module: 'Модуль 3',
-            title: 'Проектная работа и демонстрация результатов',
-            description:
-              'Создание индивидуального или командного проекта, подведение итогов обучения и презентация работ.',
-            hours: '10 ак. ч.',
-          },
-        ];
+  // Filter syllabus for non-empty modules (no fake fallback)
+  const syllabus = (activity.syllabus || []).filter(
+    (item) => Boolean(item?.title?.trim() || item?.description?.trim())
+  );
 
   const outcomes =
     activity.learningOutcomes && activity.learningOutcomes.length > 0
@@ -93,6 +70,18 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
               {activity.type === 'olympic_reserve' && (
                 <Badge variant="warning">
                   Олимпийский резерв{activity.subject ? `: ${activity.subject}` : ''}
+                </Badge>
+              )}
+              {activity.type === 'club' && (
+                <Badge
+                  variant="secondary"
+                  style={{
+                    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                    color: '#059669',
+                    borderColor: 'rgba(16, 185, 129, 0.25)',
+                  }}
+                >
+                  Клуб
                 </Badge>
               )}
               {activity.requiresExam && (
@@ -234,119 +223,121 @@ export function ActivityDetailsModal({ isOpen, onClose, activity, onEnroll }) {
         </div>
 
         {/* Section: Содержание программы (Curriculum Syllabus) */}
-        <div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '14px',
-            }}
-          >
-            <h3
+        {syllabus.length > 0 && (
+          <div>
+            <div
               style={{
-                fontSize: '15px',
-                fontWeight: 600,
-                fontFamily: 'var(--font-heading)',
-                color: 'var(--text-primary)',
-                margin: 0,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                justifyContent: 'space-between',
+                marginBottom: '14px',
               }}
             >
-              <BookOpen size={16} style={{ color: 'var(--primary)' }} />
-              <span>Содержание программы курса</span>
-            </h3>
-            <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
-              МОДУЛЕЙ: {syllabus.length}
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {syllabus.map((item, idx) => (
-              <div
-                key={idx}
+              <h3
                 style={{
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '14px 16px',
-                  backgroundColor: 'var(--bg-surface)',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-heading)',
+                  color: 'var(--text-primary)',
+                  margin: 0,
                   display: 'flex',
-                  gap: '14px',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}
               >
+                <BookOpen size={16} style={{ color: 'var(--primary)' }} />
+                <span>Содержание программы курса</span>
+              </h3>
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+                МОДУЛЕЙ: {syllabus.length}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {syllabus.map((item, idx) => (
                 <div
+                  key={idx}
                   style={{
-                    minWidth: '26px',
-                    height: '26px',
-                    borderRadius: 'var(--radius-sm)',
-                    backgroundColor: 'var(--bg-subtle)',
                     border: '1px solid var(--border-color)',
-                    color: 'var(--text-primary)',
+                    borderRadius: 'var(--radius-md)',
+                    padding: '14px 16px',
+                    backgroundColor: 'var(--bg-surface)',
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    fontFamily: 'var(--font-mono)',
-                    marginTop: '2px',
-                    flexShrink: 0,
+                    gap: '14px',
+                    alignItems: 'flex-start',
                   }}
                 >
-                  {idx + 1}
-                </div>
-
-                <div style={{ flex: 1 }}>
                   <div
                     style={{
+                      minWidth: '26px',
+                      height: '26px',
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: 'var(--bg-subtle)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-primary)',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      flexWrap: 'wrap',
-                      gap: '6px',
-                      marginBottom: '4px',
+                      justifyContent: 'center',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      fontFamily: 'var(--font-mono)',
+                      marginTop: '2px',
+                      flexShrink: 0,
                     }}
                   >
-                    <div
-                      style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}
-                    >
-                      <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '12px', marginRight: '6px' }}>
-                        {item.module}:
-                      </span>
-                      {item.title}
-                    </div>
-                    {item.hours && (
-                      <span
-                        style={{
-                          fontSize: '11px',
-                          fontFamily: 'var(--font-mono)',
-                          color: 'var(--primary)',
-                          backgroundColor: 'var(--primary-light)',
-                          border: '1px solid var(--border-color)',
-                          padding: '2px 8px',
-                          borderRadius: 'var(--radius-sm)',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                        }}
-                      >
-                        <Clock size={11} />
-                        {item.hours}
-                      </span>
-                    )}
+                    {idx + 1}
                   </div>
-                  <div
-                    style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}
-                  >
-                    {item.description}
+
+                  <div style={{ flex: 1 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: '6px',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      <div
+                        style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}
+                      >
+                        <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '12px', marginRight: '6px' }}>
+                          {item.module}:
+                        </span>
+                        {item.title}
+                      </div>
+                      {item.hours && (
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontFamily: 'var(--font-mono)',
+                            color: 'var(--primary)',
+                            backgroundColor: 'var(--primary-light)',
+                            border: '1px solid var(--border-color)',
+                            padding: '2px 8px',
+                            borderRadius: 'var(--radius-sm)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          <Clock size={11} />
+                          {item.hours}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}
+                    >
+                      {item.description}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Section: Чему научится ребёнок */}
         <div>

@@ -33,7 +33,7 @@ export function combineCatalogData(rawActivities, rawGroups, rawTeachers) {
 
     return {
       ...act,
-      type: act.type || 'club',
+      type: act.type === 'olympic_reserve' ? 'olympic_reserve' : act.type === 'club' ? 'club' : 'circle',
       subject: act.subject || '',
       allowedClasses: Array.isArray(act.allowedClasses) ? act.allowedClasses.map(Number) : [],
       allowedShifts: Array.isArray(act.allowedShifts) ? act.allowedShifts.map(Number) : [1, 2],
@@ -58,7 +58,12 @@ export async function createActivityRecord(activityData) {
     id: newId,
     title: (activityData.title || '').trim(),
     category: activityData.category || 'Общее развитие',
-    type: activityData.type === 'olympic_reserve' ? 'olympic_reserve' : 'club',
+    type:
+      activityData.type === 'olympic_reserve'
+        ? 'olympic_reserve'
+        : activityData.type === 'club'
+        ? 'club'
+        : 'circle',
     subject: activityData.subject ? String(activityData.subject).trim() : '',
     allowedClasses: Array.isArray(activityData.allowedClasses)
       ? activityData.allowedClasses.map(Number)
@@ -91,41 +96,7 @@ export async function createActivityRecord(activityData) {
             'Развитие творческого, аналитического и проектного мышления',
             'Опыт командного взаимодействия и публичной презентации результатов',
           ],
-    syllabus:
-      Array.isArray(activityData.syllabus) && activityData.syllabus.length > 0
-        ? activityData.syllabus
-        : [
-            {
-              module: 'Модуль 1',
-              title: 'Введение и основы направления',
-              description: 'Знакомство с предметом, базовые понятия, инструменты и правила безопасности.',
-              hours: '6 ак. ч.',
-            },
-            {
-              module: 'Модуль 2',
-              title: 'Практические навыки и упражнения',
-              description: 'Погружение в практическую деятельность и выполнение базовых упражнений.',
-              hours: '8 ак. ч.',
-            },
-            {
-              module: 'Модуль 3',
-              title: 'Углубленная индивидуальная работа',
-              description: 'Решение комплексных задач и разбор прикладных кейсов.',
-              hours: '10 ак. ч.',
-            },
-            {
-              module: 'Модуль 4',
-              title: 'Командный проект',
-              description: 'Разработка собственного группового или индивидуального проекта под кураторством педагога.',
-              hours: '12 ак. ч.',
-            },
-            {
-              module: 'Модуль 5',
-              title: 'Итоговая демонстрация и защита',
-              description: 'Презентация и защита результатов родителям, подведение итогов и вручение сертификатов.',
-              hours: '6 ак. ч.',
-            },
-          ],
+    syllabus: Array.isArray(activityData.syllabus) ? activityData.syllabus : [],
     createdAt: new Date().toISOString(),
   };
 
