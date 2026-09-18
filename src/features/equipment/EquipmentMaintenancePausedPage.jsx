@@ -1,4 +1,4 @@
-import { Wrench, Clock, ArrowLeft, ShieldAlert } from 'lucide-react';
+import { Wrench, Clock, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card, Button, Badge } from '../../shared/ui/index.js';
 import { schoolConfig } from '../../app/config/schoolConfig.js';
@@ -86,47 +86,13 @@ export function EquipmentMaintenancePausedPage() {
             color: 'var(--text-secondary)',
             lineHeight: 1.6,
             maxWidth: '560px',
-            margin: '0 0 28px',
+            margin: '0 0 32px',
           }}
         >
           Модуль учёта поломок, сервисных заявок и диспетчеризации инженеров сейчас находится
           в разработке и проходит финальное тестирование. Для {schoolConfig.name} он будет
           активирован в следующем обновлении платформы ExtraHub.
         </p>
-
-        {/* Informative notice card */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '540px',
-            padding: '16px 20px',
-            backgroundColor: 'var(--bg-subtle, #f8fafc)',
-            borderRadius: 'var(--radius-md, 10px)',
-            border: '1px solid var(--border-color)',
-            marginBottom: '32px',
-            textAlign: 'left',
-            fontSize: '13px',
-            color: 'var(--text-secondary)',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '12px',
-          }}
-        >
-          <ShieldAlert size={20} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-          <div style={{ lineHeight: 1.5 }}>
-            <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '2px' }}>
-              Экстренные неполадки в кабинетах
-            </strong>
-            При возникновении срочных аварийных ситуаций (отопление, электричество, сантехника)
-            обращайтесь напрямую к дежурному коменданту школы или по адресу{' '}
-            <a
-              href={`mailto:${schoolConfig.supportEmail}`}
-              style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'underline' }}
-            >
-              {schoolConfig.supportEmail}
-            </a>.
-          </div>
-        </div>
 
         {/* Action Button */}
         <Link to="/catalog" style={{ textDecoration: 'none' }}>
