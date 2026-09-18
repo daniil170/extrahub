@@ -17,7 +17,12 @@ import {
   TeacherDashboard,
   CoordinatorDashboard,
 } from '../../features/dashboard/index.js';
-import { TeacherEquipmentPage, TechnicianDashboard } from '../../features/equipment/index.js';
+import {
+  TeacherEquipmentPage,
+  TechnicianDashboard,
+  EquipmentMaintenancePausedPage,
+} from '../../features/equipment/index.js';
+import { schoolConfig } from '../config/schoolConfig.js';
 import { DashboardRedirect } from './DashboardRedirect.jsx';
 
 export const router = createBrowserRouter([
@@ -93,7 +98,11 @@ export const router = createBrowserRouter([
         path: 'teacher/equipment',
         element: (
           <ProtectedRoute allowedRoles={['teacher', 'admin']}>
-            <TeacherEquipmentPage />
+            {schoolConfig.equipmentModuleEnabled ? (
+              <TeacherEquipmentPage />
+            ) : (
+              <EquipmentMaintenancePausedPage />
+            )}
           </ProtectedRoute>
         ),
       },
@@ -109,7 +118,11 @@ export const router = createBrowserRouter([
         path: 'technician',
         element: (
           <ProtectedRoute allowedRoles={['technician', 'admin']}>
-            <TechnicianDashboard />
+            {schoolConfig.equipmentModuleEnabled ? (
+              <TechnicianDashboard />
+            ) : (
+              <EquipmentMaintenancePausedPage />
+            )}
           </ProtectedRoute>
         ),
       },

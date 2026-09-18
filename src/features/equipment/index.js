@@ -6,3 +6,4 @@ export * from './IssueDetailsModal.jsx';
 export * from './TeacherEquipmentSection.jsx';
 export * from './TeacherEquipmentPage.jsx';
 export * from './TechnicianDashboard.jsx';
+export * from './EquipmentMaintenancePausedPage.jsx';

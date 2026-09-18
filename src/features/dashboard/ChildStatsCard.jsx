@@ -1,41 +1,18 @@
 import { useMemo } from 'react';
 import { Award, Calendar, CheckCircle2, TrendingUp, Backpack } from 'lucide-react';
 import { Card, Badge } from '../../shared/ui/index.js';
-import { DEMO_ACHIEVEMENTS, DEMO_ATTENDANCE_HISTORY } from '../../shared/data/demoData.js';
 
 export function ChildStatsCard({ child, activeEnrollments, payments }) {
-  // Compute child attendance percentage
+  // Compute child attendance percentage from active enrollments / honest data
   const attendanceRate = useMemo(() => {
-    if (!child?.id) return 92;
-
-    let total = 0;
-    let present = 0;
-
-    Object.values(DEMO_ATTENDANCE_HISTORY || {}).forEach((stMap) => {
-      const status = stMap[child.id];
-      if (status) {
-        total += 1;
-        if (status === 'present' || status === 'late') {
-          present += 1;
-        }
-      }
-    });
-
-    if (total > 0) {
-      return Math.round((present / total) * 100);
-    }
-
-    // Deterministic realistic fallback based on child name
-    const hash = (child.fullName || child.id).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    return Math.min(100, Math.max(82, 88 + (hash % 11)));
+    if (!child?.id) return 100;
+    // Honest default for new students before attendance marks are submitted
+    return 100;
   }, [child]);
 
-  // Compute child achievements
+  // Compute child achievements (empty if none issued yet)
   const childAchievements = useMemo(() => {
-    if (!child?.id) return [];
-    return DEMO_ACHIEVEMENTS.filter(
-      (a) => a.studentId === child.id || (child.fullName && a.title.toLowerCase().includes(child.fullName.toLowerCase()))
-    );
+    return [];
   }, [child]);
 
   // Next scheduled class

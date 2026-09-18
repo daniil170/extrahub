@@ -255,12 +255,48 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                 )}
 
                 {currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin') && (
-                  <NavLink
-                    to={currentUser.role === 'teacher' ? '/teacher/equipment' : '/technician'}
-                    style={navLinkStyle}
-                  >
-                    Заявки на ремонт
-                  </NavLink>
+                  <>
+                    {/* Visual separator isolating equipment maintenance */}
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: '1px',
+                        height: '18px',
+                        backgroundColor: 'var(--border-color)',
+                        margin: '0 6px',
+                        opacity: 0.8,
+                      }}
+                      aria-hidden="true"
+                    />
+                    <NavLink
+                      to={currentUser.role === 'teacher' ? '/teacher/equipment' : '/technician'}
+                      style={(args) => ({
+                        ...navLinkStyle(args),
+                        color: 'var(--text-muted)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      })}
+                    >
+                      <span>Заявки на ремонт</span>
+                      {!schoolConfig.equipmentModuleEnabled && (
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            padding: '1px 5px',
+                            borderRadius: '4px',
+                            backgroundColor: 'var(--bg-subtle)',
+                            color: 'var(--text-muted)',
+                            border: '1px solid var(--border-color)',
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          Скоро
+                        </span>
+                      )}
+                    </NavLink>
+                  </>
                 )}
               </>
             )}
@@ -605,13 +641,36 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                 )}
 
                 {currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin') && (
-                  <NavLink
-                    to={currentUser.role === 'teacher' ? '/teacher/equipment' : '/technician'}
-                    style={mobileNavLinkStyle}
-                    onClick={handleMobileNavClick}
-                  >
-                    Заявки на ремонт
-                  </NavLink>
+                  <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed var(--border-color)' }}>
+                    <NavLink
+                      to={currentUser.role === 'teacher' ? '/teacher/equipment' : '/technician'}
+                      style={(args) => ({
+                        ...mobileNavLinkStyle(args),
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        color: 'var(--text-secondary)',
+                      })}
+                      onClick={handleMobileNavClick}
+                    >
+                      <span>Заявки на ремонт</span>
+                      {!schoolConfig.equipmentModuleEnabled && (
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            backgroundColor: 'var(--bg-subtle)',
+                            color: 'var(--text-muted)',
+                            border: '1px solid var(--border-color)',
+                          }}
+                        >
+                          В разработке
+                        </span>
+                      )}
+                    </NavLink>
+                  </div>
                 )}
               </>
             )}

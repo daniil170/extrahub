@@ -71,6 +71,12 @@ export const schoolConfig = {
     return found ? found.name : `${shiftId} смена`;
   },
 
+  // Feature Flags
+  equipmentModuleEnabled:
+    import.meta.env.VITE_EQUIPMENT_MODULE_ENABLED === 'true' ||
+    import.meta.env.EQUIPMENT_MODULE_ENABLED === 'true' ||
+    false,
+
   // Contact & Legal
   supportEmail: `support@${SCHOOL_DOMAIN}`,
   privacyEmail: `privacy@${SCHOOL_DOMAIN}`,

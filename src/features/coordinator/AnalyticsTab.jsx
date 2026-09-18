@@ -37,14 +37,6 @@ import { Card, Badge, Spinner, Button } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, exportToExcel } from '../../shared/utils/index.js';
 import { useEquipmentIssues } from '../equipment/useEquipmentIssues.js';
 import { ISSUE_CATEGORIES, ISSUE_CATEGORY_META } from '../../entities/equipmentIssue/model.js';
-import {
-  DEMO_STUDENTS,
-  DEMO_ACHIEVEMENTS,
-  DEMO_TEACHERS,
-  DEMO_ATTENDANCE_HISTORY,
-  DEMO_ACTIVITIES,
-  DEMO_ACTIVITY_GROUPS,
-} from '../../shared/data/demoData.js';
 
 // Ranking calculation weights
 export const ACHIEVEMENT_WEIGHT = 10;
@@ -115,18 +107,13 @@ export function AnalyticsTab() {
       const loadedAchs = achsSnap.docs ? achsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
       const loadedTeachers = teachersSnap.docs ? teachersSnap.docs.map((d) => ({ id: d.id, ...d.data() })) : [];
 
-      setActivities(loadedActs.length > 0 ? loadedActs : DEMO_ACTIVITIES);
-      setGroups(loadedGrps.length > 0 ? loadedGrps : DEMO_ACTIVITY_GROUPS);
+      setActivities(loadedActs);
+      setGroups(loadedGrps);
       setPayments(loadedPays);
-      setStudents(loadedStuds.length > 0 ? loadedStuds : DEMO_STUDENTS);
+      setStudents(loadedStuds);
       setAttendanceRecords(loadedAtt);
-      setAchievements(loadedAchs.length > 0 ? loadedAchs : DEMO_ACHIEVEMENTS);
-
-      // Merge demo teachers and live teachers
-      const teachersMap = new Map();
-      Object.values(DEMO_TEACHERS || {}).forEach((t) => teachersMap.set(t.id, t));
-      loadedTeachers.forEach((t) => teachersMap.set(t.id, { ...teachersMap.get(t.id), ...t }));
-      setTeachers(Array.from(teachersMap.values()));
+      setAchievements(loadedAchs);
+      setTeachers(loadedTeachers);
     } catch (err) {
       console.error('Failed to load analytics data from Firestore:', err);
       setLoadError(err.message || 'Не удалось загрузить данные аналитики');
@@ -193,16 +180,8 @@ export function AnalyticsTab() {
         }
       });
 
-      // If real records exist, calculate real rate.
-      // Otherwise synthesize a realistic demo baseline between 78% and 96% based on group fill rate
-      let rate;
-      if (total > 0) {
-        rate = Math.round((present / total) * 100);
-      } else {
-        // Deterministic realistic baseline for presentation demo
-        const hash = (act.title || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        rate = 78 + (hash % 19);
-      }
+      // If real records exist, calculate real rate. Otherwise 0% (honest data).
+      const rate = total > 0 ? Math.round((present / total) * 100) : 0;
 
       return {
         id: act.id,
@@ -210,7 +189,7 @@ export function AnalyticsTab() {
         shortTitle: act.title.length > 20 ? act.title.substring(0, 18) + '…' : act.title,
         category: act.category || 'Общее',
         rate,
-        totalLessons: total || 12,
+        totalLessons: total,
       };
     });
 
@@ -380,19 +359,6 @@ export function AnalyticsTab() {
       }
     });
 
-    // Also include DEMO_ATTENDANCE_HISTORY records
-    Object.values(DEMO_ATTENDANCE_HISTORY || {}).forEach((stMap) => {
-      Object.entries(stMap).forEach(([studentId, status]) => {
-        if (!studentAttMap[studentId]) {
-          studentAttMap[studentId] = { total: 0, present: 0 };
-        }
-        studentAttMap[studentId].total += 1;
-        if (status === 'present' || status === 'late') {
-          studentAttMap[studentId].present += 1;
-        }
-      });
-    });
-
     // Map achievements per student
     const studentAchsMap = {};
     achievements.forEach((ach) => {
@@ -405,14 +371,7 @@ export function AnalyticsTab() {
       const achsCount = studentAchsMap[st.id] || 0;
       const att = studentAttMap[st.id];
 
-      let attRate;
-      if (att && att.total > 0) {
-        attRate = Math.round((att.present / att.total) * 100);
-      } else {
-        const hash = (st.fullName || st.id).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        attRate = Math.min(100, Math.max(78, 84 + (hash % 16)));
-      }
-
+      const attRate = att && att.total > 0 ? Math.round((att.present / att.total) * 100) : 0;
       const score = Math.round((achsCount * ACHIEVEMENT_WEIGHT) + (attRate * ATTENDANCE_WEIGHT));
 
       return {
@@ -450,19 +409,6 @@ export function AnalyticsTab() {
       }
     });
 
-    Object.entries(DEMO_ATTENDANCE_HISTORY || {}).forEach(([key, stMap]) => {
-      const grpId = key.split('_')[0];
-      if (!groupAttMap[grpId]) {
-        groupAttMap[grpId] = { total: 0, present: 0 };
-      }
-      Object.values(stMap).forEach((status) => {
-        groupAttMap[grpId].total += 1;
-        if (status === 'present' || status === 'late') {
-          groupAttMap[grpId].present += 1;
-        }
-      });
-    });
-
     const ranked = teachers.map((t) => {
       const linkedActs = activities.filter(
         (a) =>
@@ -474,7 +420,7 @@ export function AnalyticsTab() {
 
       const totalStudents = linkedGrps.reduce((sum, g) => sum + (Number(g.enrolledCount) || 0), 0);
 
-      let avgRate;
+      let avgRate = 0;
       if (linkedGrps.length > 0) {
         let total = 0;
         let present = 0;
@@ -488,13 +434,7 @@ export function AnalyticsTab() {
 
         if (total > 0) {
           avgRate = Math.round((present / total) * 100);
-        } else {
-          const hash = (t.fullName || t.id).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-          avgRate = Math.min(100, Math.max(82, 85 + (hash % 14)));
         }
-      } else {
-        const hash = (t.fullName || t.id).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        avgRate = Math.min(100, Math.max(80, 83 + (hash % 15)));
       }
 
       return {

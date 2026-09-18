@@ -16,7 +16,6 @@ import { fetchTeacherGroups, fetchGroupStudents } from '../attendance/api.js';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
-import { DEMO_ACHIEVEMENTS, DEMO_ATTENDANCE_HISTORY } from '../../shared/data/demoData.js';
 
 export function TeacherStudentsTab() {
   const { user } = useAuth();
@@ -64,7 +63,7 @@ export function TeacherStudentsTab() {
 
         setGroups(loadedGroups);
         setAttendanceRecords(liveAtt);
-        setAchievements(liveAchs.length > 0 ? liveAchs : DEMO_ACHIEVEMENTS);
+        setAchievements(liveAchs);
 
         // Flatten student entries with group context
         const allStudentsList = [];
@@ -118,19 +117,6 @@ export function TeacherStudentsTab() {
       }
     });
 
-    // Demo attendance history fallback
-    Object.values(DEMO_ATTENDANCE_HISTORY || {}).forEach((stMap) => {
-      Object.entries(stMap).forEach(([studentId, status]) => {
-        if (!map[studentId]) {
-          map[studentId] = { total: 0, present: 0 };
-        }
-        map[studentId].total += 1;
-        if (status === 'present' || status === 'late') {
-          map[studentId].present += 1;
-        }
-      });
-    });
-
     return map;
   }, [attendanceRecords]);
 
@@ -150,14 +136,7 @@ export function TeacherStudentsTab() {
   const enrichedStudents = useMemo(() => {
     return students.map((st) => {
       const att = studentAttMap[st.id];
-      let attendanceRate;
-      if (att && att.total > 0) {
-        attendanceRate = Math.round((att.present / att.total) * 100);
-      } else {
-        const hash = (st.fullName || st.id).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        attendanceRate = Math.min(100, Math.max(78, 85 + (hash % 15)));
-      }
-
+      const attendanceRate = att && att.total > 0 ? Math.round((att.present / att.total) * 100) : 0;
       const achs = studentAchievementsMap[st.id] || [];
 
       return {

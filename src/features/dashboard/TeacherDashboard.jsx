@@ -3,9 +3,10 @@ import { GraduationCap, Users } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { PageHeader, IconBookOpen, IconWrench } from '../../shared/ui/index.js';
 import { AttendanceJournal } from '../attendance/index.js';
-import { TeacherEquipmentSection } from '../equipment/index.js';
+import { TeacherEquipmentSection, EquipmentMaintenancePausedPage } from '../equipment/index.js';
 import { TeacherExamApplicationsSection } from '../teacher/TeacherExamApplicationsSection.jsx';
 import { TeacherStudentsTab } from '../teacher/TeacherStudentsTab.jsx';
+import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 export function TeacherDashboard() {
   const { user } = useAuth();
@@ -111,13 +112,34 @@ export function TeacherDashboard() {
         >
           <IconWrench size={16} />
           <span>Заявки на ремонт</span>
+          {!schoolConfig.equipmentModuleEnabled && (
+            <span
+              style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                padding: '1px 5px',
+                borderRadius: '4px',
+                backgroundColor: activeTab === 'equipment' ? 'rgba(255, 255, 255, 0.25)' : 'var(--bg-subtle)',
+                color: activeTab === 'equipment' ? '#ffffff' : 'var(--text-muted)',
+                border: activeTab === 'equipment' ? 'none' : '1px solid var(--border-color)',
+              }}
+            >
+              Пауза
+            </span>
+          )}
         </button>
       </div>
 
       {activeTab === 'attendance' && <AttendanceJournal />}
       {activeTab === 'students' && <TeacherStudentsTab />}
       {activeTab === 'exams' && <TeacherExamApplicationsSection />}
-      {activeTab === 'equipment' && <TeacherEquipmentSection />}
+      {activeTab === 'equipment' && (
+        schoolConfig.equipmentModuleEnabled ? (
+          <TeacherEquipmentSection />
+        ) : (
+          <EquipmentMaintenancePausedPage />
+        )
+      )}
     </div>
   );
 }
