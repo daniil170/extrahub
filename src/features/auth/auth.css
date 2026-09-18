@@ -81,7 +81,10 @@
 }
 
 .auth-brand-logo.school-logo {
-  border-radius: var(--radius-xs, 4px);
+  background-color: #ffffff;
+  border-radius: var(--radius-xs, 6px);
+  padding: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 .auth-brand-separator {
