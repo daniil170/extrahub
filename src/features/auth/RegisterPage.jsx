@@ -22,6 +22,7 @@ import { useTheme } from '../../shared/hooks/index.js';
 import { Button, Alert, Spinner } from '../../shared/ui/index.js';
 import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
+import pifagorLogo from '../../assets/pifagor-logo.png';
 import { schoolConfig } from '../../app/config/schoolConfig.js';
 import './auth.css';
 
@@ -185,15 +186,30 @@ export function RegisterPage() {
         {/* Brand Header */}
         <div className="auth-header">
           <Link to="/catalog" className="auth-logo-link">
-            <img
-              src={isDark ? logoDarkImg : logoImg}
-              alt="ExtraHub Logo"
-              style={{ width: '36px', height: '36px', objectFit: 'contain' }}
-            />
-            <span className="auth-logo-title">ExtraHub</span>
+            <div className="auth-brand-pair">
+              <div className="auth-brand-item">
+                <img
+                  src={isDark ? logoDarkImg : logoImg}
+                  alt="ExtraHub Logo"
+                  className="auth-brand-logo"
+                />
+                <span className="auth-logo-title">ExtraHub</span>
+              </div>
+              <span className="auth-brand-separator">×</span>
+              <div className="auth-brand-item">
+                <img
+                  src={pifagorLogo}
+                  alt={schoolConfig.name}
+                  className="auth-brand-logo school-logo"
+                />
+                <span className="auth-school-title">{schoolConfig.name}</span>
+              </div>
+            </div>
           </Link>
           <h1 className="auth-title">Регистрация ученика</h1>
-          <p className="auth-subtitle">Создайте профиль учащегося с корпоративной почтой школы</p>
+          <p className="auth-subtitle">
+            Создайте профиль учащегося с корпоративной почтой школы
+          </p>
         </div>
 
         {/* Two-tab Switcher (Вход / Регистрация) */}
