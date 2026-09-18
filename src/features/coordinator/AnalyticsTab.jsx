@@ -1098,231 +1098,7 @@ export function AnalyticsTab() {
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. БЛОК: СТАТИСТИКА ПО ПОЛОМКАМ ОБОРУДОВАНИЯ */}
-      {/* ========================================================================= */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '12px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Wrench size={20} color="var(--primary)" />
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-              3. Статистика по поломкам оборудования
-            </h3>
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExportEquipment}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            title="Экспорт статистики поломок оборудования в Excel"
-          >
-            <FileSpreadsheet size={15} color="var(--primary)" />
-            <span>Экспорт в Excel</span>
-          </Button>
-        </div>
-
-        {/* KPI Cards */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '14px',
-          }}
-        >
-          <Card>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Всего заявок за всё время</div>
-            <div
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '28px',
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                margin: '6px 0 4px',
-              }}
-            >
-              {equipmentAnalytics.total}
-            </div>
-            <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-              зарегистрировано в школьном фонде
-            </div>
-          </Card>
-
-          <Card>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Сейчас открыто / в работе</div>
-            <div
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '28px',
-                fontWeight: 700,
-                color: equipmentAnalytics.openCount > 0 ? 'var(--warning)' : 'var(--success)',
-                margin: '6px 0 4px',
-              }}
-            >
-              {equipmentAnalytics.openCount}
-            </div>
-            <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-              {equipmentAnalytics.inProgressCount} заявок взято техниками в работу
-            </div>
-          </Card>
-
-          <Card>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Успешно решено</div>
-            <div
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '28px',
-                fontWeight: 700,
-                color: 'var(--success)',
-                margin: '6px 0 4px',
-              }}
-            >
-              {equipmentAnalytics.resolvedCount}
-            </div>
-            <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-              завершённых актов ремонта
-            </div>
-          </Card>
-
-          <Card>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Среднее время починки</div>
-            <div
-              style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '28px',
-                fontWeight: 700,
-                color: 'var(--primary)',
-                margin: '6px 0 4px',
-              }}
-            >
-              {equipmentAnalytics.avgResolutionHours}
-            </div>
-            <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-              от создания до закрытия заявки
-            </div>
-          </Card>
-        </div>
-
-        {/* Grid of 3 Charts for Equipment */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '16px',
-          }}
-        >
-          {/* Bar chart by Category */}
-          <Card style={{ padding: '20px' }}>
-            <div style={{ fontSize: '14.5px', fontWeight: 600, marginBottom: '14px', color: 'var(--text-primary)' }}>
-              Заявки по категориям поломок
-            </div>
-            <div style={{ width: '100%', height: '240px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={equipmentAnalytics.categoryChartData} margin={{ top: 10, right: 20, left: -10, bottom: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                  <XAxis dataKey="category" tick={{ fontSize: 11, fill: COLORS.textSecondary }} angle={-15} textAnchor="end" interval={0} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: COLORS.textSecondary }} />
-                  <Tooltip
-                    formatter={(val) => [val, 'Заявок']}
-                    contentStyle={{
-                      backgroundColor: 'var(--bg-surface)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '8px',
-                      fontSize: '12.5px',
-                    }}
-                  />
-                  <Bar dataKey="count" fill={COLORS.indigo} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          {/* Line chart: Weekly intake dynamic */}
-          <Card style={{ padding: '20px' }}>
-            <div style={{ fontSize: '14.5px', fontWeight: 600, marginBottom: '14px', color: 'var(--text-primary)' }}>
-              Динамика новых заявок по неделям
-            </div>
-            <div style={{ width: '100%', height: '240px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={equipmentAnalytics.weeklyIntakeData} margin={{ top: 10, right: 20, left: -10, bottom: 10 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                  <XAxis dataKey="week" tick={{ fontSize: 11, fill: COLORS.textSecondary }} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: COLORS.textSecondary }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'var(--bg-surface)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '8px',
-                      fontSize: '12.5px',
-                    }}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    name="Новых заявок"
-                    dataKey="newIssues"
-                    stroke={COLORS.coral}
-                    strokeWidth={2.5}
-                    dot={{ r: 4 }}
-                  />
-                  <Line
-                    type="monotone"
-                    name="Устранено"
-                    dataKey="resolved"
-                    stroke={COLORS.success}
-                    strokeWidth={2}
-                    dot={{ r: 3 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          {/* Pie Chart: Priority distribution */}
-          <Card style={{ padding: '20px' }}>
-            <div style={{ fontSize: '14.5px', fontWeight: 600, marginBottom: '14px', color: 'var(--text-primary)' }}>
-              Распределение по приоритетам
-            </div>
-            <div style={{ width: '100%', height: '240px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={equipmentAnalytics.priorityPieData}
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={4}
-                    dataKey="count"
-                  >
-                    {equipmentAnalytics.priorityPieData.map((entry, index) => (
-                      <Cell key={`cell-p-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(val) => [val, 'Заявок']}
-                    contentStyle={{
-                      backgroundColor: 'var(--bg-surface)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '8px',
-                      fontSize: '12.5px',
-                    }}
-                  />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </div>
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 4. БЛОК: РЕЙТИНГ «ЛУЧШИЕ УЧЕНИКИ» (ТОЛЬКО ДЛЯ АДМИНИСТРАТОРА) */}
+      {/* 3. БЛОК: РЕЙТИНГ «ЛУЧШИЕ УЧЕНИКИ» (ТОЛЬКО ДЛЯ АДМИНИСТРАТОРА) */}
       {/* ========================================================================= */}
       {isAdmin && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -1339,7 +1115,7 @@ export function AnalyticsTab() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Trophy size={20} color="var(--primary)" />
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  4. Рейтинг: Лучшие ученики школы (Топ-10)
+                  3. Рейтинг: Лучшие ученики школы (Топ-10)
                 </h3>
               </div>
               <span style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
@@ -1434,7 +1210,7 @@ export function AnalyticsTab() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Award size={20} color="var(--primary)" />
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  5. Рейтинг: Лучшие преподаватели (Топ-5)
+                  4. Рейтинг: Лучшие преподаватели (Топ-5)
                 </h3>
               </div>
               <span style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
@@ -1523,6 +1299,259 @@ export function AnalyticsTab() {
           </Card>
         </div>
       )}
+
+      {/* ========================================================================= */}
+      {/* 5. БЛОК: СТАТИСТИКА ПО ПОЛОМКАМ ОБОРУДОВАНИЯ (В РАЗРАБОТКЕ / В КРУПНОМ БЛЮРЕ) */}
+      {/* ========================================================================= */}
+      <div style={{ position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+        {/* Overlay Banner "В разработке" */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 10,
+            backgroundColor: 'rgba(255, 255, 255, 0.55)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            padding: '24px',
+            textAlign: 'center',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--border-color)',
+          }}
+        >
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 24px',
+              borderRadius: '999px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-color)',
+              boxShadow: 'var(--shadow-md)',
+              fontSize: '15px',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+            }}
+          >
+            <Wrench size={18} color="var(--primary)" />
+            <span>Статистика по поломкам оборудования — В разработке</span>
+          </div>
+          <span style={{ fontSize: '13.5px', color: 'var(--text-secondary)', maxWidth: '460px', lineHeight: 1.5 }}>
+            Модуль учета и аналитики заявок на ремонт технического оборудования временно приостановлен и находится в процессе модернизации.
+          </span>
+        </div>
+
+        {/* Blurred underlying content */}
+        <div
+          style={{
+            filter: 'blur(5px)',
+            opacity: 0.45,
+            pointerEvents: 'none',
+            userSelect: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '12px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Wrench size={20} color="var(--primary)" />
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                5. Статистика по поломкам оборудования
+              </h3>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <FileSpreadsheet size={15} color="var(--primary)" />
+              <span>Экспорт в Excel</span>
+            </Button>
+          </div>
+
+          {/* KPI Cards */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '14px',
+            }}
+          >
+            <Card>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Всего заявок за всё время</div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '28px',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  margin: '6px 0 4px',
+                }}
+              >
+                {equipmentAnalytics.total}
+              </div>
+              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                зарегистрировано в школьном фонде
+              </div>
+            </Card>
+
+            <Card>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Сейчас открыто / в работе</div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '28px',
+                  fontWeight: 700,
+                  color: equipmentAnalytics.openCount > 0 ? 'var(--warning)' : 'var(--success)',
+                  margin: '6px 0 4px',
+                }}
+              >
+                {equipmentAnalytics.openCount}
+              </div>
+              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                {equipmentAnalytics.inProgressCount} заявок взято техниками в работу
+              </div>
+            </Card>
+
+            <Card>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Успешно решено</div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '28px',
+                  fontWeight: 700,
+                  color: 'var(--success)',
+                  margin: '6px 0 4px',
+                }}
+              >
+                {equipmentAnalytics.resolvedCount}
+              </div>
+              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                завершённых актов ремонта
+              </div>
+            </Card>
+
+            <Card>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Среднее время починки</div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '28px',
+                  fontWeight: 700,
+                  color: 'var(--primary)',
+                  margin: '6px 0 4px',
+                }}
+              >
+                {equipmentAnalytics.avgResolutionHours}
+              </div>
+              <div style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+                от создания до закрытия заявки
+              </div>
+            </Card>
+          </div>
+
+          {/* Grid of 3 Charts for Equipment */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '16px',
+            }}
+          >
+            {/* Bar chart by Category */}
+            <Card style={{ padding: '20px' }}>
+              <div style={{ fontSize: '14.5px', fontWeight: 600, marginBottom: '14px', color: 'var(--text-primary)' }}>
+                Заявки по категориям поломок
+              </div>
+              <div style={{ width: '100%', height: '240px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={equipmentAnalytics.categoryChartData} margin={{ top: 10, right: 20, left: -10, bottom: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                    <XAxis dataKey="category" tick={{ fontSize: 11, fill: COLORS.textSecondary }} angle={-15} textAnchor="end" interval={0} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: COLORS.textSecondary }} />
+                    <Bar dataKey="count" fill={COLORS.indigo} radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+
+            {/* Line chart: Weekly intake dynamic */}
+            <Card style={{ padding: '20px' }}>
+              <div style={{ fontSize: '14.5px', fontWeight: 600, marginBottom: '14px', color: 'var(--text-primary)' }}>
+                Динамика новых заявок по неделям
+              </div>
+              <div style={{ width: '100%', height: '240px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={equipmentAnalytics.weeklyIntakeData} margin={{ top: 10, right: 20, left: -10, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                    <XAxis dataKey="week" tick={{ fontSize: 11, fill: COLORS.textSecondary }} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: COLORS.textSecondary }} />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      name="Новых заявок"
+                      dataKey="newIssues"
+                      stroke={COLORS.coral}
+                      strokeWidth={2.5}
+                      dot={{ r: 4 }}
+                    />
+                    <Line
+                      type="monotone"
+                      name="Устранено"
+                      dataKey="resolved"
+                      stroke={COLORS.success}
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+
+            {/* Pie Chart: Priority distribution */}
+            <Card style={{ padding: '20px' }}>
+              <div style={{ fontSize: '14.5px', fontWeight: 600, marginBottom: '14px', color: 'var(--text-primary)' }}>
+                Распределение по приоритетам
+              </div>
+              <div style={{ width: '100%', height: '240px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={equipmentAnalytics.priorityPieData}
+                      innerRadius={55}
+                      outerRadius={80}
+                      paddingAngle={4}
+                      dataKey="count"
+                    >
+                      {equipmentAnalytics.priorityPieData.map((entry, index) => (
+                        <Cell key={`cell-p-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
