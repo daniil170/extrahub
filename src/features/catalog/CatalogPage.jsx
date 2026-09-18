@@ -556,7 +556,7 @@ export function CatalogPage() {
                   e.currentTarget.style.borderColor = '#f1f5f9';
                 }}
               >
-                {/* 1. Header: Category badge & Age/Grade tag */}
+                {/* 1. Header: Category badge, Age/Grade tag & Prominent Spots Badge */}
                 <div
                   style={{
                     display: 'flex',
@@ -566,37 +566,101 @@ export function CatalogPage() {
                     marginBottom: '14px',
                   }}
                 >
-                  {/* Category Pill with Soft Pastel Background and Vector Icon */}
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      padding: '4px 10px',
-                      borderRadius: '999px',
-                      backgroundColor: categoryStyle.bg,
-                      color: categoryStyle.color,
-                      border: `1px solid ${categoryStyle.border}`,
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      letterSpacing: '0.01em',
-                    }}
-                  >
-                    <CategoryIcon size={13} style={{ flexShrink: 0 }} />
-                    <span>{act.category || 'Кружок'}</span>
-                  </span>
+                  {/* Left: Category Pill with Soft Pastel Background and Vector Icon */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '4px 10px',
+                        borderRadius: '999px',
+                        backgroundColor: categoryStyle.bg,
+                        color: categoryStyle.color,
+                        border: `1px solid ${categoryStyle.border}`,
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        letterSpacing: '0.01em',
+                      }}
+                    >
+                      <CategoryIcon size={13} style={{ flexShrink: 0 }} />
+                      <span>{act.category || 'Кружок'}</span>
+                    </span>
 
-                  {/* Age / Grade Label */}
-                  <span
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 500,
-                      color: 'var(--text-muted)',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {cleanAgeGroup(act.ageGroup)}
-                  </span>
+                    {/* Age / Grade Label */}
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        color: 'var(--text-muted)',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {cleanAgeGroup(act.ageGroup)}
+                    </span>
+                  </div>
+
+                  {/* Right: Prominent direct spots pill right on top of card */}
+                  <div>
+                    {isFull || remainingSpots <= 0 ? (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          padding: '3px 9px',
+                          borderRadius: '999px',
+                          backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                          color: '#dc2626',
+                          border: '1px solid rgba(239, 68, 68, 0.25)',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#dc2626' }} />
+                        Мест нет
+                      </span>
+                    ) : remainingSpots <= 3 ? (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          padding: '3px 9px',
+                          borderRadius: '999px',
+                          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                          color: '#b45309',
+                          border: '1px solid rgba(245, 158, 11, 0.3)',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#f59e0b' }} />
+                        {remainingSpots} {remainingSpots === 1 ? 'место' : 'места'}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          padding: '3px 9px',
+                          borderRadius: '999px',
+                          backgroundColor: 'rgba(0, 150, 57, 0.08)',
+                          color: '#009639',
+                          border: '1px solid rgba(0, 150, 57, 0.25)',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#009639' }} />
+                        {remainingSpots} из {totalCapacity} мест
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Special Tags: Olympic reserve or Exam required */}
