@@ -44,7 +44,7 @@ export function GroupMonitoringTab() {
 
   const [groupSearch, setGroupSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'full' | 'available' | 'waitlist'
-  const [activeViewSection, setActiveViewSection] = useState('groups'); // 'groups' | 'analytics_cards' | 'achievements'
+  const [activeViewSection, setActiveViewSection] = useState('groups'); // 'groups' | 'analytics_cards'
   const [detailsActivity, setDetailsActivity] = useState(null);
 
   // Calculate attendance & mastery metrics per activity / group (strictly real data)
@@ -438,23 +438,6 @@ export function GroupMonitoringTab() {
               <Eye size={14} />
               <span>Аналитика по группам (карточки)</span>
             </button>
-            <button
-              type="button"
-              onClick={() => setActiveViewSection('achievements')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-sm)',
-                border: 'none',
-                fontSize: '13px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                backgroundColor: activeViewSection === 'achievements' ? 'var(--bg-surface)' : 'transparent',
-                color: activeViewSection === 'achievements' ? 'var(--primary)' : 'var(--text-secondary)',
-                boxShadow: activeViewSection === 'achievements' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-              }}
-            >
-              Достижения учеников ({DEMO_ACHIEVEMENTS.length})
-            </button>
           </div>
         </div>
 
@@ -470,7 +453,6 @@ export function GroupMonitoringTab() {
                   <th style={{ padding: '10px 12px', textAlign: 'center' }}>Заполненность</th>
                   <th style={{ padding: '10px 12px', textAlign: 'center' }}>Ср. посещаемость</th>
                   <th style={{ padding: '10px 12px', textAlign: 'center' }}>Успеваемость</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'center' }}>Достижения</th>
                 </tr>
               </thead>
               <tbody>
@@ -549,24 +531,6 @@ export function GroupMonitoringTab() {
                         {act.successRate}%
                       </span>
                     </td>
-                    <td style={{ padding: '12px', textAlign: 'center' }}>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          padding: '3px 8px',
-                          borderRadius: '12px',
-                          backgroundColor: 'rgba(245, 158, 11, 0.12)',
-                          color: '#b45309',
-                          fontWeight: 600,
-                          fontSize: '12px',
-                        }}
-                      >
-                        <Trophy size={13} />
-                        {act.achievementsCount} нагр.
-                      </span>
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -582,74 +546,6 @@ export function GroupMonitoringTab() {
               groups={groups}
               onOpenDetails={(act) => setDetailsActivity(act)}
             />
-          </div>
-        )}
-
-        {/* View 3: Student Achievements */}
-        {activeViewSection === 'achievements' && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-              gap: '14px',
-            }}
-          >
-            {DEMO_ACHIEVEMENTS.map((ach) => {
-              const act = activities.find((a) => a.id === ach.activityId);
-              return (
-                <div
-                  key={ach.id}
-                  style={{
-                    padding: '14px',
-                    backgroundColor: 'var(--bg-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-color)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          width: '28px',
-                          height: '28px',
-                          borderRadius: '50%',
-                          backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                          color: '#b45309',
-                        }}
-                      >
-                        <Trophy size={15} />
-                      </span>
-                      <strong style={{ fontSize: '14px', color: 'var(--text-primary)' }}>
-                        {ach.title}
-                      </strong>
-                    </div>
-                    <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', margin: '0 0 10px', lineHeight: 1.4 }}>
-                      {ach.description}
-                    </p>
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      paddingTop: '8px',
-                      borderTop: '1px solid var(--border-color)',
-                      fontSize: '11.5px',
-                      color: 'var(--text-muted)',
-                    }}
-                  >
-                    <span>{act?.title || 'Школьная секция'}</span>
-                    <span>{ach.createdAt ? new Date(ach.createdAt).toLocaleDateString('ru-RU') : '—'}</span>
-                  </div>
-                </div>
-              );
-            })}
           </div>
         )}
       </Card>
