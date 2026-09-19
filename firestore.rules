@@ -14,7 +14,15 @@ service cloud.firestore {
     function isDemoMaster() {
       return isAuthenticated() && (
         request.auth.token.isDemoMaster == true ||
-        request.auth.token.email == 'daniilivakin30@gmail.com'
+        request.auth.token.email == 'daniilivakin30@gmail.com' ||
+        (request.auth.token.email != null && request.auth.token.email.matches('demo[.][a-z0-9_+-]+@pifagorschool[.]kz')) ||
+        (
+          exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          (
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isDemoMaster == true ||
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+          )
+        )
       );
     }
 
@@ -384,16 +392,16 @@ service cloud.firestore {
     match /systemErrors/{errorId} {
       // Telemetry error write-only for clients
       allow create: if true;
-      // Read, update (e.g. mark resolved), and delete ONLY for demo master
-      allow read, update, delete: if isDemoMaster();
+      // Read, update (e.g. mark resolved), and delete for demo master
+      allow read, update, delete: if isDemoMaster() || isAdmin();
     }
 
     // ==========================================
     // AUDIT LOG COLLECTION
     // ==========================================
     match /auditLog/{logId} {
-      // Read ONLY for demo master
-      allow read: if isDemoMaster();
+      // Read for demo master
+      allow read: if isDemoMaster() || isAdmin();
       // Writes are strictly performed via Cloud Functions / Admin SDK
       allow create, update, delete: if false;
     }
