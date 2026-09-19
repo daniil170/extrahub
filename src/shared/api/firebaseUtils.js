@@ -29,6 +29,9 @@ export const COLLECTIONS = {
   AUDIT_LOG: 'auditLog',
   USER_BALANCES: 'userBalances',
   POINTS_LEDGER: 'pointsLedger',
+  SEASONS: 'seasons',
+  LEAGUE_DIVISIONS: 'leagueDivisions',
+  LEAGUE_MEMBERSHIPS: 'leagueMemberships',
 };
 
 /**

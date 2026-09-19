@@ -1544,3 +1544,81 @@ export const DEMO_ISSUE_COMMENTS = {
     },
   ],
 };
+
+export const DEMO_SEASONS = [
+  {
+    id: 'season-2026-q3',
+    name: 'Осенняя четверть 2026',
+    startDate: '2026-09-01',
+    endDate: '2026-11-05',
+    status: 'active',
+    createdAt: '2026-09-01T00:00:00.000Z',
+    finalizedAt: null,
+  },
+];
+
+export const DEMO_LEAGUE_DIVISIONS = [
+  {
+    id: 'season-2026-q3_gold_group_1',
+    seasonId: 'season-2026-q3',
+    rank: 'gold',
+    groupNumber: 1,
+    name: 'Золотая лига • Группа 1',
+    createdAt: '2026-09-01T00:00:00.000Z',
+  },
+  {
+    id: 'season-2026-q3_silver_group_1',
+    seasonId: 'season-2026-q3',
+    rank: 'silver',
+    groupNumber: 1,
+    name: 'Серебряная лига • Группа 1',
+    createdAt: '2026-09-01T00:00:00.000Z',
+  },
+  {
+    id: 'season-2026-q3_bronze_group_1',
+    seasonId: 'season-2026-q3',
+    rank: 'bronze',
+    groupNumber: 1,
+    name: 'Бронзовая лига • Группа 1',
+    createdAt: '2026-09-01T00:00:00.000Z',
+  },
+];
+
+export const DEMO_LEAGUE_MEMBERSHIPS = [
+  {
+    id: 'season-2026-q3_student-1',
+    seasonId: 'season-2026-q3',
+    divisionId: 'season-2026-q3_bronze_group_1',
+    rank: 'bronze',
+    groupNumber: 1,
+    userId: 'student-1',
+    xpEarnedThisSeason: 150,
+    pseudonym: '',
+    useRealName: true,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'season-2026-q3_student-demo-1',
+    seasonId: 'season-2026-q3',
+    divisionId: 'season-2026-q3_bronze_group_1',
+    rank: 'bronze',
+    groupNumber: 1,
+    userId: 'student-demo-1',
+    xpEarnedThisSeason: 250,
+    pseudonym: '',
+    useRealName: true,
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'season-2026-q3_student-demo-2',
+    seasonId: 'season-2026-q3',
+    divisionId: 'season-2026-q3_bronze_group_1',
+    rank: 'bronze',
+    groupNumber: 1,
+    userId: 'student-demo-2',
+    xpEarnedThisSeason: 220,
+    pseudonym: 'CyberFox',
+    useRealName: false,
+    updatedAt: new Date().toISOString(),
+  },
+];
