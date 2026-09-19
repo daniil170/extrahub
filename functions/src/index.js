@@ -20,8 +20,19 @@ export { registerStudent } from './callable/registerStudent.js';
 export { switchDemoRole } from './callable/switchDemoRole.js';
 export { logClientAudit } from './callable/logClientAudit.js';
 
+export { recordAttendance } from './callable/recordAttendance.js';
+export { awardSpecialRecognition } from './callable/awardSpecialRecognition.js';
+export { useStreakFreeze } from './callable/useStreakFreeze.js';
+export { gradeExamApplication } from './callable/gradeExamApplication.js';
+
 export { logAuditEvent } from './shared/auditLog.js';
 export { logFunctionError } from './shared/systemErrors.js';
 export { promoteFromWaitlist } from './shared/waitlist.js';
 export { findScheduleConflict, doIntervalsOverlap } from './shared/scheduleConflict.js';
+export {
+  awardPoints,
+  calculateStreakMultiplier,
+  getCurrentQuarterKey,
+  GAMIFICATION_CONFIG,
+} from './shared/gamification.js';
 

@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue } from 'firebase-admin/firestore';
 import { db, auth } from '../config/firebase.js';
+import { awardPoints, GAMIFICATION_CONFIG } from '../shared/gamification.js';
 import { logAuditEvent } from '../shared/auditLog.js';
 import { logFunctionError } from '../shared/systemErrors.js';
 
@@ -111,6 +112,36 @@ export const approveEnrollment = onCall(async (request) => {
         } catch (e) {
           console.warn('Could not check parent user profile:', e.message);
         }
+      }
+    }
+
+    // Fast Parent Approval Gamification Bonus (within 6 hours of invite creation)
+    let quickApprovalBonusAwarded = false;
+    if (inviteData.studentId) {
+      try {
+        const inviteCreatedAt = inviteData.createdAt ? new Date(inviteData.createdAt) : null;
+        const diffHours = inviteCreatedAt ? (now.getTime() - inviteCreatedAt.getTime()) / (1000 * 60 * 60) : 0;
+        
+        // If approved within first 6 hours of creation
+        if (diffHours >= 0 && diffHours <= 6) {
+          const awardRes = await awardPoints({
+            userId: inviteData.studentId,
+            amount: GAMIFICATION_CONFIG.PARENT_QUICK_APPROVAL_COINS,
+            currencyType: 'coin',
+            source: 'parent_quick_approval',
+            sourceRefId: inviteData.enrollmentId,
+            reason: 'Бонус за быстрое подтверждение родителем (в течение 6 часов)',
+            createdBy: 'system',
+            metadata: {
+              enrollmentId: inviteData.enrollmentId,
+              inviteId: inviteDoc.id,
+              hoursToApprove: Number(diffHours.toFixed(2)),
+            },
+          });
+          quickApprovalBonusAwarded = Boolean(awardRes.awarded);
+        }
+      } catch (gamifyErr) {
+        console.warn('Could not process parent quick approval gamification reward:', gamifyErr.message);
       }
     }
 
