@@ -1,5 +1,6 @@
 import { FieldValue } from 'firebase-admin/firestore';
 import { db } from '../config/firebase.js';
+import { incrementSeasonalLeagueXP } from './leagues.js';
 
 export const GAMIFICATION_CONFIG = {
   ATTENDANCE_XP: 50,
@@ -139,6 +140,8 @@ export async function awardPoints({
 
     if (currencyType === 'xp') {
       balance.xpPoints += amount;
+      // Increment active seasonal league membership XP
+      await incrementSeasonalLeagueXP(transaction, { userId, xpAmount: amount });
     } else if (currencyType === 'coin') {
       balance.coins += amount;
     }

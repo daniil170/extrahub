@@ -7,6 +7,7 @@ import {
   getCurrentQuarterKey,
   getOrCreateUserBalance,
 } from '../shared/gamification.js';
+import { incrementSeasonalLeagueXP } from '../shared/leagues.js';
 import { logAuditEvent } from '../shared/auditLog.js';
 import { logFunctionError } from '../shared/systemErrors.js';
 
@@ -122,6 +123,9 @@ export const recordAttendance = onCall(async (request) => {
             balance.xpPoints = (balance.xpPoints || 0) + xpAwarded;
             balance.coins = (balance.coins || 0) + coinsAwarded;
             balance.updatedAt = nowStr;
+
+            // Increment active season league membership XP
+            await incrementSeasonalLeagueXP(transaction, { userId: studentId, xpAmount: xpAwarded });
 
             const streakNotice =
               balance.xpMultiplier > 1.0

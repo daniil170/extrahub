@@ -25,6 +25,10 @@ export { awardSpecialRecognition } from './callable/awardSpecialRecognition.js';
 export { useStreakFreeze } from './callable/useStreakFreeze.js';
 export { gradeExamApplication } from './callable/gradeExamApplication.js';
 
+export { createSeason } from './callable/createSeason.js';
+export { finalizeSeasonAndPromote } from './callable/finalizeSeasonAndPromote.js';
+export { updateLeagueProfile } from './callable/updateLeagueProfile.js';
+
 export { logAuditEvent } from './shared/auditLog.js';
 export { logFunctionError } from './shared/systemErrors.js';
 export { promoteFromWaitlist } from './shared/waitlist.js';
@@ -35,4 +39,12 @@ export {
   getCurrentQuarterKey,
   GAMIFICATION_CONFIG,
 } from './shared/gamification.js';
+export {
+  getActiveSeason,
+  incrementSeasonalLeagueXP,
+  shuffleArray,
+  splitIntoGroups,
+  getNextRank,
+  LEAGUE_CONSTANTS,
+} from './shared/leagues.js';
 
