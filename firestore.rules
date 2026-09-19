@@ -435,5 +435,29 @@ service cloud.firestore {
       // Writes are strictly performed via Cloud Functions / Admin SDK
       allow create, update, delete: if false;
     }
+
+    // ==========================================
+    // GAMIFICATION: SEASONS & DIVISIONS
+    // ==========================================
+    match /seasons/{seasonId} {
+      // All authenticated users can read seasons
+      allow read: if isAuthenticated();
+      // Writes managed exclusively via Cloud Functions / Admin SDK
+      allow write: if false;
+    }
+
+    match /leagueDivisions/{divisionId} {
+      // All authenticated users can read divisions
+      allow read: if isAuthenticated();
+      // Writes managed exclusively via Cloud Functions / Admin SDK
+      allow write: if false;
+    }
+
+    match /leagueMemberships/{membershipId} {
+      // All authenticated users can read division standings
+      allow read: if isAuthenticated();
+      // Writes managed exclusively via Cloud Functions / Admin SDK
+      allow write: if false;
+    }
   }
 }
