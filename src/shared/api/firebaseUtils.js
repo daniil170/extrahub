@@ -27,6 +27,8 @@ export const COLLECTIONS = {
   EXAM_APPLICATIONS: 'examApplications',
   SYSTEM_ERRORS: 'systemErrors',
   AUDIT_LOG: 'auditLog',
+  USER_BALANCES: 'userBalances',
+  POINTS_LEDGER: 'pointsLedger',
 };
 
 /**

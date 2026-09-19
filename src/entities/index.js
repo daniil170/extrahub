@@ -9,3 +9,4 @@ export * from './invite/model.js';
 export * from './achievement/model.js';
 export * from './notification/model.js';
 export * from './equipmentIssue/model.js';
+export * from './gamification/model.js';
