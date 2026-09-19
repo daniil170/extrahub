@@ -10,6 +10,7 @@ import {
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { createEnrollmentCall } from '../enrollment/api.js';
+import { recordClientAudit } from '../../shared/services/auditLogger.js';
 
 /**
  * Submit an exam application for student to join an olympic reserve or competitive group
@@ -205,6 +206,20 @@ export async function decideExamApplicationRecord({
       enrollmentId: enrollmentResult?.enrollmentId || null,
     });
 
+    recordClientAudit({
+      action: 'exam.graded',
+      targetId: applicationId,
+      targetType: 'exam_application',
+      metadata: {
+        outcome: 'passed',
+        score: numericScore,
+        maxScore: numericMaxScore,
+        studentId,
+        groupId,
+        enrollmentId: enrollmentResult?.enrollmentId || null,
+      },
+    });
+
     return { success: true, status: 'passed', score: numericScore, enrollmentResult };
   }
 
@@ -216,6 +231,19 @@ export async function decideExamApplicationRecord({
     maxScore: numericMaxScore,
     gradedBy,
     gradedAt: now,
+  });
+
+  recordClientAudit({
+    action: 'exam.graded',
+    targetId: applicationId,
+    targetType: 'exam_application',
+    metadata: {
+      outcome: 'failed',
+      score: numericScore,
+      maxScore: numericMaxScore,
+      studentId,
+      groupId,
+    },
   });
 
   return { success: true, status: 'failed', score: numericScore };

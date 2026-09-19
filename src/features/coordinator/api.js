@@ -14,6 +14,7 @@ import {
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { createActivityRecord } from '../catalog/api.js';
+import { recordClientAudit } from '../../shared/services/auditLogger.js';
 
 export { createActivityRecord };
 
@@ -517,6 +518,20 @@ export async function createGroupInvoicesRecord({
       return setDoc(docRef, inv);
     });
     await Promise.all(promises);
+
+    recordClientAudit({
+      action: 'payment.group_invoices_created',
+      targetId: groupId,
+      targetType: 'payment_batch',
+      metadata: {
+        groupId,
+        activityId,
+        invoiceCount: newInvoices.length,
+        totalAmount: newInvoices.length * (Number(amount) || 0),
+        periodTitle,
+      },
+    });
+
     return {
       success: true,
       count: newInvoices.length,
@@ -552,6 +567,19 @@ export async function createPaymentRecord(paymentData) {
   try {
     const docRef = doc(db, COLLECTIONS.PAYMENTS, newId);
     await setDoc(docRef, payload);
+
+    recordClientAudit({
+      action: 'payment.invoice_created',
+      targetId: newId,
+      targetType: 'payment',
+      metadata: {
+        studentId: payload.studentId,
+        studentName: payload.studentName,
+        amount: payload.amount,
+        activityTitle: payload.activityTitle,
+      },
+    });
+
     return { success: true, id: newId };
   } catch (err) {
     console.error('createPaymentRecord error:', err);
@@ -569,6 +597,17 @@ export async function markPaymentAsPaid(paymentId) {
       status: 'paid',
       paidAt: serverTimestamp(),
     });
+
+    recordClientAudit({
+      action: 'payment.marked_as_paid',
+      targetId: paymentId,
+      targetType: 'payment',
+      metadata: {
+        paymentId,
+        status: 'paid',
+      },
+    });
+
     return { success: true };
   } catch (err) {
     console.error('markPaymentAsPaid error:', err);

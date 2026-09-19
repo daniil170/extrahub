@@ -3,6 +3,8 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { db } from '../config/firebase.js';
 import { findScheduleConflict } from '../shared/scheduleConflict.js';
 import { generateInviteToken, calculateHoldExpiration } from '../shared/tokens.js';
+import { logAuditEvent } from '../shared/auditLog.js';
+import { logFunctionError } from '../shared/systemErrors.js';
 
 /**
  * Callable Cloud Function to create an activity enrollment or put student on waitlist
@@ -283,7 +285,27 @@ export const createEnrollment = onCall(async (request) => {
   const maxRetries = 5;
   while (attempts < maxRetries) {
     try {
-      return await executeEnrollmentTransaction();
+      const result = await executeEnrollmentTransaction();
+      if (result) {
+        if (result.waitlisted) {
+          await logAuditEvent({
+            action: 'enrollment.waitlisted',
+            actorId: callerUid,
+            targetId: result.waitlistId,
+            targetType: 'waitlist',
+            metadata: { studentId, groupId, position: result.position },
+          });
+        } else {
+          await logAuditEvent({
+            action: 'enrollment.created',
+            actorId: callerUid,
+            targetId: result.enrollmentId,
+            targetType: 'enrollment',
+            metadata: { studentId, groupId, holdExpiresAt: result.holdExpiresAt },
+          });
+        }
+      }
+      return result;
     } catch (txErr) {
       attempts++;
       const isContention =
@@ -301,6 +323,11 @@ export const createEnrollment = onCall(async (request) => {
   }
   } catch (err) {
     console.error('createEnrollment fatal error:', err);
+    await logFunctionError({
+      functionName: 'createEnrollment',
+      error: err,
+      request,
+    });
     if (err instanceof HttpsError) {
       throw err;
     }

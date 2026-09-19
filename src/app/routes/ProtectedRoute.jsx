@@ -3,12 +3,13 @@ import { useAuth } from '../../shared/hooks/useAuth.js';
 import { Spinner, Card } from '../../shared/ui/index.js';
 
 /**
- * Route guard for authenticated users and specific roles
+ * Route guard for authenticated users, specific roles, and master account
  * @param {Object} props
  * @param {import('react').ReactNode} props.children
  * @param {string[]} [props.allowedRoles]
+ * @param {boolean} [props.requireDemoMaster]
  */
-export function ProtectedRoute({ children, allowedRoles }) {
+export function ProtectedRoute({ children, allowedRoles, requireDemoMaster = false }) {
   const { user, loading, isAuthenticated } = useAuth();
 
   if (loading && !user) {
@@ -23,6 +24,22 @@ export function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/login" replace />;
   }
 
+  if (requireDemoMaster && !user?.isDemoMaster) {
+    return (
+      <div style={{ maxWidth: '600px', margin: '40px auto', padding: '0 16px' }}>
+        <Card style={{ borderColor: 'var(--danger)', backgroundColor: 'var(--danger-light)' }}>
+          <h3 style={{ color: 'var(--danger)', marginBottom: '8px' }}>Доступ запрещен</h3>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+            Этот раздел предназначен исключительно для мастер-аккаунта владельца платформы ExtraHub.
+          </p>
+          <p style={{ marginTop: '12px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            Для доступа требуется custom claim <code>isDemoMaster: true</code>. Обычным администраторам и другим ролям доступ закрыт.
+          </p>
+        </Card>
+      </div>
+    );
+  }
+
   if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
     if (loading) {
       return (
@@ -32,7 +49,7 @@ export function ProtectedRoute({ children, allowedRoles }) {
       );
     }
     return (
-      <div style={{ maxWidth: '600px', margin: '40px auto' }}>
+      <div style={{ maxWidth: '600px', margin: '40px auto', padding: '0 16px' }}>
         <Card style={{ borderColor: 'var(--danger)', backgroundColor: 'var(--danger-light)' }}>
           <h3 style={{ color: 'var(--danger)', marginBottom: '8px' }}>Доступ ограничен</h3>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>

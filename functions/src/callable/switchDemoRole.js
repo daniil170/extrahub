@@ -1,6 +1,8 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue } from 'firebase-admin/firestore';
 import { db, auth } from '../config/firebase.js';
+import { logAuditEvent } from '../shared/auditLog.js';
+import { logFunctionError } from '../shared/systemErrors.js';
 
 const DEMO_MASTER_EMAIL = (process.env.DEMO_MASTER_EMAIL || 'daniilivakin30@gmail.com').trim().toLowerCase();
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'DemoRole2026!#';
@@ -41,9 +43,10 @@ const VALID_ROLES = ['student', 'parent', 'teacher', 'coordinator', 'technician'
  * for the project master account.
  */
 export const switchDemoRole = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'Требуется авторизация');
-  }
+  try {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'Требуется авторизация');
+    }
 
   const callerClaims = request.auth.token || {};
   const callerEmail = (callerClaims.email || '').toLowerCase();
@@ -193,13 +196,39 @@ export const switchDemoRole = onCall(async (request) => {
     console.warn('createCustomToken failed (fallback to email/password will be used):', tokenErr.message);
   }
 
-  return {
-    success: true,
-    customToken,
-    email: targetEmail,
-    password: targetRole === 'master' ? null : DEMO_PASSWORD,
-    targetRole,
-    effectiveRole: targetRoleName,
-    uid: targetUser.uid,
-  };
+  // Log audit event
+  await logAuditEvent({
+    action: 'demo.role_switched',
+    actorId: request.auth.uid,
+    actorRole: callerClaims.role || 'master',
+    actorName: 'Мастер-аккаунт ExtraHub',
+    targetId: targetUser.uid,
+    targetType: 'user',
+    metadata: {
+      fromEmail: callerEmail,
+      targetRole,
+      effectiveRole: targetRoleName,
+      targetEmail,
+    },
+  });
+
+    return {
+      success: true,
+      customToken,
+      email: targetEmail,
+      password: targetRole === 'master' ? null : DEMO_PASSWORD,
+      targetRole,
+      effectiveRole: targetRoleName,
+      uid: targetUser.uid,
+    };
+  } catch (err) {
+    console.error('switchDemoRole error:', err);
+    await logFunctionError({
+      functionName: 'switchDemoRole',
+      error: err,
+      request,
+    });
+    if (err instanceof HttpsError) throw err;
+    throw new HttpsError('internal', `Ошибка смены демо-роли: ${err.message}`);
+  }
 });

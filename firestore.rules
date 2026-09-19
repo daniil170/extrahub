@@ -11,6 +11,13 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isDemoMaster() {
+      return isAuthenticated() && (
+        request.auth.token.isDemoMaster == true ||
+        request.auth.token.email == 'daniilivakin30@gmail.com'
+      );
+    }
+
     function getUserDoc() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
@@ -369,6 +376,26 @@ service cloud.firestore {
 
         allow update, delete: if isAdmin();
       }
+    }
+
+    // ==========================================
+    // SYSTEM ERRORS COLLECTION
+    // ==========================================
+    match /systemErrors/{errorId} {
+      // Telemetry error write-only for clients
+      allow create: if true;
+      // Read, update (e.g. mark resolved), and delete ONLY for demo master
+      allow read, update, delete: if isDemoMaster();
+    }
+
+    // ==========================================
+    // AUDIT LOG COLLECTION
+    // ==========================================
+    match /auditLog/{logId} {
+      // Read ONLY for demo master
+      allow read: if isDemoMaster();
+      // Writes are strictly performed via Cloud Functions / Admin SDK
+      allow create, update, delete: if false;
     }
   }
 }

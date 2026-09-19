@@ -42,6 +42,8 @@ export function formatCurrency(amount = 0, currency = '₸') {
   return `${amount.toLocaleString('ru-RU')} ${currency}`;
 }
 
+export const formatMoney = formatCurrency;
+
 /**
  * Format Russian noun "место" based on count (1 место, 2-4 места, 5+ мест)
  * @param {number} count

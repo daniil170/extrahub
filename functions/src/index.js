@@ -18,6 +18,10 @@ export { createStaffInvite } from './callable/createStaffInvite.js';
 export { registerViaInvite } from './callable/registerViaInvite.js';
 export { registerStudent } from './callable/registerStudent.js';
 export { switchDemoRole } from './callable/switchDemoRole.js';
+export { logClientAudit } from './callable/logClientAudit.js';
 
+export { logAuditEvent } from './shared/auditLog.js';
+export { logFunctionError } from './shared/systemErrors.js';
 export { promoteFromWaitlist } from './shared/waitlist.js';
 export { findScheduleConflict, doIntervalsOverlap } from './shared/scheduleConflict.js';
+

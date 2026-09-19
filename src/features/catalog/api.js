@@ -1,6 +1,7 @@
 import { collection, doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
+import { recordClientAudit } from '../../shared/services/auditLogger.js';
 
 /**
  * Merge raw activities, groups, and teachers into ready-to-display activity models
@@ -102,6 +103,18 @@ export async function createActivityRecord(activityData) {
 
   const docRef = doc(db, COLLECTIONS.ACTIVITIES, newId);
   await setDoc(docRef, record);
+
+  recordClientAudit({
+    action: 'activity.created',
+    targetId: newId,
+    targetType: 'activity',
+    metadata: {
+      title: record.title,
+      category: record.category,
+      price: record.price,
+      teacherId: record.teacherId,
+    },
+  });
 
   return { success: true, activity: record };
 }

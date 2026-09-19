@@ -22,6 +22,7 @@ import {
   TechnicianDashboard,
   EquipmentMaintenancePausedPage,
 } from '../../features/equipment/index.js';
+import { SystemMonitoringPage } from '../../features/monitoring/index.js';
 import { schoolConfig } from '../config/schoolConfig.js';
 import { DashboardRedirect } from './DashboardRedirect.jsx';
 
@@ -123,6 +124,14 @@ export const router = createBrowserRouter([
             ) : (
               <EquipmentMaintenancePausedPage />
             )}
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'system-monitor',
+        element: (
+          <ProtectedRoute requireDemoMaster>
+            <SystemMonitoringPage />
           </ProtectedRoute>
         ),
       },

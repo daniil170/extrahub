@@ -25,6 +25,8 @@ export const COLLECTIONS = {
   EQUIPMENT_ISSUES: 'equipmentIssues',
   ISSUE_COMMENTS: 'issueComments',
   EXAM_APPLICATIONS: 'examApplications',
+  SYSTEM_ERRORS: 'systemErrors',
+  AUDIT_LOG: 'auditLog',
 };
 
 /**
