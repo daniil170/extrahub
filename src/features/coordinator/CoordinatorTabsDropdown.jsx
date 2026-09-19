@@ -56,10 +56,10 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '10px 16px',
-            backgroundColor: '#ffffff',
-            border: '2px solid var(--primary)',
+            backgroundColor: 'var(--bg-surface)',
+            border: isOpen ? '1.5px solid var(--primary)' : '1.5px solid var(--primary-border, var(--primary))',
             borderRadius: 'var(--radius-md)',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
+            boxShadow: 'var(--shadow-sm)',
             cursor: 'pointer',
             fontSize: '14px',
             fontWeight: 600,
@@ -77,13 +77,13 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
                 width: '30px',
                 height: '30px',
                 borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--primary-light, rgba(14, 124, 107, 0.1))',
+                backgroundColor: 'var(--primary-light)',
                 color: 'var(--primary)',
               }}
             >
               {activeItem?.icon}
             </span>
-            <span>{activeItem?.label}</span>
+            <span style={{ color: 'var(--text-primary)' }}>{activeItem?.label}</span>
           </div>
 
           <ChevronDown
@@ -96,7 +96,7 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
           />
         </button>
 
-        {/* Dropdown Menu Popup with Solid Background and High z-index */}
+        {/* Dropdown Menu Popup with Solid Theme Background and High z-index */}
         {isOpen && (
           <ul
             role="listbox"
@@ -106,10 +106,10 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
               top: 'calc(100% + 6px)',
               left: 0,
               right: 0,
-              backgroundColor: '#ffffff',
+              backgroundColor: 'var(--bg-surface)',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border-color)',
-              boxShadow: '0 12px 28px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.08)',
+              boxShadow: 'var(--shadow-lg)',
               zIndex: 9999,
               margin: 0,
               padding: '6px',
@@ -138,7 +138,7 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
                       padding: '10px 14px',
                       borderRadius: 'var(--radius-sm)',
                       border: 'none',
-                      backgroundColor: isSelected ? 'var(--primary-light, rgba(14, 124, 107, 0.1))' : 'transparent',
+                      backgroundColor: isSelected ? 'var(--primary-light)' : 'transparent',
                       color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
                       fontWeight: isSelected ? 600 : 500,
                       fontSize: '14px',
@@ -147,7 +147,7 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
                       transition: 'background-color 0.12s ease',
                     }}
                     onMouseEnter={(e) => {
-                      if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-subtle, #f4f4f2)';
+                      if (!isSelected) e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
                     }}
                     onMouseLeave={(e) => {
                       if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent';
@@ -159,12 +159,14 @@ export function CoordinatorTabsDropdown({ tabs, activeTab, onSelectTab }) {
                           display: 'inline-flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: isSelected ? 'var(--primary)' : 'var(--text-muted)',
+                          color: isSelected ? 'var(--primary)' : 'var(--text-secondary)',
                         }}
                       >
                         {tab.icon}
                       </span>
-                      <span>{tab.label}</span>
+                      <span style={{ color: isSelected ? 'var(--primary)' : 'var(--text-primary)' }}>
+                        {tab.label}
+                      </span>
                     </div>
 
                     {isSelected && <Check size={16} style={{ color: 'var(--primary)' }} />}
