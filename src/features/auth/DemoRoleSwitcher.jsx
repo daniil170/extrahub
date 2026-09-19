@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
 import {
   Sparkles,
   GraduationCap,
@@ -12,6 +12,7 @@ import {
   ChevronUp,
   ChevronDown,
   Loader2,
+  Server,
 } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { switchDemoRoleAndSignIn } from './api.js';
@@ -404,6 +405,29 @@ export function DemoRoleSwitcher() {
               {isMasterUser ? 'Вы в мастер-аккаунте' : 'Вернуться в мастер-аккаунт'}
             </span>
           </button>
+
+          {/* Master Monitoring Panel Link */}
+          <NavLink
+            to="/system-monitor"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '8px 12px',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'rgba(234, 179, 8, 0.12)',
+              border: '1px solid rgba(234, 179, 8, 0.35)',
+              color: '#d97706',
+              fontSize: '12px',
+              fontWeight: 600,
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Server size={14} />
+            <span>Панель мониторинга (/system-monitor)</span>
+          </NavLink>
         </div>
       )}
     </aside>

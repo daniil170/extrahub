@@ -7,6 +7,7 @@ import {
   Moon,
   Menu,
   X,
+  Server,
 } from 'lucide-react';
 import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
@@ -254,6 +255,21 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                   </NavLink>
                 )}
 
+                {currentUser && (currentUser.email === 'daniilivakin30@gmail.com' || currentUser.isDemoMaster) && (
+                  <NavLink
+                    to="/system-monitor"
+                    style={(args) => ({
+                      ...navLinkStyle(args),
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    })}
+                  >
+                    <Server size={14} />
+                    <span>Мониторинг</span>
+                  </NavLink>
+                )}
+
                 {currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin') && (
                   <>
                     {/* Visual separator isolating equipment maintenance */}
@@ -436,6 +452,33 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                         >
                           <span>{userCabinet.label}</span>
                           <span style={{ fontSize: '11px', opacity: 0.8 }}>→</span>
+                        </NavLink>
+                      </div>
+                    )}
+
+                    {/* Master System Monitoring shortcut */}
+                    {(currentUser.email === 'daniilivakin30@gmail.com' || currentUser.isDemoMaster) && (
+                      <div style={{ padding: '0 8px 6px' }}>
+                        <NavLink
+                          to="/system-monitor"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            width: '100%',
+                            padding: '8px 10px',
+                            borderRadius: 'var(--radius-xs)',
+                            backgroundColor: 'rgba(234, 179, 8, 0.12)',
+                            color: '#d97706',
+                            fontSize: '12.5px',
+                            fontWeight: 600,
+                            textDecoration: 'none',
+                            transition: 'opacity 0.15s ease',
+                          }}
+                        >
+                          <Server size={14} />
+                          <span>Системный мониторинг</span>
                         </NavLink>
                       </div>
                     )}
@@ -637,6 +680,25 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                 {currentUser && userCabinet && (
                   <NavLink to={userCabinet.to} style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
                     {userCabinet.label}
+                  </NavLink>
+                )}
+
+                {currentUser && (currentUser.email === 'daniilivakin30@gmail.com' || currentUser.isDemoMaster) && (
+                  <NavLink
+                    to="/system-monitor"
+                    style={(args) => ({
+                      ...mobileNavLinkStyle(args),
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#d97706',
+                      backgroundColor: args.isActive ? 'rgba(234, 179, 8, 0.16)' : 'rgba(234, 179, 8, 0.08)',
+                      fontWeight: 600,
+                    })}
+                    onClick={handleMobileNavClick}
+                  >
+                    <Server size={16} />
+                    <span>Системный мониторинг</span>
                   </NavLink>
                 )}
 
