@@ -7,7 +7,8 @@ import {
   doc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from '../../app/config/firebase.js';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { DEMO_ACTIVITY_GROUPS, DEMO_ACTIVITIES } from '../../shared/data/demoData.js';
 
@@ -188,7 +189,7 @@ export async function fetchAttendanceMap(groupId, date) {
 }
 
 /**
- * Save group attendance records with batch write to Firestore
+ * Save group attendance records with Cloud Function recordAttendance (with batch write fallback)
  * @param {Object} params
  * @param {string} params.groupId
  * @param {string} params.date
@@ -197,6 +198,16 @@ export async function fetchAttendanceMap(groupId, date) {
  */
 export async function saveAttendanceBatch({ groupId, date, attendanceMap, teacherId }) {
   try {
+    // 1. Attempt Cloud Function execution (atomically marks attendance + calculates streak + awards XP/coins)
+    try {
+      const recordFn = httpsCallable(functions, 'recordAttendance');
+      const res = await recordFn({ groupId, date, attendanceMap });
+      return res.data || { success: true };
+    } catch (fnErr) {
+      console.warn('recordAttendance Cloud Function failed, falling back to direct Firestore write:', fnErr.message);
+    }
+
+    // 2. Direct Firestore fallback
     const batch = writeBatch(db);
 
     Object.entries(attendanceMap).forEach(([studentId, status]) => {

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Check,
   AlertTriangle,
@@ -6,10 +7,12 @@ import {
   Users,
   CheckCheck,
   Save,
+  Award,
 } from 'lucide-react';
 import { useAttendance } from './useAttendance.js';
 import { Card, Button, Spinner } from '../../shared/ui/index.js';
 import { formatDaysOfWeek } from '../../shared/utils/index.js';
+import { AwardRecognitionModal } from '../gamification/index.js';
 
 const STATUS_OPTIONS = [
   {
@@ -55,6 +58,8 @@ export function AttendanceJournal() {
     saveSuccess,
     error,
   } = useAttendance();
+
+  const [recognitionStudent, setRecognitionStudent] = useState(null);
 
   const selectedGroup = teacherGroups.find((g) => g.id === selectedGroupId) || teacherGroups[0];
 
@@ -520,6 +525,26 @@ export function AttendanceJournal() {
                       );
                     })}
                   </div>
+
+                  {/* Special Recognition Button */}
+                  <div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setRecognitionStudent(student)}
+                      title="Наградить ученика за особые успехи"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        fontSize: '12px',
+                        padding: '5px 9px',
+                      }}
+                    >
+                      <Award size={13} color="var(--warning)" />
+                      <span>Отметить за успехи</span>
+                    </Button>
+                  </div>
                 </div>
               );
             })}
@@ -555,6 +580,16 @@ export function AttendanceJournal() {
           </div>
         )}
       </Card>
+
+      {/* Award Recognition Modal */}
+      {recognitionStudent && (
+        <AwardRecognitionModal
+          isOpen={Boolean(recognitionStudent)}
+          onClose={() => setRecognitionStudent(null)}
+          student={recognitionStudent}
+          groupId={selectedGroupId}
+        />
+      )}
     </div>
   );
 }

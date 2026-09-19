@@ -7,7 +7,8 @@ import {
   where,
   onSnapshot,
 } from 'firebase/firestore';
-import { db } from '../../app/config/firebase.js';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
 import { createEnrollmentCall } from '../enrollment/api.js';
 import { recordClientAudit } from '../../shared/services/auditLogger.js';
@@ -205,6 +206,19 @@ export async function decideExamApplicationRecord({
       gradedAt: now,
       enrollmentId: enrollmentResult?.enrollmentId || null,
     });
+
+    // 3. Trigger gamification exam pass reward (+100 XP) via Cloud Function
+    try {
+      const gradeFn = httpsCallable(functions, 'gradeExamApplication');
+      await gradeFn({
+        applicationId,
+        decision: 'passed',
+        score: numericScore,
+        maxScore: numericMaxScore,
+      });
+    } catch (gamifyErr) {
+      console.warn('gradeExamApplication Cloud Function award warning:', gamifyErr.message);
+    }
 
     recordClientAudit({
       action: 'exam.graded',

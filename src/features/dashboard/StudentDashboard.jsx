@@ -20,6 +20,12 @@ import { useParentDashboard } from './useParentDashboard.js';
 import { subscribeStudentExamApplications } from '../exam/api.js';
 import { Card, Badge, Button, Spinner, Modal, PageHeader, CountdownTimer } from '../../shared/ui/index.js';
 import { formatCurrency, formatDate, formatDaysOfWeek } from '../../shared/utils/index.js';
+import {
+  subscribeUserBalance,
+  subscribePointsLedger,
+  GamificationBalanceCard,
+  PointsHistorySection,
+} from '../gamification/index.js';
 
 export function StudentDashboard() {
   const { user } = useAuth();
@@ -39,6 +45,10 @@ export function StudentDashboard() {
   } = useParentDashboard(user?.id);
 
   const [examApplications, setExamApplications] = useState([]);
+  const [balance, setBalance] = useState(null);
+  const [pointsHistory, setPointsHistory] = useState([]);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [loadingGamification, setLoadingGamification] = useState(true);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -47,6 +57,32 @@ export function StudentDashboard() {
     });
     return () => {
       if (unsubscribe) unsubscribe();
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    setLoadingGamification(true);
+
+    const unsubBalance = subscribeUserBalance(
+      user.id,
+      (bal) => {
+        setBalance(bal);
+        setLoadingGamification(false);
+      },
+      () => setLoadingGamification(false)
+    );
+
+    const unsubHistory = subscribePointsLedger(
+      user.id,
+      (hist) => {
+        setPointsHistory(hist || []);
+      }
+    );
+
+    return () => {
+      if (unsubBalance) unsubBalance();
+      if (unsubHistory) unsubHistory();
     };
   }, [user?.id]);
 
@@ -86,6 +122,44 @@ export function StudentDashboard() {
         >
           <CheckCircle2 size={16} />
           <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Gamification Balance Widget */}
+      <GamificationBalanceCard
+        balance={balance}
+        loading={loadingGamification}
+        historyOpen={historyOpen}
+        onToggleHistory={() => setHistoryOpen((prev) => !prev)}
+      />
+
+      {/* Points History Collapsible Section */}
+      {historyOpen && (
+        <div style={{ marginBottom: '24px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '12px',
+            }}
+          >
+            <h3
+              style={{
+                fontSize: '16px',
+                fontWeight: 700,
+                fontFamily: 'var(--font-heading)',
+                margin: 0,
+                color: 'var(--text-primary)',
+              }}
+            >
+              История начислений баллов и монет
+            </h3>
+            <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
+              Всего операций: {pointsHistory.length}
+            </span>
+          </div>
+          <PointsHistorySection entries={pointsHistory} />
         </div>
       )}
 
