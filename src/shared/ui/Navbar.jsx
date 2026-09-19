@@ -255,21 +255,6 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                   </NavLink>
                 )}
 
-                {currentUser && (currentUser.email === 'daniilivakin30@gmail.com' || currentUser.isDemoMaster) && (
-                  <NavLink
-                    to="/system-monitor"
-                    style={(args) => ({
-                      ...navLinkStyle(args),
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    })}
-                  >
-                    <Server size={14} />
-                    <span>Мониторинг</span>
-                  </NavLink>
-                )}
-
                 {currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin') && (
                   <>
                     {/* Visual separator isolating equipment maintenance */}
