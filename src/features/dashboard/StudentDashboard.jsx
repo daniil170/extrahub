@@ -26,6 +26,7 @@ import {
   GamificationBalanceCard,
   PointsHistorySection,
 } from '../gamification/index.js';
+import { LeagueWidget } from '../league/index.js';
 
 export function StudentDashboard() {
   const { user } = useAuth();
@@ -132,6 +133,9 @@ export function StudentDashboard() {
         historyOpen={historyOpen}
         onToggleHistory={() => setHistoryOpen((prev) => !prev)}
       />
+
+      {/* Gamification League Division Widget */}
+      <LeagueWidget userId={user?.id} />
 
       {/* Points History Collapsible Section */}
       {historyOpen && (

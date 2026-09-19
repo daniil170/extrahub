@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3, CreditCard, UserPlus, GraduationCap, TrendingUp, Users, BookOpen } from 'lucide-react';
+import { BarChart3, CreditCard, UserPlus, GraduationCap, TrendingUp, Users, BookOpen, Trophy } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { PageHeader } from '../../shared/ui/index.js';
 import { GroupMonitoringTab } from './GroupMonitoringTab.jsx';
@@ -10,6 +10,7 @@ import { StaffInvitesTab } from './StaffInvitesTab.jsx';
 import { ExamApplicationsTab } from './ExamApplicationsTab.jsx';
 import { AnalyticsTab } from './AnalyticsTab.jsx';
 import { TeachersTab } from './TeachersTab.jsx';
+import { SeasonsManagementTab } from './SeasonsManagementTab.jsx';
 
 import { CoordinatorTabsDropdown } from './CoordinatorTabsDropdown.jsx';
 
@@ -58,6 +59,11 @@ export function CoordinatorDashboard() {
       icon: <GraduationCap size={16} />,
     },
     {
+      id: 'seasons',
+      label: 'Сезоны и Лиги',
+      icon: <Trophy size={16} />,
+    },
+    {
       id: 'analytics',
       label: 'Аналитика и статистика',
       icon: <TrendingUp size={16} />,
@@ -91,6 +97,7 @@ export function CoordinatorDashboard() {
       {activeTab === 'payments' && <PaymentManagement />}
       {isAdmin && activeTab === 'invites' && <StaffInvitesTab />}
       {activeTab === 'exams' && <ExamApplicationsTab />}
+      {activeTab === 'seasons' && <SeasonsManagementTab />}
       {activeTab === 'analytics' && <AnalyticsTab />}
     </div>
   );
