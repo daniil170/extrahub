@@ -32,6 +32,10 @@ export { updateLeagueProfile } from './callable/updateLeagueProfile.js';
 export { purchaseShopItem } from './callable/purchaseShopItem.js';
 export { equipShopItem } from './callable/equipShopItem.js';
 
+export { createClubEvent } from './callable/createClubEvent.js';
+export { respondToEvent } from './callable/respondToEvent.js';
+export { markEventOutcome } from './callable/markEventOutcome.js';
+
 export { logAuditEvent } from './shared/auditLog.js';
 export { logFunctionError } from './shared/systemErrors.js';
 export { promoteFromWaitlist } from './shared/waitlist.js';

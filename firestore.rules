@@ -472,5 +472,37 @@ service cloud.firestore {
       // Purchases and removals strictly via Cloud Functions / Admin SDK
       allow create, delete: if false;
     }
+
+    // ==========================================
+    // GAMIFICATION: CALENDAR EVENTS & BOSS-EVENTS
+    // ==========================================
+    match /clubEvents/{eventId} {
+      // Calendar events are readable by all students and teachers
+      allow read: if true;
+      // Creation, update and removal by teachers, coordinators or admin
+      allow create, update, delete: if isAuthenticated() && (
+        isTeacher() ||
+        isCoordinator() ||
+        isAdmin() ||
+        isDemoMaster()
+      );
+    }
+
+    // ==========================================
+    // GAMIFICATION: EVENT RESPONSES & OUTCOMES
+    // ==========================================
+    match /eventResponses/{responseId} {
+      // Event responses readable for attendee lists, calendar badges, heatmaps
+      allow read: if true;
+      // Students can RSVP, Teachers/Admins can grade outcomes
+      allow create, update: if isAuthenticated() && (
+        request.auth.uid == request.resource.data.studentId ||
+        isTeacher() ||
+        isCoordinator() ||
+        isAdmin() ||
+        isDemoMaster()
+      );
+      allow delete: if isAdmin() || isDemoMaster();
+    }
   }
 }
