@@ -16,7 +16,7 @@ export const EVENT_TYPE_LABELS = {
   [EVENT_TYPES.EXAM]: 'Экзамен / Зачёт',
   [EVENT_TYPES.COMPETITION]: 'Хакатон / Турнир',
   [EVENT_TYPES.DEADLINE]: 'Дедлайн / Сдача работы',
-  [EVENT_TYPES.BOSS_EVENT]: '⚔️ Босс-Событие',
+  [EVENT_TYPES.BOSS_EVENT]: 'Специальное событие',
 };
 
 export const EVENT_TYPE_BADGES = {
@@ -24,7 +24,7 @@ export const EVENT_TYPE_BADGES = {
   [EVENT_TYPES.EXAM]: { label: 'Экзамен', bg: 'rgba(139, 92, 246, 0.12)', color: '#7c3aed', border: '#ddd6fe' },
   [EVENT_TYPES.COMPETITION]: { label: 'Турнир', bg: 'rgba(245, 158, 11, 0.12)', color: '#d97706', border: '#fde68a' },
   [EVENT_TYPES.DEADLINE]: { label: 'Дедлайн', bg: 'rgba(239, 68, 68, 0.12)', color: '#dc2626', border: '#fecaca' },
-  [EVENT_TYPES.BOSS_EVENT]: { label: '⚔️ БОСС-СОБЫТИЕ', bg: 'rgba(236, 72, 153, 0.16)', color: '#db2777', border: '#fbcfe8' },
+  [EVENT_TYPES.BOSS_EVENT]: { label: 'Спец-событие', bg: 'rgba(139, 92, 246, 0.12)', color: '#7c3aed', border: '#ddd6fe' },
 };
 
 export const RESPONSE_STATUS = {

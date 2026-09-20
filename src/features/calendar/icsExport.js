@@ -58,13 +58,13 @@ export function generateIcsContent(events = [], calendarName = 'ExtraHub Рас�
     
     let summaryPrefix = '';
     if (ev.isBossEvent) {
-      summaryPrefix = '⚔️ [БОСС-СОБЫТИЕ] ';
+      summaryPrefix = '[СПЕЦ-СОБЫТИЕ] ';
     } else if (ev.type === 'exam') {
-      summaryPrefix = '📝 [ЭКЗАМЕН] ';
+      summaryPrefix = '[ЭКЗАМЕН] ';
     } else if (ev.type === 'competition') {
-      summaryPrefix = '🏆 [ТУРНИР] ';
+      summaryPrefix = '[ТУРНИР] ';
     } else if (ev.type === 'deadline') {
-      summaryPrefix = '⏰ [ДЕДЛАЙН] ';
+      summaryPrefix = '[ДЕДЛАЙН] ';
     }
 
     const summary = `${summaryPrefix}${ev.title || 'Событие ExtraHub'}`;

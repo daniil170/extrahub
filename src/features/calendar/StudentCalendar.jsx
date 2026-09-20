@@ -164,7 +164,7 @@ export function StudentCalendar({
         studentName,
         status,
       });
-      setRsvpFeedback(status === 'accepted' ? 'Вы подтвердили участие! ⚔️' : 'Вы отклонили участие.');
+      setRsvpFeedback(status === 'accepted' ? 'Вы подтвердили участие!' : 'Вы отклонили участие.');
     } catch (e) {
       setRsvpFeedback(`Ошибка: ${e.message}`);
     } finally {
@@ -312,10 +312,10 @@ export function StudentCalendar({
 
           {[
             { id: 'all', label: 'Все события' },
-            { id: 'boss_event', label: '⚔️ Босс-События' },
-            { id: 'exam', label: '📝 Экзамены' },
-            { id: 'competition', label: '🏆 Турниры' },
-            { id: 'lesson', label: '📅 Занятия' },
+            { id: 'boss_event', label: 'Спец-события' },
+            { id: 'exam', label: 'Экзамены' },
+            { id: 'competition', label: 'Турниры' },
+            { id: 'lesson', label: 'Занятия' },
           ].map((f) => {
             const active = filterType === f.id;
             return (
@@ -326,13 +326,13 @@ export function StudentCalendar({
                   padding: '4px 10px',
                   borderRadius: '999px',
                   border: active
-                    ? f.id === 'boss_event' ? '1px solid #db2777' : '1px solid var(--primary)'
+                    ? f.id === 'boss_event' ? '1px solid #7c3aed' : '1px solid var(--primary)'
                     : '1px solid var(--border-color)',
                   backgroundColor: active
-                    ? f.id === 'boss_event' ? 'rgba(236, 72, 153, 0.15)' : 'rgba(59, 130, 246, 0.12)'
+                    ? f.id === 'boss_event' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(59, 130, 246, 0.12)'
                     : 'var(--bg-surface)',
                   color: active
-                    ? f.id === 'boss_event' ? '#db2777' : 'var(--primary)'
+                    ? f.id === 'boss_event' ? '#7c3aed' : 'var(--primary)'
                     : 'var(--text-secondary)',
                   fontSize: '12px',
                   fontWeight: active ? 700 : 500,
@@ -427,29 +427,26 @@ export function StudentCalendar({
                           padding: '8px 10px',
                           borderRadius: '8px',
                           backgroundColor: isBoss
-                            ? 'rgba(236, 72, 153, 0.12)'
+                            ? 'rgba(139, 92, 246, 0.12)'
                             : ev.type === EVENT_TYPES.EXAM
                             ? 'rgba(139, 92, 246, 0.1)'
                             : ev.type === EVENT_TYPES.COMPETITION
                             ? 'rgba(245, 158, 11, 0.1)'
                             : 'rgba(59, 130, 246, 0.08)',
                           border: isBoss
-                            ? '1.5px solid #db2777'
+                            ? '1.5px solid #7c3aed'
                             : '1px solid var(--border-color)',
-                          boxShadow: isBoss
-                            ? '0 0 10px rgba(236, 72, 153, 0.35)'
-                            : 'none',
                           cursor: 'pointer',
                           transition: 'transform 0.15s ease, box-shadow 0.15s ease',
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 700, color: isBoss ? '#db2777' : 'var(--text-secondary)' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: isBoss ? '#7c3aed' : 'var(--text-secondary)' }}>
                             {startTimeStr}
                           </span>
                           {isBoss && (
-                            <span style={{ fontSize: '10px', fontWeight: 800, color: '#db2777' }}>
-                              ⚔️ БОСС
+                            <span style={{ fontSize: '10px', fontWeight: 800, color: '#7c3aed' }}>
+                              Спец
                             </span>
                           )}
                         </div>
@@ -478,9 +475,9 @@ export function StudentCalendar({
                           </span>
 
                           {resp?.status === 'accepted' ? (
-                            <span style={{ color: '#10b981', fontWeight: 700 }}>✓ Иду</span>
+                            <span style={{ color: '#10b981', fontWeight: 700 }}>Иду</span>
                           ) : ev.requiresRsvp ? (
-                            <span style={{ color: '#db2777', fontWeight: 700 }}>RSVP</span>
+                            <span style={{ color: 'var(--primary)', fontWeight: 700 }}>RSVP</span>
                           ) : null}
                         </div>
                       </div>
@@ -519,9 +516,8 @@ export function StudentCalendar({
                     padding: '16px 20px',
                     cursor: 'pointer',
                     borderRadius: 'var(--radius-md, 12px)',
-                    backgroundColor: isBoss ? 'rgba(236, 72, 153, 0.04)' : 'var(--bg-surface)',
-                    border: isBoss ? '2px solid rgba(236, 72, 153, 0.5)' : '1px solid var(--border-color)',
-                    boxShadow: isBoss ? '0 0 14px rgba(236, 72, 153, 0.2)' : 'none',
+                    backgroundColor: isBoss ? 'rgba(139, 92, 246, 0.04)' : 'var(--bg-surface)',
+                    border: isBoss ? '1.5px solid rgba(139, 92, 246, 0.4)' : '1px solid var(--border-color)',
                     display: 'flex',
                     flexWrap: 'wrap',
                     alignItems: 'center',
@@ -534,7 +530,7 @@ export function StudentCalendar({
                       style={{
                         padding: '10px 14px',
                         borderRadius: '10px',
-                        backgroundColor: isBoss ? '#db2777' : 'var(--primary)',
+                        backgroundColor: isBoss ? '#7c3aed' : 'var(--primary)',
                         color: '#ffffff',
                         textAlign: 'center',
                         minWidth: '55px',
@@ -551,22 +547,7 @@ export function StudentCalendar({
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                         {isBoss ? (
-                          <span
-                            style={{
-                              padding: '2px 8px',
-                              borderRadius: '999px',
-                              backgroundColor: 'rgba(236, 72, 153, 0.16)',
-                              color: '#db2777',
-                              fontWeight: 800,
-                              fontSize: '11px',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '3px',
-                            }}
-                          >
-                            <Sword size={11} />
-                            БОСС-СОБЫТИЕ
-                          </span>
+                          <Badge variant="purple" size="sm">Спец-событие</Badge>
                         ) : (
                           <Badge variant="blue" size="sm">{EVENT_TYPE_LABELS[ev.type] || 'Занятие'}</Badge>
                         )}
@@ -717,7 +698,7 @@ export function StudentCalendar({
                             borderRadius: '4px',
                             fontSize: '10.5px',
                             fontWeight: 700,
-                            backgroundColor: ev.isBossEvent ? '#db2777' : 'var(--primary)',
+                            backgroundColor: ev.isBossEvent ? '#7c3aed' : 'var(--primary)',
                             color: '#ffffff',
                             cursor: 'pointer',
                             overflow: 'hidden',
@@ -725,7 +706,7 @@ export function StudentCalendar({
                             whiteSpace: 'nowrap',
                           }}
                         >
-                          {ev.isBossEvent ? '⚔️ ' : ''}{ev.title}
+                          {ev.title}
                         </div>
                       ))}
                       {cell.events.length > 3 && (
@@ -750,19 +731,18 @@ export function StudentCalendar({
             setSelectedEvent(null);
             setRsvpFeedback('');
           }}
-          title={selectedEvent.isBossEvent ? '⚔️ БОСС-СОБЫТИЕ' : selectedEvent.title}
+          title={selectedEvent.title}
           size="md"
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {/* Header Hero if Boss Event */}
+            {/* Header Hero if Boss/Special Event */}
             {selectedEvent.isBossEvent && (
               <div
                 style={{
                   padding: '16px',
                   borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.3) 100%)',
-                  border: '1.5px solid #db2777',
-                  boxShadow: '0 0 15px rgba(236, 72, 153, 0.25)',
+                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.2) 100%)',
+                  border: '1.5px solid #7c3aed',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
@@ -773,7 +753,7 @@ export function StudentCalendar({
                     width: '44px',
                     height: '44px',
                     borderRadius: '50%',
-                    backgroundColor: '#db2777',
+                    backgroundColor: '#7c3aed',
                     color: '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
@@ -781,14 +761,14 @@ export function StudentCalendar({
                     flexShrink: 0,
                   }}
                 >
-                  <Sword size={24} />
+                  <Sparkles size={22} />
                 </div>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#be185d' }}>
+                  <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#6d28d9' }}>
                     {selectedEvent.title}
                   </h4>
                   <div style={{ fontSize: '12.5px', color: 'var(--text-primary)', marginTop: '2px' }}>
-                    Победа над этим испытанием принесет повышенный XP и монеты школы!
+                    Специальное мероприятие: за участие начисляется повышенный XP и школьные монеты!
                   </div>
                 </div>
               </div>

@@ -129,7 +129,7 @@ export function StudentDashboard() {
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '48px' }}>
       <PageHeader
         title={`Личный кабинет ученика: ${user?.fullName || 'Ученик'}`}
-        subtitle="Ваши секции, интерактивное расписание, Босс-события и статус оплат"
+        subtitle="Ваши кружки, расписание занятий, мероприятия и статус оплат"
       />
 
       {/* Toast alert */}
@@ -155,48 +155,7 @@ export function StudentDashboard() {
         </div>
       )}
 
-      {/* Gamification Balance Widget */}
-      <GamificationBalanceCard
-        balance={balance}
-        loading={loadingGamification}
-        historyOpen={historyOpen}
-        onToggleHistory={() => setHistoryOpen((prev) => !prev)}
-      />
-
-      {/* Gamification League Division Widget */}
-      <LeagueWidget userId={user?.id} />
-
-      {/* Points History Collapsible Section */}
-      {historyOpen && (
-        <div style={{ marginBottom: '24px' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '12px',
-            }}
-          >
-            <h3
-              style={{
-                fontSize: '16px',
-                fontWeight: 700,
-                fontFamily: 'var(--font-heading)',
-                margin: 0,
-                color: 'var(--text-primary)',
-              }}
-            >
-              История начислений баллов и монет
-            </h3>
-            <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-              Всего операций: {pointsHistory.length}
-            </span>
-          </div>
-          <PointsHistorySection entries={pointsHistory} />
-        </div>
-      )}
-
-      {/* Tab switcher: Enrollments vs Calendar */}
+      {/* Tab switcher: Enrollments vs Calendar (Placed at the very top) */}
       <div
         style={{
           display: 'flex',
@@ -234,30 +193,16 @@ export function StudentDashboard() {
             gap: '8px',
             padding: '9px 18px',
             borderRadius: 'var(--radius-md, 10px)',
-            border: activeTab === 'calendar' ? '2px solid #db2777' : '1px solid var(--border-color)',
-            backgroundColor: activeTab === 'calendar' ? 'rgba(236, 72, 153, 0.1)' : 'var(--bg-surface)',
-            color: activeTab === 'calendar' ? '#db2777' : 'var(--text-secondary)',
+            border: activeTab === 'calendar' ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+            backgroundColor: activeTab === 'calendar' ? 'rgba(59, 130, 246, 0.1)' : 'var(--bg-surface)',
+            color: activeTab === 'calendar' ? 'var(--primary)' : 'var(--text-secondary)',
             fontWeight: activeTab === 'calendar' ? 700 : 500,
             fontSize: '14px',
             cursor: 'pointer',
           }}
         >
           <Calendar size={16} />
-          <span>Календарь и Босс-События</span>
-          {clubEvents.some((e) => e.isBossEvent) && (
-            <span
-              style={{
-                fontSize: '11px',
-                padding: '1px 6px',
-                borderRadius: '999px',
-                backgroundColor: '#db2777',
-                color: '#ffffff',
-                fontWeight: 800,
-              }}
-            >
-              БОСС
-            </span>
-          )}
+          <span>Календарь и расписание</span>
         </button>
       </div>
 
@@ -838,6 +783,69 @@ export function StudentDashboard() {
               </Card>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Gamification, Leagues and Balance Section (Placed below enrollments/calendar) */}
+      {!loading && (
+        <div style={{ marginTop: '32px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '16px',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: '18px',
+                fontWeight: 700,
+                margin: 0,
+                color: 'var(--text-primary)',
+              }}
+            >
+              Достижения, рейтинг и баллы
+            </h2>
+          </div>
+
+          <GamificationBalanceCard
+            balance={balance}
+            loading={loadingGamification}
+            historyOpen={historyOpen}
+            onToggleHistory={() => setHistoryOpen((prev) => !prev)}
+          />
+
+          <LeagueWidget userId={user?.id} />
+
+          {historyOpen && (
+            <div style={{ marginBottom: '24px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '12px',
+                }}
+              >
+                <h3
+                  style={{
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-heading)',
+                    margin: 0,
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  История начислений баллов и монет
+                </h3>
+                <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
+                  Всего операций: {pointsHistory.length}
+                </span>
+              </div>
+              <PointsHistorySection entries={pointsHistory} />
+            </div>
+          )}
         </div>
       )}
 

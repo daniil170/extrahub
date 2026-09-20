@@ -175,7 +175,7 @@ describe('Gamification Calendar, Boss-Events, Heatmap & iCal — Unit Tests', ()
       expect(ics).toContain('BEGIN:VCALENDAR');
       expect(ics).toContain('VERSION:2.0');
       expect(ics).toContain('BEGIN:VEVENT');
-      expect(ics).toContain('SUMMARY:⚔️ [БОСС-СОБЫТИЕ] Финальный Босс: Защита Робота');
+      expect(ics).toContain('SUMMARY:[СПЕЦ-СОБЫТИЕ] Финальный Босс: Защита Робота');
       expect(ics).toContain('UID:ev-boss-1@extrahub.school');
       expect(ics).toContain('+350 XP');
       expect(ics).toContain('+60 монет');

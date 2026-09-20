@@ -213,9 +213,9 @@ export function AttendanceHeatmap({
 
     if (data.hasBossEvent) {
       return {
-        bg: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
-        border: '1px solid #be185d',
-        boxShadow: '0 0 8px rgba(236, 72, 153, 0.65)',
+        bg: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+        border: '1px solid #6d28d9',
+        boxShadow: '0 0 6px rgba(124, 58, 237, 0.4)',
         cursor: 'pointer',
         transform: 'scale(1.15)',
         zIndex: 2,
@@ -272,7 +272,7 @@ export function AttendanceHeatmap({
             </h3>
           </div>
           <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
-            График занятий, хакатонов и побед над Боссами за последние 15 недель
+            График посещаемости регулярных занятий, мероприятий и хакатонов за последние 15 недель
           </p>
         </div>
 
@@ -303,15 +303,15 @@ export function AttendanceHeatmap({
               gap: '6px',
               padding: '4px 10px',
               borderRadius: '999px',
-              backgroundColor: 'rgba(236, 72, 153, 0.1)',
-              border: '1px solid rgba(236, 72, 153, 0.3)',
+              backgroundColor: 'rgba(139, 92, 246, 0.1)',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
               fontSize: '12.5px',
               fontWeight: 700,
-              color: '#db2777',
+              color: '#7c3aed',
             }}
           >
-            <Sword size={14} />
-            <span>Боссы: {stats.totalBossWins}</span>
+            <Award size={14} />
+            <span>Спец-события: {stats.totalBossWins}</span>
           </div>
 
           <div
@@ -469,8 +469,8 @@ export function AttendanceHeatmap({
               </div>
               <ul style={{ margin: '4px 0 0', paddingLeft: '14px', fontSize: '11px', color: '#cbd5e1' }}>
                 {hoveredCell.data.items.map((item, i) => (
-                  <li key={i} style={{ color: item.isBoss ? '#f472b6' : '#cbd5e1', fontWeight: item.isBoss ? 700 : 400 }}>
-                    {item.isBoss ? '⚔️ ' : ''}{item.title}
+                  <li key={i} style={{ color: item.isBoss ? '#c084fc' : '#cbd5e1', fontWeight: item.isBoss ? 700 : 400 }}>
+                    {item.title}
                   </li>
                 ))}
               </ul>
@@ -503,9 +503,9 @@ export function AttendanceHeatmap({
           <div style={{ width: '11px', height: '11px', borderRadius: '2px', backgroundColor: '#22c55e' }} />
           <div style={{ width: '11px', height: '11px', borderRadius: '2px', backgroundColor: '#15803d' }} />
           <span>Больше</span>
-          <span style={{ marginLeft: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#db2777', fontWeight: 600 }}>
-            <div style={{ width: '11px', height: '11px', borderRadius: '2px', backgroundColor: '#db2777', boxShadow: '0 0 6px rgba(236,72,153,0.8)' }} />
-            ⚔️ Босс-Событие
+          <span style={{ marginLeft: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#7c3aed', fontWeight: 600 }}>
+            <div style={{ width: '11px', height: '11px', borderRadius: '2px', backgroundColor: '#7c3aed' }} />
+            Спец-событие
           </span>
         </div>
 

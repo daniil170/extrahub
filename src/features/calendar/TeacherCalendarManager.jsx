@@ -124,7 +124,7 @@ export function CreateEventModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Создать событие / Босс-Событие" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Создать специальное событие" size="lg">
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {error && (
           <div
@@ -151,11 +151,11 @@ export function CreateEventModal({
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
             {[
-              { type: EVENT_TYPES.BOSS_EVENT, label: '⚔️ Босс-Событие', desc: 'Эпический хакатон / финальный проект' },
-              { type: EVENT_TYPES.EXAM, label: '📝 Экзамен / Зачет', desc: 'Проверка знаний' },
-              { type: EVENT_TYPES.COMPETITION, label: '🏆 Турнир', desc: 'Олимпиада / Соревнование' },
-              { type: EVENT_TYPES.DEADLINE, label: '⏰ Дедлайн', desc: 'Сдача проекта' },
-              { type: EVENT_TYPES.LESSON, label: '📅 Занятие', desc: 'Спец-урок' },
+              { type: EVENT_TYPES.BOSS_EVENT, label: 'Специальное событие', desc: 'Хакатон / финальный проект' },
+              { type: EVENT_TYPES.EXAM, label: 'Экзамен / Зачёт', desc: 'Проверка знаний' },
+              { type: EVENT_TYPES.COMPETITION, label: 'Хакатон / Турнир', desc: 'Олимпиада / соревнование' },
+              { type: EVENT_TYPES.DEADLINE, label: 'Дедлайн', desc: 'Сдача проекта' },
+              { type: EVENT_TYPES.LESSON, label: 'Занятие', desc: 'Спец-урок' },
             ].map((opt) => {
               const active = formData.type === opt.type;
               return (
@@ -167,14 +167,10 @@ export function CreateEventModal({
                     padding: '10px',
                     borderRadius: 'var(--radius-sm, 8px)',
                     border: active
-                      ? opt.type === EVENT_TYPES.BOSS_EVENT
-                        ? '2px solid #db2777'
-                        : '2px solid var(--primary)'
+                      ? '2px solid var(--primary)'
                       : '1px solid var(--border-color)',
                     backgroundColor: active
-                      ? opt.type === EVENT_TYPES.BOSS_EVENT
-                        ? 'rgba(236, 72, 153, 0.08)'
-                        : 'rgba(59, 130, 246, 0.08)'
+                      ? 'rgba(59, 130, 246, 0.08)'
                       : 'var(--bg-surface)',
                     cursor: 'pointer',
                     textAlign: 'left',
@@ -329,18 +325,13 @@ export function CreateEventModal({
           style={{
             padding: '14px',
             borderRadius: 'var(--radius-md)',
-            backgroundColor: formData.isBossEvent ? 'rgba(236, 72, 153, 0.06)' : 'var(--bg-secondary)',
-            border: formData.isBossEvent ? '1px solid rgba(236, 72, 153, 0.3)' : '1px solid var(--border-color)',
+            backgroundColor: formData.isBossEvent ? 'rgba(139, 92, 246, 0.06)' : 'var(--bg-secondary)',
+            border: formData.isBossEvent ? '1px solid rgba(139, 92, 246, 0.3)' : '1px solid var(--border-color)',
           }}
         >
           <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Award size={16} color={formData.isBossEvent ? '#db2777' : 'var(--primary)'} />
+            <Award size={16} color="var(--primary)" />
             <span>Награды за успешное участие / прохождение</span>
-            {formData.isBossEvent && (
-              <Badge variant="purple" size="sm">
-                Мин. 200 XP за Босса
-              </Badge>
-            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -350,7 +341,7 @@ export function CreateEventModal({
               </label>
               <input
                 type="number"
-                min={formData.isBossEvent ? 200 : 0}
+                min="0"
                 step="50"
                 value={formData.xpReward}
                 onChange={(e) => setFormData({ ...formData, xpReward: Number(e.target.value) })}
@@ -428,8 +419,8 @@ export function CreateEventModal({
               </>
             ) : (
               <>
-                {formData.isBossEvent ? <Sword size={16} /> : <Plus size={16} />}
-                <span>Создать {formData.isBossEvent ? 'Босс-Событие' : 'Событие'}</span>
+                <Plus size={16} />
+                <span>Создать событие</span>
               </>
             )}
           </Button>
@@ -440,7 +431,7 @@ export function CreateEventModal({
 }
 
 /**
- * Modal for grading event outcome and awarding Boss XP
+ * Modal for grading event outcome and awarding points
  */
 export function EventOutcomeModal({
   isOpen,
@@ -452,7 +443,7 @@ export function EventOutcomeModal({
 }) {
   const [selectedStudentId, setSelectedStudentId] = useState('');
   const [outcome, setOutcome] = useState('attended');
-  const [grade, setGrade] = useState('Отлично (Победа)');
+  const [grade, setGrade] = useState('Отлично (Зачёт)');
   const [feedback, setFeedback] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -505,9 +496,9 @@ export function EventOutcomeModal({
             style={{
               padding: '10px 14px',
               borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'rgba(236, 72, 153, 0.1)',
-              border: '1px solid rgba(236, 72, 153, 0.3)',
-              color: '#db2777',
+              backgroundColor: 'rgba(139, 92, 246, 0.1)',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+              color: '#7c3aed',
               fontSize: '13px',
               fontWeight: 700,
               display: 'flex',
@@ -515,8 +506,8 @@ export function EventOutcomeModal({
               gap: '8px',
             }}
           >
-            <Sword size={16} />
-            <span>Победа над Боссом автоматически начислит +{event.xpReward} XP и +{event.coinsReward} монет в профиль ученика!</span>
+            <Sparkles size={16} />
+            <span>Подтверждение участия автоматически начислит +{event.xpReward} XP и +{event.coinsReward} монет в профиль ученика!</span>
           </div>
         )}
 
@@ -528,7 +519,7 @@ export function EventOutcomeModal({
 
         {successMsg && (
           <div style={{ color: '#059669', fontSize: '13px', backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '8px 12px', borderRadius: '6px' }}>
-            ✓ {successMsg}
+            {successMsg}
           </div>
         )}
 
@@ -544,7 +535,7 @@ export function EventOutcomeModal({
               const existingResp = studentResponses.find((r) => r.studentId === e.target.value);
               if (existingResp) {
                 setOutcome(existingResp.outcome === 'absent' ? 'absent' : 'attended');
-                setGrade(existingResp.grade || 'Отлично (Победа)');
+                setGrade(existingResp.grade || 'Отлично (Зачёт)');
                 setFeedback(existingResp.feedback || '');
               }
             }}
@@ -584,7 +575,7 @@ export function EventOutcomeModal({
                 cursor: 'pointer',
               }}
             >
-              ✓ Участвовал / Победил
+              Участвовал / Сдал
             </button>
             <button
               type="button"
@@ -599,7 +590,7 @@ export function EventOutcomeModal({
                 cursor: 'pointer',
               }}
             >
-              ✕ Не явился
+              Не явился
             </button>
           </div>
         </div>
@@ -683,8 +674,8 @@ export function TeacherCalendarManager({
       <Card
         style={{
           padding: '24px',
-          background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%)',
-          border: '1.5px solid rgba(236, 72, 153, 0.3)',
+          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%)',
+          border: '1.5px solid rgba(139, 92, 246, 0.3)',
           borderRadius: 'var(--radius-lg, 16px)',
         }}
       >
@@ -703,22 +694,21 @@ export function TeacherCalendarManager({
                 width: '52px',
                 height: '52px',
                 borderRadius: '12px',
-                backgroundColor: '#db2777',
+                backgroundColor: 'var(--primary)',
                 color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 0 15px rgba(236, 72, 153, 0.4)',
               }}
             >
-              <Sword size={26} />
+              <Calendar size={26} />
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>
-                Босс-События, Экзамены и Календарь
+                Специальные события, экзамены и календарь
               </h3>
               <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                Назначайте проектные хакатоны, испытания с повышенными наградами (мин. 200 XP) и подводите итоги
+                Назначайте проектные хакатоны, олимпиады и экзамены с начислением XP и школьных монет
               </p>
             </div>
           </div>
@@ -727,8 +717,6 @@ export function TeacherCalendarManager({
             variant="primary"
             onClick={() => setCreateModalOpen(true)}
             style={{
-              backgroundColor: '#db2777',
-              borderColor: '#db2777',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
@@ -736,8 +724,8 @@ export function TeacherCalendarManager({
               fontWeight: 700,
             }}
           >
-            <Sword size={16} />
-            <span>+ Назначить Босс-Событие</span>
+            <Plus size={16} />
+            <span>+ Создать событие</span>
           </Button>
         </div>
       </Card>
@@ -768,8 +756,8 @@ export function TeacherCalendarManager({
                   style={{
                     padding: '16px',
                     borderRadius: '10px',
-                    border: ev.isBossEvent ? '1.5px solid rgba(236, 72, 153, 0.4)' : '1px solid var(--border-color)',
-                    backgroundColor: ev.isBossEvent ? 'rgba(236, 72, 153, 0.03)' : 'var(--bg-surface)',
+                    border: ev.isBossEvent ? '1.5px solid rgba(139, 92, 246, 0.35)' : '1px solid var(--border-color)',
+                    backgroundColor: ev.isBossEvent ? 'rgba(139, 92, 246, 0.03)' : 'var(--bg-surface)',
                     display: 'flex',
                     flexWrap: 'wrap',
                     alignItems: 'center',
@@ -780,22 +768,7 @@ export function TeacherCalendarManager({
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                       {ev.isBossEvent ? (
-                        <span
-                          style={{
-                            padding: '2px 8px',
-                            borderRadius: '999px',
-                            backgroundColor: 'rgba(236, 72, 153, 0.16)',
-                            color: '#db2777',
-                            fontWeight: 800,
-                            fontSize: '11px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '3px',
-                          }}
-                        >
-                          <Sword size={11} />
-                          БОСС-СОБЫТИЕ
-                        </span>
+                        <Badge variant="purple" size="sm">Спец-событие</Badge>
                       ) : (
                         <Badge variant="blue" size="sm">{EVENT_TYPE_LABELS[ev.type] || 'Событие'}</Badge>
                       )}

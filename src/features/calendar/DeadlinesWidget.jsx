@@ -90,7 +90,7 @@ export function DeadlinesWidget({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Clock size={18} color="var(--primary)" />
-            <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 700 }}>Ближайшие дедлайны и Боссы</h4>
+            <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 700 }}>Ближайшие дедлайны и события</h4>
           </div>
         </div>
         <div
@@ -105,7 +105,7 @@ export function DeadlinesWidget({
           }}
         >
           <Sparkles size={24} style={{ margin: '0 auto 8px', opacity: 0.6 }} />
-          <div>Все дедлайны закрыты, активных босс-событий на этой неделе нет!</div>
+          <div>Все дедлайны закрыты, активных мероприятий на этой неделе нет.</div>
         </div>
       </Card>
     );
@@ -117,7 +117,7 @@ export function DeadlinesWidget({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Clock size={18} color="var(--primary)" />
           <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 700 }}>
-            Ближайшие дедлайны и Боссы
+            Ближайшие дедлайны и события
           </h4>
           <span
             style={{
@@ -167,11 +167,10 @@ export function DeadlinesWidget({
               style={{
                 padding: '12px 14px',
                 borderRadius: 'var(--radius-md, 10px)',
-                backgroundColor: isBoss ? 'rgba(236, 72, 153, 0.05)' : 'var(--bg-surface)',
+                backgroundColor: isBoss ? 'rgba(139, 92, 246, 0.05)' : 'var(--bg-surface)',
                 border: isBoss
-                  ? '1.5px solid rgba(236, 72, 153, 0.4)'
+                  ? '1.5px solid rgba(139, 92, 246, 0.35)'
                   : '1px solid var(--border-color, #e2e8f0)',
-                boxShadow: isBoss ? '0 0 12px rgba(236, 72, 153, 0.15)' : 'none',
                 cursor: onSelectEvent ? 'pointer' : 'default',
                 transition: 'transform 0.15s ease, box-shadow 0.15s ease',
                 display: 'flex',
@@ -183,23 +182,7 @@ export function DeadlinesWidget({
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                   {isBoss ? (
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '3px',
-                        padding: '2px 7px',
-                        borderRadius: '999px',
-                        backgroundColor: 'rgba(236, 72, 153, 0.2)',
-                        color: '#db2777',
-                        fontSize: '11px',
-                        fontWeight: 800,
-                        letterSpacing: '0.3px',
-                      }}
-                    >
-                      <Sword size={11} />
-                      БОСС-СОБЫТИЕ
-                    </span>
+                    <Badge variant="purple" size="sm">Спец-событие</Badge>
                   ) : ev.type === EVENT_TYPES.EXAM ? (
                     <Badge variant="purple" size="sm">Экзамен</Badge>
                   ) : ev.type === EVENT_TYPES.COMPETITION ? (
