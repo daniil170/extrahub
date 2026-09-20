@@ -27,9 +27,19 @@ import {
   PointsHistorySection,
 } from '../gamification/index.js';
 import { LeagueWidget } from '../league/index.js';
+import {
+  StudentCalendar,
+  DeadlinesWidget,
+  AttendanceHeatmap,
+  subscribeClubEvents,
+  subscribeStudentEventResponses,
+} from '../calendar/index.js';
 
 export function StudentDashboard() {
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('enrollments'); // 'enrollments' | 'calendar'
+  const [clubEvents, setClubEvents] = useState([]);
+  const [eventResponses, setEventResponses] = useState([]);
   const {
     enrollments,
     payments,
@@ -81,26 +91,38 @@ export function StudentDashboard() {
       }
     );
 
+    const unsubEvents = subscribeClubEvents((evs) => {
+      setClubEvents(evs || []);
+    });
+
+    const unsubResponses = subscribeStudentEventResponses(user.id, (resps) => {
+      setEventResponses(resps || []);
+    });
+
     return () => {
       if (unsubBalance) unsubBalance();
       if (unsubHistory) unsubHistory();
+      if (unsubEvents) unsubEvents();
+      if (unsubResponses) unsubResponses();
     };
   }, [user?.id]);
 
   const [showCancelled, setShowCancelled] = useState(false);
 
-  const activeEnrollments = enrollments.filter(
-    (e) => e.status !== 'cancelled' && e.status !== 'cancelled_by_timeout'
-  );
-  const cancelledEnrollments = enrollments.filter(
-    (e) => e.status === 'cancelled' || e.status === 'cancelled_by_timeout'
-  );
+  const studentGroups = activeEnrollments
+    .map((e) => e.group)
+    .filter(Boolean);
+
+  const activitiesMap = {};
+  enrollments.forEach((e) => {
+    if (e.activity?.id) activitiesMap[e.activity.id] = e.activity;
+  });
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '48px' }}>
       <PageHeader
         title={`Личный кабинет ученика: ${user?.fullName || 'Ученик'}`}
-        subtitle="Ваши секции, расписание занятий и статус оплат"
+        subtitle="Ваши секции, интерактивное расписание, Босс-события и статус оплат"
       />
 
       {/* Toast alert */}
@@ -167,6 +189,71 @@ export function StudentDashboard() {
         </div>
       )}
 
+      {/* Tab switcher: Enrollments vs Calendar */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '24px',
+          borderBottom: '1px solid var(--border-color)',
+          paddingBottom: '12px',
+        }}
+      >
+        <button
+          onClick={() => setActiveTab('enrollments')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '9px 18px',
+            borderRadius: 'var(--radius-md, 10px)',
+            border: activeTab === 'enrollments' ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+            backgroundColor: activeTab === 'enrollments' ? 'rgba(59, 130, 246, 0.1)' : 'var(--bg-surface)',
+            color: activeTab === 'enrollments' ? 'var(--primary)' : 'var(--text-secondary)',
+            fontWeight: activeTab === 'enrollments' ? 700 : 500,
+            fontSize: '14px',
+            cursor: 'pointer',
+          }}
+        >
+          <ClipboardList size={16} />
+          <span>Мои кружки и записи ({activeEnrollments.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('calendar')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '9px 18px',
+            borderRadius: 'var(--radius-md, 10px)',
+            border: activeTab === 'calendar' ? '2px solid #db2777' : '1px solid var(--border-color)',
+            backgroundColor: activeTab === 'calendar' ? 'rgba(236, 72, 153, 0.1)' : 'var(--bg-surface)',
+            color: activeTab === 'calendar' ? '#db2777' : 'var(--text-secondary)',
+            fontWeight: activeTab === 'calendar' ? 700 : 500,
+            fontSize: '14px',
+            cursor: 'pointer',
+          }}
+        >
+          <Calendar size={16} />
+          <span>Календарь и Босс-События</span>
+          {clubEvents.some((e) => e.isBossEvent) && (
+            <span
+              style={{
+                fontSize: '11px',
+                padding: '1px 6px',
+                borderRadius: '999px',
+                backgroundColor: '#db2777',
+                color: '#ffffff',
+                fontWeight: 800,
+              }}
+            >
+              БОСС
+            </span>
+          )}
+        </button>
+      </div>
+
       {loading && (
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
           <Spinner size="lg" label="Загрузка данных ученика..." />
@@ -185,7 +272,28 @@ export function StudentDashboard() {
         </Card>
       )}
 
-      {!loading && (
+      {!loading && activeTab === 'calendar' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <StudentCalendar
+            events={clubEvents}
+            studentGroups={studentGroups}
+            activitiesMap={activitiesMap}
+            eventResponses={eventResponses}
+            studentId={user?.id}
+            studentName={user?.fullName || 'Ученик'}
+          />
+
+          <AttendanceHeatmap
+            attendanceHistory={[]}
+            eventResponses={eventResponses}
+            events={clubEvents}
+            currentStreak={balance?.currentStreak || 0}
+            studentName={user?.fullName || 'Ученик'}
+          />
+        </div>
+      )}
+
+      {!loading && activeTab === 'enrollments' && (
         <div className="dashboard-grid">
           {/* Left Column: My Enrollments */}
           <div>
@@ -626,8 +734,15 @@ export function StudentDashboard() {
             )}
           </div>
 
-          {/* Right Column: Payments */}
+          {/* Right Column: Deadlines & Payments */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Urgent Deadlines & Boss Events Widget */}
+            <DeadlinesWidget
+              events={clubEvents}
+              eventResponses={eventResponses}
+              onOpenCalendar={() => setActiveTab('calendar')}
+            />
+
             {/* Payment Section */}
             <div>
               <h2

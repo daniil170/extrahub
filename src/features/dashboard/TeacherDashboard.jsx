@@ -1,16 +1,43 @@
-import { useState } from 'react';
-import { GraduationCap, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { GraduationCap, Users, Calendar, Sword } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
 import { PageHeader, IconBookOpen, IconWrench } from '../../shared/ui/index.js';
 import { AttendanceJournal } from '../attendance/index.js';
 import { TeacherEquipmentSection, EquipmentMaintenancePausedPage } from '../equipment/index.js';
 import { TeacherExamApplicationsSection } from '../teacher/TeacherExamApplicationsSection.jsx';
 import { TeacherStudentsTab } from '../teacher/TeacherStudentsTab.jsx';
+import {
+  TeacherCalendarManager,
+  subscribeClubEvents,
+  subscribeAllEventResponses,
+} from '../calendar/index.js';
+import { fetchTeacherGroups } from '../attendance/api.js';
 import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 export function TeacherDashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('attendance'); // 'attendance' | 'students' | 'exams' | 'equipment'
+  const [activeTab, setActiveTab] = useState('attendance'); // 'attendance' | 'students' | 'calendar' | 'exams' | 'equipment'
+  const [teacherGroups, setTeacherGroups] = useState([]);
+  const [clubEvents, setClubEvents] = useState([]);
+  const [eventResponses, setEventResponses] = useState([]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    fetchTeacherGroups(user.id).then((grps) => setTeacherGroups(grps || []));
+
+    const unsubEvents = subscribeClubEvents((evs) => {
+      setClubEvents(evs || []);
+    });
+
+    const unsubResponses = subscribeAllEventResponses((resps) => {
+      setEventResponses(resps || []);
+    });
+
+    return () => {
+      unsubEvents();
+      unsubResponses();
+    };
+  }, [user?.id]);
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', paddingBottom: '48px' }}>
@@ -73,6 +100,27 @@ export function TeacherDashboard() {
         </button>
         <button
           type="button"
+          onClick={() => setActiveTab('calendar')}
+          style={{
+            padding: '8px 16px',
+            borderRadius: 'var(--radius-sm)',
+            border: activeTab === 'calendar' ? '2px solid #db2777' : '1px solid var(--border-color)',
+            backgroundColor: activeTab === 'calendar' ? '#db2777' : 'transparent',
+            color: activeTab === 'calendar' ? '#ffffff' : 'var(--text-primary)',
+            fontWeight: 600,
+            fontSize: '14px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <Sword size={16} />
+          <span>Босс-События и Календарь</span>
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab('exams')}
           style={{
             padding: '8px 16px',
@@ -132,6 +180,20 @@ export function TeacherDashboard() {
 
       {activeTab === 'attendance' && <AttendanceJournal />}
       {activeTab === 'students' && <TeacherStudentsTab />}
+      {activeTab === 'calendar' && (
+        <TeacherCalendarManager
+          teacherId={user?.id}
+          teacherName={user?.fullName || 'Преподаватель'}
+          teacherGroups={teacherGroups}
+          events={clubEvents}
+          eventResponses={eventResponses}
+          onRefresh={() => {
+            if (user?.id) {
+              fetchTeacherGroups(user.id).then((grps) => setTeacherGroups(grps || []));
+            }
+          }}
+        />
+      )}
       {activeTab === 'exams' && <TeacherExamApplicationsSection />}
       {activeTab === 'equipment' && (
         schoolConfig.equipmentModuleEnabled ? (

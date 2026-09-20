@@ -38,6 +38,11 @@ import { STARTER_SHOP_ITEMS } from '../../entities/shop/model.js';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../../app/config/firebase.js';
 import { COLLECTIONS } from '../../shared/api/firebaseUtils.js';
+import {
+  AttendanceHeatmap,
+  subscribeClubEvents,
+  subscribeStudentEventResponses,
+} from '../calendar/index.js';
 
 const SHOWCASE_STORAGE_KEY = 'extrahub_showcase_achievements_';
 
@@ -64,6 +69,9 @@ export function StudentProfilePage() {
   const [tempShowcaseIds, setTempShowcaseIds] = useState([]);
   const [equippingItemId, setEquippingItemId] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+  const [clubEvents, setClubEvents] = useState([]);
+  const [eventResponses, setEventResponses] = useState([]);
+  const [attendanceHistory, setAttendanceHistory] = useState([]);
 
   // Subscriptions
   useEffect(() => {
@@ -162,6 +170,51 @@ export function StudentProfilePage() {
       }
     );
 
+    // Calendar events & responses
+    const unsubEvents = subscribeClubEvents((evs) => {
+      setClubEvents(evs || []);
+    });
+
+    const unsubResponses = subscribeStudentEventResponses(targetStudentId, (resps) => {
+      setEventResponses(resps || []);
+    });
+
+    // Attendance records
+    const attQuery = query(
+      collection(db, COLLECTIONS.ATTENDANCE),
+      where('studentId', '==', targetStudentId)
+    );
+    const unsubAtt = onSnapshot(
+      attQuery,
+      (snap) => {
+        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        if (list.length === 0) {
+          // Fallback demo attendance for preview
+          const now = new Date();
+          const demoAtt = [];
+          for (let i = 1; i <= 24; i += 3) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            demoAtt.push({
+              id: `demo-att-${i}`,
+              date: d.toISOString().substring(0, 10),
+              status: 'attended',
+              attended: true,
+              activityName: 'Робототехника',
+              xpEarned: 50,
+              coinsEarned: 10,
+            });
+          }
+          setAttendanceHistory(demoAtt);
+        } else {
+          setAttendanceHistory(list);
+        }
+      },
+      () => {
+        setAttendanceHistory([]);
+      }
+    );
+
     return () => {
       unsubInventory();
       unsubShop();
@@ -169,6 +222,9 @@ export function StudentProfilePage() {
       unsubLeague();
       unsubSeason();
       unsubAch();
+      unsubEvents();
+      unsubResponses();
+      unsubAtt();
     };
   }, [targetStudentId]);
 
@@ -451,6 +507,15 @@ export function StudentProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Attendance & Boss-Events Activity Heatmap */}
+      <AttendanceHeatmap
+        attendanceHistory={attendanceHistory}
+        eventResponses={eventResponses}
+        events={clubEvents}
+        currentStreak={balance.currentStreak || 0}
+        studentName={user?.fullName || 'Ученик'}
+      />
 
       {/* Grid: Achievement Showcase (3 slots) & Wardrobe */}
       <div
