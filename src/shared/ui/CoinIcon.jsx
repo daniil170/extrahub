@@ -3,12 +3,12 @@ import coinIconImg from '../../assets/icons/coin-icon.png';
 /**
  * Custom scalable Coin Icon component for ExtraHub currency
  * @param {Object} props
- * @param {number} [props.size=18] - Dimension in pixels (width and height)
+ * @param {number} [props.size=22] - Dimension in pixels (width and height)
  * @param {string} [props.className] - CSS classes
  * @param {import('react').CSSProperties} [props.style] - Inline styles
  * @param {boolean} [props.inline=true] - Whether to render inline with text alignment
  */
-export function CoinIcon({ size = 18, className = '', style = {}, inline = true }) {
+export function CoinIcon({ size = 22, className = '', style = {}, inline = true }) {
   return (
     <img
       src={coinIconImg}

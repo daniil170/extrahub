@@ -600,8 +600,8 @@ export function StudentCalendar({
                       <div style={{ color: '#059669', fontWeight: 800, fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
                         <span>+{ev.xpReward} XP</span>
                         {ev.coinsReward > 0 && (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', color: '#b45309' }}>
-                            +{ev.coinsReward} <CoinIcon size={14} />
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#b45309' }}>
+                            +{ev.coinsReward} <CoinIcon size={18} />
                           </span>
                         )}
                       </div>
@@ -843,8 +843,8 @@ export function StudentCalendar({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800 }}>
                   <span style={{ color: '#059669' }}>+{selectedEvent.xpReward} XP</span>
                   {selectedEvent.coinsReward > 0 && (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#b45309' }}>
-                      +{selectedEvent.coinsReward} <CoinIcon size={14} />
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#b45309' }}>
+                      +{selectedEvent.coinsReward} <CoinIcon size={18} />
                     </span>
                   )}
                 </div>

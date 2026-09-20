@@ -236,8 +236,8 @@ export function DeadlinesWidget({
                     <span style={{ color: '#059669', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                       +{ev.xpReward} XP
                       {ev.coinsReward > 0 && (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', color: '#b45309' }}>
-                          +{ev.coinsReward} <CoinIcon size={12} />
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#b45309' }}>
+                          +{ev.coinsReward} <CoinIcon size={16} />
                         </span>
                       )}
                     </span>

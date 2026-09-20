@@ -366,8 +366,8 @@ export function CreateEventModal({
             </div>
 
             <div>
-              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 600, marginBottom: '4px' }}>
-                Монеты школы (<CoinIcon size={12} />)
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, marginBottom: '4px' }}>
+                Монеты школы (<CoinIcon size={18} />)
               </label>
               <input
                 type="number"

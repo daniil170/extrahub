@@ -494,13 +494,13 @@ export function StudentProfilePage() {
                 border: '1px solid rgba(245, 158, 11, 0.25)',
               }}
             >
-              <CoinIcon size={20} />
+              <CoinIcon size={26} />
               <div>
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
                   Монеты
                 </div>
-                <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#b45309', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  {(balance.coins || 0).toLocaleString('ru-RU')} <CoinIcon size={13} />
+                <div style={{ fontSize: '14px', fontWeight: 800, color: '#b45309', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {(balance.coins || 0).toLocaleString('ru-RU')} <CoinIcon size={16} />
                 </div>
               </div>
             </div>

@@ -135,7 +135,7 @@ export function PointsHistorySection({ entries = [], loading = false }) {
                   gap: '4px',
                 }}
               >
-                +{entry.amount} {isXp ? 'XP' : <CoinIcon size={14} />}
+                +{entry.amount} {isXp ? 'XP' : <CoinIcon size={18} />}
               </span>
             </div>
           </div>

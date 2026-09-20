@@ -303,8 +303,8 @@ export function ShopAdminManager() {
                       </span>
                     </td>
                     <td style={{ padding: '10px 12px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        {item.price} <CoinIcon size={14} />
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        {item.price} <CoinIcon size={18} />
                       </span>
                     </td>
                     <td style={{ padding: '10px 12px' }}>
@@ -432,8 +432,8 @@ export function ShopAdminManager() {
             {/* Price & Safe Visual Preset */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', fontWeight: 600, marginBottom: '4px' }}>
-                  Цена (в Extra-монетах <CoinIcon size={14} />)
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600, marginBottom: '4px' }}>
+                  Цена (в Extra-монетах <CoinIcon size={18} />)
                 </label>
                 <input
                   type="number"

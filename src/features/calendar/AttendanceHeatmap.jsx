@@ -463,8 +463,8 @@ export function AttendanceHeatmap({
               <div style={{ color: '#86efac', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span>+{hoveredCell.data.xpEarned} XP</span>
                 <span>•</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', color: '#fde047' }}>
-                  +{hoveredCell.data.coinsEarned} <CoinIcon size={12} />
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#fde047' }}>
+                  +{hoveredCell.data.coinsEarned} <CoinIcon size={16} />
                 </span>
               </div>
               <ul style={{ margin: '4px 0 0', paddingLeft: '14px', fontSize: '11px', color: '#cbd5e1' }}>

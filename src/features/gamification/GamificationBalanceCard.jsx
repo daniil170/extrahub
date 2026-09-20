@@ -146,8 +146,8 @@ export function GamificationBalanceCard({
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               <ShoppingBag size={14} />
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                В магазин <CoinIcon size={14} />
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                В магазин <CoinIcon size={18} />
               </span>
             </Button>
           </NavLink>
@@ -159,7 +159,7 @@ export function GamificationBalanceCard({
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               <User size={14} />
-              <span>Профиль 🎨</span>
+              <span>Профиль</span>
             </Button>
           </NavLink>
 
@@ -263,8 +263,8 @@ export function GamificationBalanceCard({
           >
             <div
               style={{
-                width: '46px',
-                height: '46px',
+                width: '48px',
+                height: '48px',
                 borderRadius: '50%',
                 backgroundColor: 'rgba(234, 179, 8, 0.15)',
                 color: '#d97706',
@@ -274,7 +274,7 @@ export function GamificationBalanceCard({
                 flexShrink: 0,
               }}
             >
-              <CoinIcon size={24} />
+              <CoinIcon size={32} />
             </div>
             <div>
               <div
@@ -296,10 +296,10 @@ export function GamificationBalanceCard({
                   color: '#b45309',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '8px',
                 }}
               >
-                {coins.toLocaleString('ru-RU')} <CoinIcon size={20} />
+                {coins.toLocaleString('ru-RU')} <CoinIcon size={26} />
               </div>
             </div>
           </div>

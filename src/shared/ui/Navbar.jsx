@@ -259,12 +259,12 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                 {currentUser && (currentUser.role === 'student' || currentUser.role === 'admin') && (
                   <>
                     <NavLink to="/student/shop" style={navLinkStyle}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        Магазин <CoinIcon size={14} />
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                        Магазин <CoinIcon size={18} />
                       </span>
                     </NavLink>
                     <NavLink to="/student/profile" style={navLinkStyle}>
-                      Профиль 
+                      Профиль
                     </NavLink>
                   </>
                 )}
@@ -473,7 +473,7 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                             textDecoration: 'none',
                           }}
                         >
-                          <span>🎨 Мой профиль и витрина</span>
+                          <span>Мой профиль и витрина</span>
                         </NavLink>
                         <NavLink
                           to="/student/shop"
@@ -491,8 +491,8 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                             textDecoration: 'none',
                           }}
                         >
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                            <CoinIcon size={14} /> Магазин кастомизации
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                            <CoinIcon size={18} /> Магазин кастомизации
                           </span>
                         </NavLink>
                       </div>
@@ -728,11 +728,11 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                 {currentUser && (currentUser.role === 'student' || currentUser.role === 'admin') && (
                   <>
                     <NavLink to="/student/profile" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-                      🎨 Мой профиль и витрина
+                      Мой профиль и витрина
                     </NavLink>
                     <NavLink to="/student/shop" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                        <CoinIcon size={16} /> Магазин кастомизации
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                        <CoinIcon size={20} /> Магазин кастомизации
                       </span>
                     </NavLink>
                   </>

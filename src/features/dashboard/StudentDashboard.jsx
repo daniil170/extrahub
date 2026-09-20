@@ -109,12 +109,19 @@ export function StudentDashboard() {
 
   const [showCancelled, setShowCancelled] = useState(false);
 
+  const activeEnrollments = (enrollments || []).filter(
+    (e) => e.status !== 'cancelled' && e.status !== 'cancelled_by_timeout'
+  );
+  const cancelledEnrollments = (enrollments || []).filter(
+    (e) => e.status === 'cancelled' || e.status === 'cancelled_by_timeout'
+  );
+
   const studentGroups = activeEnrollments
     .map((e) => e.group)
     .filter(Boolean);
 
   const activitiesMap = {};
-  enrollments.forEach((e) => {
+  (enrollments || []).forEach((e) => {
     if (e.activity?.id) activitiesMap[e.activity.id] = e.activity;
   });
 
