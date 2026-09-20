@@ -803,7 +803,7 @@ export function StudentDashboard() {
               border: '1px solid var(--border-color)',
               borderRadius: gamificationExpanded ? 'var(--radius-md) var(--radius-md) 0 0' : 'var(--radius-md)',
               cursor: 'pointer',
-              transition: 'all 0.15s ease',
+              transition: 'border-radius 0.25s ease, background-color 0.15s ease, box-shadow 0.15s ease',
               textAlign: 'left',
               boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}
@@ -851,20 +851,30 @@ export function StudentDashboard() {
                 size={18}
                 style={{
                   transform: gamificationExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform 0.2s ease',
+                  transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}
               />
             </div>
           </button>
 
-          {gamificationExpanded && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateRows: gamificationExpanded ? '1fr' : '0fr',
+              transition: 'grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease',
+              opacity: gamificationExpanded ? 1 : 0,
+              backgroundColor: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderTop: 'none',
+              borderRadius: '0 0 var(--radius-md) var(--radius-md)',
+              overflow: 'hidden',
+            }}
+          >
             <div
               style={{
-                padding: '20px',
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
-                borderTop: 'none',
-                borderRadius: '0 0 var(--radius-md) var(--radius-md)',
+                minHeight: 0,
+                padding: gamificationExpanded ? '20px' : '0 20px',
+                transition: 'padding 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px',
@@ -908,7 +918,7 @@ export function StudentDashboard() {
                 </div>
               )}
             </div>
-          )}
+          </div>
         </div>
       )}
 
