@@ -17,6 +17,7 @@ import {
   TeacherDashboard,
   CoordinatorDashboard,
 } from '../../features/dashboard/index.js';
+import { ShopPage, StudentProfilePage } from '../../features/shop/index.js';
 import {
   TeacherEquipmentPage,
   TechnicianDashboard,
@@ -76,6 +77,30 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['student', 'admin']}>
             <StudentDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'student/shop',
+        element: (
+          <ProtectedRoute allowedRoles={['student', 'admin', 'parent', 'teacher', 'coordinator']}>
+            <ShopPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'student/profile',
+        element: (
+          <ProtectedRoute allowedRoles={['student', 'admin', 'parent', 'teacher', 'coordinator']}>
+            <StudentProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'profile/:studentId',
+        element: (
+          <ProtectedRoute allowedRoles={['student', 'admin', 'parent', 'teacher', 'coordinator']}>
+            <StudentProfilePage />
           </ProtectedRoute>
         ),
       },

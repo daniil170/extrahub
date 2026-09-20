@@ -410,8 +410,8 @@ service cloud.firestore {
     // GAMIFICATION: USER BALANCES COLLECTION
     // ==========================================
     match /userBalances/{userId} {
-      // User balances are readable by authenticated users (for profile stats, leaderboards, teacher views)
-      allow read: if isAuthenticated();
+      // User balances are readable for profile stats, leaderboards, teacher views
+      allow read: if true;
       // Writes are strictly performed via Cloud Functions / Admin SDK
       allow create, update, delete: if false;
     }
@@ -420,8 +420,8 @@ service cloud.firestore {
     // GAMIFICATION: POINTS LEDGER COLLECTION
     // ==========================================
     match /pointsLedger/{entryId} {
-      // Points ledger transactions can be read by authenticated users
-      allow read: if isAuthenticated();
+      // Points ledger transactions are readable for student history and logs
+      allow read: if true;
       // Writes are strictly performed via Cloud Functions / Admin SDK
       allow create, update, delete: if false;
     }
@@ -448,6 +448,29 @@ service cloud.firestore {
       allow read: if true;
       // Writes managed exclusively via Cloud Functions / Admin SDK
       allow write: if false;
+    }
+
+    // ==========================================
+    // GAMIFICATION: SHOP & USER INVENTORY
+    // ==========================================
+    match /shopItems/{itemId} {
+      // Public shop catalog
+      allow read: if true;
+      // Creation, update and removal by admin or coordinator
+      allow create, update, delete: if isAdmin() || isCoordinator() || isDemoMaster();
+    }
+
+    match /userInventory/{inventoryItemId} {
+      // Inventory readable for profile views, leaderboards, showcase
+      allow read: if true;
+      // Owner can update isEquipped flag directly or via Cloud Function
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        isDemoMaster() ||
+        isAdmin()
+      ) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isEquipped']);
+      // Purchases and removals strictly via Cloud Functions / Admin SDK
+      allow create, delete: if false;
     }
   }
 }

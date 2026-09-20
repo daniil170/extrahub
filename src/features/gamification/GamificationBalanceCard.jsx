@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import {
   Flame,
   Coins,
@@ -8,6 +9,8 @@ import {
   TrendingUp,
   CheckCircle2,
   AlertTriangle,
+  ShoppingBag,
+  User,
 } from 'lucide-react';
 import { Card, Badge, Button, Modal, Spinner } from '../../shared/ui/index.js';
 import { useStreakFreezeCall } from './api.js';
@@ -137,6 +140,28 @@ export function GamificationBalanceCard({
             </span>
           )}
 
+          <NavLink to="/student/shop" style={{ textDecoration: 'none' }}>
+            <Button
+              size="sm"
+              variant="primary"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <ShoppingBag size={14} />
+              <span>В магазин 🪙</span>
+            </Button>
+          </NavLink>
+
+          <NavLink to="/student/profile" style={{ textDecoration: 'none' }}>
+            <Button
+              size="sm"
+              variant="outline"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <User size={14} />
+              <span>Профиль 🎨</span>
+            </Button>
+          </NavLink>
+
           {onToggleHistory && (
             <Button
               size="sm"
@@ -145,7 +170,7 @@ export function GamificationBalanceCard({
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               <History size={14} />
-              <span>{historyOpen ? 'Скрыть историю' : 'История начислений'}</span>
+              <span>{historyOpen ? 'Скрыть историю' : 'История'}</span>
             </Button>
           )}
         </div>

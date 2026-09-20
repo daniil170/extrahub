@@ -11,3 +11,4 @@ export * from './notification/model.js';
 export * from './equipmentIssue/model.js';
 export * from './gamification/model.js';
 export * from './league/model.js';
+export * from './shop/model.js';

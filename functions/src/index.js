@@ -29,6 +29,9 @@ export { createSeason } from './callable/createSeason.js';
 export { finalizeSeasonAndPromote } from './callable/finalizeSeasonAndPromote.js';
 export { updateLeagueProfile } from './callable/updateLeagueProfile.js';
 
+export { purchaseShopItem } from './callable/purchaseShopItem.js';
+export { equipShopItem } from './callable/equipShopItem.js';
+
 export { logAuditEvent } from './shared/auditLog.js';
 export { logFunctionError } from './shared/systemErrors.js';
 export { promoteFromWaitlist } from './shared/waitlist.js';

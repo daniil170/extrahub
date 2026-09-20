@@ -255,6 +255,17 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                   </NavLink>
                 )}
 
+                {currentUser && (currentUser.role === 'student' || currentUser.role === 'admin') && (
+                  <>
+                    <NavLink to="/student/shop" style={navLinkStyle}>
+                      Магазин 🪙
+                    </NavLink>
+                    <NavLink to="/student/profile" style={navLinkStyle}>
+                      Профиль 🎨
+                    </NavLink>
+                  </>
+                )}
+
                 {currentUser && (currentUser.role === 'teacher' || currentUser.role === 'admin') && (
                   <>
                     {/* Visual separator isolating equipment maintenance */}
@@ -416,7 +427,7 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
 
                     {/* Cabinet shortcut */}
                     {userCabinet && (
-                      <div style={{ padding: '6px 8px' }}>
+                      <div style={{ padding: '6px 8px 2px' }}>
                         <NavLink
                           to={userCabinet.to}
                           onClick={() => setProfileDropdownOpen(false)}
@@ -437,6 +448,47 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                         >
                           <span>{userCabinet.label}</span>
                           <span style={{ fontSize: '11px', opacity: 0.8 }}>→</span>
+                        </NavLink>
+                      </div>
+                    )}
+
+                    {(currentUser.role === 'student' || currentUser.role === 'admin') && (
+                      <div style={{ padding: '2px 8px 6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <NavLink
+                          to="/student/profile"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            width: '100%',
+                            padding: '6px 10px',
+                            borderRadius: 'var(--radius-xs)',
+                            color: 'var(--text-primary)',
+                            fontSize: '12.5px',
+                            fontWeight: 500,
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <span>🎨 Мой профиль и витрина</span>
+                        </NavLink>
+                        <NavLink
+                          to="/student/shop"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            width: '100%',
+                            padding: '6px 10px',
+                            borderRadius: 'var(--radius-xs)',
+                            color: 'var(--text-primary)',
+                            fontSize: '12.5px',
+                            fontWeight: 500,
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <span>🪙 Магазин кастомизации</span>
                         </NavLink>
                       </div>
                     )}
@@ -666,6 +718,17 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                   <NavLink to={userCabinet.to} style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
                     {userCabinet.label}
                   </NavLink>
+                )}
+
+                {currentUser && (currentUser.role === 'student' || currentUser.role === 'admin') && (
+                  <>
+                    <NavLink to="/student/profile" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
+                      🎨 Мой профиль и витрина
+                    </NavLink>
+                    <NavLink to="/student/shop" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
+                      🪙 Магазин кастомизации
+                    </NavLink>
+                  </>
                 )}
 
                 {currentUser && (currentUser.email === 'daniilivakin30@gmail.com' || currentUser.isDemoMaster) && (

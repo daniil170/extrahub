@@ -11,6 +11,7 @@ import {
 import { Modal, Button, Badge, Spinner } from '../../shared/ui/index.js';
 import { LEAGUE_CONFIG } from '../../entities/league/model.js';
 import { subscribeDivisionLeaderboard } from './api.js';
+import { AvatarWithCosmetics, StudentTitleBadge } from '../shop/index.js';
 
 /**
  * Full Division Standings & Leaderboard Modal
@@ -214,6 +215,13 @@ export function LeagueLeaderboardModal({
                       {position === 1 ? '🥇' : position === 2 ? '🥈' : position === 3 ? '🥉' : position}
                     </div>
 
+                    {/* Participant Avatar with Cosmetic Frame */}
+                    <AvatarWithCosmetics
+                      name={displayName}
+                      frameEffectId={member.equippedFrameId || (isSelf ? member.frameEffectId : null)}
+                      size={36}
+                    />
+
                     {/* Participant Name & Status */}
                     <div>
                       <div
@@ -224,10 +232,18 @@ export function LeagueLeaderboardModal({
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px',
+                          flexWrap: 'wrap',
                         }}
                       >
                         <span>{displayName}</span>
                         {isSelf && <Badge variant="info">Вы</Badge>}
+                        {member.titleName && (
+                          <StudentTitleBadge
+                            titleName={member.titleName}
+                            titleEffectId={member.titleEffectId}
+                            rarity={member.titleRarity || 'rare'}
+                          />
+                        )}
                         {!member.useRealName && (
                           <span title="Анонимный профиль" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                             🕶️

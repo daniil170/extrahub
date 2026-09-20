@@ -41,7 +41,6 @@ export function subscribeActiveSeason(onUpdate, onError) {
       }
     },
     (err) => {
-      console.warn('subscribeActiveSeason warning:', err.message);
       onUpdate(
         createSeason({
           id: 'season-demo-current',
@@ -97,7 +96,6 @@ export function subscribeStudentLeagueMembership(userId, onUpdate, onError) {
       }
     },
     (err) => {
-      console.warn('subscribeStudentLeagueMembership warning:', err.message);
       onUpdate(fallbackMembership);
       if (onError) onError(err);
     }
@@ -164,7 +162,6 @@ export function subscribeDivisionLeaderboard(divisionId, onUpdate, onError) {
       onUpdate(list);
     },
     (err) => {
-      console.warn('subscribeDivisionLeaderboard warning:', err.message);
       onUpdate(fallbackMembers);
       if (onError) onError(err);
     }
@@ -188,7 +185,6 @@ export function subscribeAllSeasons(onUpdate, onError) {
       onUpdate(list);
     },
     (err) => {
-      console.warn('subscribeAllSeasons warning:', err.message);
       if (onError) onError(err);
     }
   );
@@ -220,7 +216,6 @@ export function subscribeSeasonDivisions(seasonId, onUpdate, onError) {
       onUpdate(list);
     },
     (err) => {
-      console.warn('subscribeSeasonDivisions warning:', err.message);
       if (onError) onError(err);
     }
   );

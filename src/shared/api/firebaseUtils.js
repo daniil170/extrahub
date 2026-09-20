@@ -32,6 +32,8 @@ export const COLLECTIONS = {
   SEASONS: 'seasons',
   LEAGUE_DIVISIONS: 'leagueDivisions',
   LEAGUE_MEMBERSHIPS: 'leagueMemberships',
+  SHOP_ITEMS: 'shopItems',
+  USER_INVENTORY: 'userInventory',
 };
 
 /**
