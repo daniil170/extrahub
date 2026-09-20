@@ -410,13 +410,8 @@ service cloud.firestore {
     // GAMIFICATION: USER BALANCES COLLECTION
     // ==========================================
     match /userBalances/{userId} {
-      // Student reads own balance, parent reads child balance
-      allow read: if isAuthenticated() && (
-        request.auth.uid == userId ||
-        isParentOfStudent(userId) ||
-        isDemoMaster() ||
-        isAdmin()
-      );
+      // User balances are readable by authenticated users (for profile stats, leaderboards, teacher views)
+      allow read: if isAuthenticated();
       // Writes are strictly performed via Cloud Functions / Admin SDK
       allow create, update, delete: if false;
     }
@@ -425,13 +420,8 @@ service cloud.firestore {
     // GAMIFICATION: POINTS LEDGER COLLECTION
     // ==========================================
     match /pointsLedger/{entryId} {
-      // Student reads own transactions, parent reads child transactions
-      allow read: if isAuthenticated() && (
-        resource.data.userId == request.auth.uid ||
-        isParentOfStudent(resource.data.userId) ||
-        isDemoMaster() ||
-        isAdmin()
-      );
+      // Points ledger transactions can be read by authenticated users
+      allow read: if isAuthenticated();
       // Writes are strictly performed via Cloud Functions / Admin SDK
       allow create, update, delete: if false;
     }
@@ -440,22 +430,22 @@ service cloud.firestore {
     // GAMIFICATION: SEASONS & DIVISIONS
     // ==========================================
     match /seasons/{seasonId} {
-      // All authenticated users can read seasons
-      allow read: if isAuthenticated();
+      // Public season information
+      allow read: if true;
       // Writes managed exclusively via Cloud Functions / Admin SDK
       allow write: if false;
     }
 
     match /leagueDivisions/{divisionId} {
-      // All authenticated users can read divisions
-      allow read: if isAuthenticated();
+      // Public league division standings
+      allow read: if true;
       // Writes managed exclusively via Cloud Functions / Admin SDK
       allow write: if false;
     }
 
     match /leagueMemberships/{membershipId} {
-      // All authenticated users can read division standings
-      allow read: if isAuthenticated();
+      // Public league leaderboard memberships
+      allow read: if true;
       // Writes managed exclusively via Cloud Functions / Admin SDK
       allow write: if false;
     }

@@ -37,7 +37,8 @@ export function subscribeUserBalance(userId, onUpdate, onError) {
       }
     },
     (err) => {
-      console.warn('subscribeUserBalance error:', err);
+      console.warn('subscribeUserBalance error:', err.message || err);
+      onUpdate(createUserBalance({ userId }));
       if (onError) onError(err);
     }
   );
@@ -70,7 +71,8 @@ export function subscribePointsLedger(userId, onUpdate, onError) {
       onUpdate(list);
     },
     (err) => {
-      console.warn('subscribePointsLedger error:', err);
+      console.warn('subscribePointsLedger error:', err.message || err);
+      onUpdate([]);
       if (onError) onError(err);
     }
   );

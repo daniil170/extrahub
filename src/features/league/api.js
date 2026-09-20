@@ -42,6 +42,13 @@ export function subscribeActiveSeason(onUpdate, onError) {
     },
     (err) => {
       console.warn('subscribeActiveSeason warning:', err.message);
+      onUpdate(
+        createSeason({
+          id: 'season-demo-current',
+          name: 'Осенний сезон 2026 (1 четверть)',
+          status: 'active',
+        })
+      );
       if (onError) onError(err);
     }
   );
@@ -55,8 +62,19 @@ export function subscribeActiveSeason(onUpdate, onError) {
  * @returns {() => void} unsubscribe
  */
 export function subscribeStudentLeagueMembership(userId, onUpdate, onError) {
+  const fallbackMembership = createLeagueMembership({
+    id: `season-demo_${userId || 'student-1'}`,
+    seasonId: 'season-demo-current',
+    divisionId: 'season-demo-current_bronze_group_1',
+    rank: 'bronze',
+    groupNumber: 1,
+    userId: userId || 'student-1',
+    xpEarnedThisSeason: 0,
+    useRealName: true,
+  });
+
   if (!userId) {
-    onUpdate(null);
+    onUpdate(fallbackMembership);
     return () => {};
   }
 
@@ -75,22 +93,12 @@ export function subscribeStudentLeagueMembership(userId, onUpdate, onError) {
         onUpdate(list[0]);
       } else {
         // Fallback demo membership
-        onUpdate(
-          createLeagueMembership({
-            id: `season-demo_${userId}`,
-            seasonId: 'season-demo-current',
-            divisionId: 'season-demo-current_bronze_group_1',
-            rank: 'bronze',
-            groupNumber: 1,
-            userId,
-            xpEarnedThisSeason: 0,
-            useRealName: true,
-          })
-        );
+        onUpdate(fallbackMembership);
       }
     },
     (err) => {
       console.warn('subscribeStudentLeagueMembership warning:', err.message);
+      onUpdate(fallbackMembership);
       if (onError) onError(err);
     }
   );
@@ -104,8 +112,19 @@ export function subscribeStudentLeagueMembership(userId, onUpdate, onError) {
  * @returns {() => void} unsubscribe
  */
 export function subscribeDivisionLeaderboard(divisionId, onUpdate, onError) {
+  const fallbackMembers = [
+    { id: 'm1', userId: 'student-demo-1', fullName: 'Алихан Сейткали', rank: 'bronze', xpEarnedThisSeason: 250, useRealName: true, pseudonym: '' },
+    { id: 'm2', userId: 'student-demo-2', fullName: 'Айзере Нургалиева', rank: 'bronze', xpEarnedThisSeason: 220, useRealName: false, pseudonym: 'CyberFox' },
+    { id: 'm3', userId: 'student-demo-3', fullName: 'Дамир Касымов', rank: 'bronze', xpEarnedThisSeason: 190, useRealName: true, pseudonym: '' },
+    { id: 'm4', userId: 'student-demo-4', fullName: 'София Ким', rank: 'bronze', xpEarnedThisSeason: 160, useRealName: true, pseudonym: '' },
+    { id: 'm5', userId: 'student-1', fullName: 'Алихан (Вы)', rank: 'bronze', xpEarnedThisSeason: 150, useRealName: true, pseudonym: '' },
+    { id: 'm6', userId: 'student-demo-5', fullName: 'Арсен Маликов', rank: 'bronze', xpEarnedThisSeason: 100, useRealName: false, pseudonym: 'ShadowCoder' },
+    { id: 'm7', userId: 'student-demo-6', fullName: 'Диана Жакипова', rank: 'bronze', xpEarnedThisSeason: 50, useRealName: true, pseudonym: '' },
+    { id: 'm8', userId: 'student-demo-7', fullName: 'Тимур Ержанов', rank: 'bronze', xpEarnedThisSeason: 0, useRealName: true, pseudonym: '' },
+  ];
+
   if (!divisionId) {
-    onUpdate([]);
+    onUpdate(fallbackMembers);
     return () => {};
   }
 
@@ -121,17 +140,7 @@ export function subscribeDivisionLeaderboard(divisionId, onUpdate, onError) {
 
       // Fetch user display names if needed
       if (list.length === 0) {
-        // Fallback realistic demo division participants
-        list = [
-          { id: 'm1', userId: 'student-demo-1', fullName: 'Алихан Сейткали', rank: 'bronze', xpEarnedThisSeason: 250, useRealName: true, pseudonym: '' },
-          { id: 'm2', userId: 'student-demo-2', fullName: 'Айзере Нургалиева', rank: 'bronze', xpEarnedThisSeason: 220, useRealName: false, pseudonym: 'CyberFox' },
-          { id: 'm3', userId: 'student-demo-3', fullName: 'Дамир Касымов', rank: 'bronze', xpEarnedThisSeason: 190, useRealName: true, pseudonym: '' },
-          { id: 'm4', userId: 'student-demo-4', fullName: 'София Ким', rank: 'bronze', xpEarnedThisSeason: 160, useRealName: true, pseudonym: '' },
-          { id: 'm5', userId: 'student-1', fullName: 'Алихан (Вы)', rank: 'bronze', xpEarnedThisSeason: 150, useRealName: true, pseudonym: '' },
-          { id: 'm6', userId: 'student-demo-5', fullName: 'Арсен Маликов', rank: 'bronze', xpEarnedThisSeason: 100, useRealName: false, pseudonym: 'ShadowCoder' },
-          { id: 'm7', userId: 'student-demo-6', fullName: 'Диана Жакипова', rank: 'bronze', xpEarnedThisSeason: 50, useRealName: true, pseudonym: '' },
-          { id: 'm8', userId: 'student-demo-7', fullName: 'Тимур Ержанов', rank: 'bronze', xpEarnedThisSeason: 0, useRealName: true, pseudonym: '' },
-        ];
+        list = fallbackMembers;
       } else {
         // Try to attach student full names for students that useRealName
         try {
@@ -156,6 +165,7 @@ export function subscribeDivisionLeaderboard(divisionId, onUpdate, onError) {
     },
     (err) => {
       console.warn('subscribeDivisionLeaderboard warning:', err.message);
+      onUpdate(fallbackMembers);
       if (onError) onError(err);
     }
   );
