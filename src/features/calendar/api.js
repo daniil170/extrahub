@@ -28,13 +28,17 @@ export function subscribeClubEvents(callback, onError) {
         callback(events);
       },
       (err) => {
-        console.warn('subscribeClubEvents warning:', err.message);
+        if (err.code !== 'permission-denied') {
+          console.warn('subscribeClubEvents warning:', err.message);
+        }
         if (onError) onError(err);
         callback([]);
       }
     );
   } catch (err) {
-    console.warn('subscribeClubEvents error:', err.message);
+    if (err.code !== 'permission-denied') {
+      console.warn('subscribeClubEvents error:', err.message);
+    }
     if (onError) onError(err);
     callback([]);
     return () => {};
@@ -67,13 +71,17 @@ export function subscribeStudentEventResponses(studentId, callback, onError) {
         callback(responses);
       },
       (err) => {
-        console.warn('subscribeStudentEventResponses warning:', err.message);
+        if (err.code !== 'permission-denied') {
+          console.warn('subscribeStudentEventResponses warning:', err.message);
+        }
         if (onError) onError(err);
         callback([]);
       }
     );
   } catch (err) {
-    console.warn('subscribeStudentEventResponses error:', err.message);
+    if (err.code !== 'permission-denied') {
+      console.warn('subscribeStudentEventResponses error:', err.message);
+    }
     if (onError) onError(err);
     callback([]);
     return () => {};
@@ -96,13 +104,17 @@ export function subscribeAllEventResponses(callback, onError) {
         callback(responses);
       },
       (err) => {
-        console.warn('subscribeAllEventResponses warning:', err.message);
+        if (err.code !== 'permission-denied') {
+          console.warn('subscribeAllEventResponses warning:', err.message);
+        }
         if (onError) onError(err);
         callback([]);
       }
     );
   } catch (err) {
-    console.warn('subscribeAllEventResponses error:', err.message);
+    if (err.code !== 'permission-denied') {
+      console.warn('subscribeAllEventResponses error:', err.message);
+    }
     if (onError) onError(err);
     callback([]);
     return () => {};
