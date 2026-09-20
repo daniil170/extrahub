@@ -13,6 +13,7 @@ import logoImg from '../../assets/logo.png';
 import logoDarkImg from '../../assets/logo-dark.svg';
 import { NotificationCenter } from '../../features/notifications/index.js';
 import { useTheme } from '../hooks/index.js';
+import { CoinIcon } from './CoinIcon.jsx';
 import { schoolConfig } from '../../app/config/schoolConfig.js';
 
 /**
@@ -258,7 +259,9 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                 {currentUser && (currentUser.role === 'student' || currentUser.role === 'admin') && (
                   <>
                     <NavLink to="/student/shop" style={navLinkStyle}>
-                      Магазин 🪙
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        Магазин <CoinIcon size={14} />
+                      </span>
                     </NavLink>
                     <NavLink to="/student/profile" style={navLinkStyle}>
                       Профиль 🎨
@@ -488,7 +491,9 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                             textDecoration: 'none',
                           }}
                         >
-                          <span>🪙 Магазин кастомизации</span>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                            <CoinIcon size={14} /> Магазин кастомизации
+                          </span>
                         </NavLink>
                       </div>
                     )}
@@ -726,7 +731,9 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                       🎨 Мой профиль и витрина
                     </NavLink>
                     <NavLink to="/student/shop" style={mobileNavLinkStyle} onClick={handleMobileNavClick}>
-                      🪙 Магазин кастомизации
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        <CoinIcon size={16} /> Магазин кастомизации
+                      </span>
                     </NavLink>
                   </>
                 )}

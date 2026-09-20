@@ -14,3 +14,4 @@ export * from './CapacityBadge.jsx';
 export * from './Alert.jsx';
 export * from './CookieConsentBanner.jsx';
 export * from './ErrorBoundary.jsx';
+export * from './CoinIcon.jsx';

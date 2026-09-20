@@ -4,10 +4,9 @@ import {
   GraduationCap,
   Clock,
   Flame,
-  Coins,
   Calendar,
 } from 'lucide-react';
-import { Card, Badge } from '../../shared/ui/index.js';
+import { Card, Badge, CoinIcon } from '../../shared/ui/index.js';
 import { formatDate } from '../../shared/utils/index.js';
 
 function getSourceIcon(source) {
@@ -131,9 +130,12 @@ export function PointsHistorySection({ entries = [], loading = false }) {
                   fontWeight: 800,
                   fontFamily: 'var(--font-heading)',
                   color: isXp ? 'var(--primary)' : '#b45309',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
                 }}
               >
-                +{entry.amount} {isXp ? 'XP' : '🪙'}
+                +{entry.amount} {isXp ? 'XP' : <CoinIcon size={14} />}
               </span>
             </div>
           </div>

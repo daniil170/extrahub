@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Flame,
-  Coins,
   Sparkles,
   Shield,
   History,
@@ -12,7 +11,7 @@ import {
   ShoppingBag,
   User,
 } from 'lucide-react';
-import { Card, Badge, Button, Modal, Spinner } from '../../shared/ui/index.js';
+import { Card, Badge, Button, Modal, Spinner, CoinIcon } from '../../shared/ui/index.js';
 import { useStreakFreezeCall } from './api.js';
 
 /**
@@ -147,7 +146,9 @@ export function GamificationBalanceCard({
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               <ShoppingBag size={14} />
-              <span>В магазин 🪙</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                В магазин <CoinIcon size={14} />
+              </span>
             </Button>
           </NavLink>
 
@@ -273,7 +274,7 @@ export function GamificationBalanceCard({
                 flexShrink: 0,
               }}
             >
-              <Coins size={24} />
+              <CoinIcon size={24} />
             </div>
             <div>
               <div
@@ -293,9 +294,12 @@ export function GamificationBalanceCard({
                   fontWeight: 800,
                   fontFamily: 'var(--font-heading)',
                   color: '#b45309',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
                 }}
               >
-                {coins.toLocaleString('ru-RU')} 🪙
+                {coins.toLocaleString('ru-RU')} <CoinIcon size={20} />
               </div>
             </div>
           </div>

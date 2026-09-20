@@ -5,7 +5,6 @@ import {
   Award,
   Crown,
   Sparkles,
-  Coins,
   Flame,
   FlameKindling,
   ShoppingBag,
@@ -20,7 +19,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
-import { PageHeader, Button, Card, Badge, Modal } from '../../shared/ui/index.js';
+import { PageHeader, Button, Card, Badge, Modal, CoinIcon } from '../../shared/ui/index.js';
 import {
   AvatarWithCosmetics,
   StudentTitleBadge,
@@ -439,13 +438,13 @@ export function StudentProfilePage() {
                 border: '1px solid rgba(245, 158, 11, 0.25)',
               }}
             >
-              <Coins size={20} color="#d97706" />
+              <CoinIcon size={20} />
               <div>
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
                   Монеты
                 </div>
-                <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#b45309' }}>
-                  {(balance.coins || 0).toLocaleString('ru-RU')} 🪙
+                <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#b45309', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  {(balance.coins || 0).toLocaleString('ru-RU')} <CoinIcon size={13} />
                 </div>
               </div>
             </div>

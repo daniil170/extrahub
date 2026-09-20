@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  Coins,
   Sparkles,
   ShoppingBag,
   Check,
@@ -15,7 +14,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { useAuth } from '../../shared/hooks/useAuth.js';
-import { PageHeader, Button, Card, Badge, Modal } from '../../shared/ui/index.js';
+import { PageHeader, Button, Card, Badge, Modal, CoinIcon } from '../../shared/ui/index.js';
 import {
   SHOP_CATEGORIES,
   SHOP_CATEGORY_LABELS,
@@ -218,7 +217,7 @@ export function ShopPage() {
                 color: '#78350f',
               }}
             >
-              <Coins size={28} />
+              <CoinIcon size={28} />
             </div>
             <div>
               <div style={{ fontSize: '13px', color: 'var(--text-secondary, #64748b)', fontWeight: 500 }}>
@@ -235,7 +234,9 @@ export function ShopPage() {
                 }}
               >
                 <span>{currentCoins.toLocaleString('ru-RU')}</span>
-                <span style={{ fontSize: '16px', color: '#d97706' }}>🪙 Extra-монет</span>
+                <span style={{ fontSize: '16px', color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <CoinIcon size={18} /> Extra-монет
+                </span>
               </div>
             </div>
           </div>
@@ -446,7 +447,7 @@ export function ShopPage() {
                         >
                           {item.price.toLocaleString('ru-RU')}
                         </span>
-                        <span style={{ fontSize: '13px', color: '#d97706', fontWeight: 600 }}>🪙</span>
+                        <CoinIcon size={15} />
                       </div>
                     ) : (
                       <span style={{ fontSize: '12px', color: 'var(--success, #10b981)', fontWeight: 600 }}>
@@ -535,16 +536,16 @@ export function ShopPage() {
                 gap: '8px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', alignItems: 'center' }}>
                 <span style={{ color: 'var(--text-secondary)' }}>Стоимость предмета:</span>
-                <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
-                  {confirmModalItem.price} 🪙
+                <span style={{ fontWeight: 700, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  {confirmModalItem.price} <CoinIcon size={14} />
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', alignItems: 'center' }}>
                 <span style={{ color: 'var(--text-secondary)' }}>Ваш текущий баланс:</span>
-                <span style={{ fontWeight: 700, color: '#d97706' }}>
-                  {currentCoins} 🪙
+                <span style={{ fontWeight: 700, color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  {currentCoins} <CoinIcon size={14} />
                 </span>
               </div>
               <div
@@ -553,13 +554,14 @@ export function ShopPage() {
                   paddingTop: '8px',
                   display: 'flex',
                   justifyContent: 'space-between',
+                  alignItems: 'center',
                   fontSize: '14px',
                   fontWeight: 700,
                 }}
               >
                 <span>Остаток после покупки:</span>
-                <span style={{ color: currentCoins >= confirmModalItem.price ? 'var(--success, #10b981)' : 'var(--danger, #ef4444)' }}>
-                  {(currentCoins - confirmModalItem.price).toLocaleString('ru-RU')} 🪙
+                <span style={{ color: currentCoins >= confirmModalItem.price ? 'var(--success, #10b981)' : 'var(--danger, #ef4444)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  {(currentCoins - confirmModalItem.price).toLocaleString('ru-RU')} <CoinIcon size={14} />
                 </span>
               </div>
             </div>
@@ -586,7 +588,7 @@ export function ShopPage() {
                   </>
                 ) : (
                   <>
-                    <Coins size={16} />
+                    <CoinIcon size={16} />
                     <span>Купить за {confirmModalItem.price} монет</span>
                   </>
                 )}

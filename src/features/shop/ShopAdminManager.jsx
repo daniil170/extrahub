@@ -13,7 +13,7 @@ import {
   Layers,
   Crown,
 } from 'lucide-react';
-import { Button, Card, Modal, Badge } from '../../shared/ui/index.js';
+import { Button, Card, Modal, Badge, CoinIcon } from '../../shared/ui/index.js';
 import {
   SHOP_CATEGORIES,
   SHOP_CATEGORY_LABELS,
@@ -303,7 +303,9 @@ export function ShopAdminManager() {
                       </span>
                     </td>
                     <td style={{ padding: '10px 12px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                      {item.price} 🪙
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        {item.price} <CoinIcon size={14} />
+                      </span>
                     </td>
                     <td style={{ padding: '10px 12px' }}>
                       <span
@@ -430,8 +432,8 @@ export function ShopAdminManager() {
             {/* Price & Safe Visual Preset */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '4px' }}>
-                  Цена (в Extra-монетах 🪙)
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '13px', fontWeight: 600, marginBottom: '4px' }}>
+                  Цена (в Extra-монетах <CoinIcon size={14} />)
                 </label>
                 <input
                   type="number"
