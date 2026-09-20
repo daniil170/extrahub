@@ -277,12 +277,12 @@ export function LeagueWidget({ userId }) {
                 {isTop5 ? (
                   <>
                     <ArrowUpCircle size={16} />
-                    <span>Зона повышения ⬆️</span>
+                    <span>Зона повышения</span>
                   </>
                 ) : isBottom5 ? (
                   <>
                     <ArrowDownCircle size={16} />
-                    <span>{currentRank === 'bronze' ? 'Бронзовая лига' : 'Зона риска вылета ⬇️'}</span>
+                    <span>{currentRank === 'bronze' ? 'Бронзовая лига' : 'Зона риска вылета'}</span>
                   </>
                 ) : (
                   <span>Сохранение лиги</span>

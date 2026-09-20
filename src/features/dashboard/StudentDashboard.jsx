@@ -59,6 +59,7 @@ export function StudentDashboard() {
   const [balance, setBalance] = useState(null);
   const [pointsHistory, setPointsHistory] = useState([]);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [gamificationExpanded, setGamificationExpanded] = useState(false);
   const [loadingGamification, setLoadingGamification] = useState(true);
 
   useEffect(() => {
@@ -786,64 +787,126 @@ export function StudentDashboard() {
         </div>
       )}
 
-      {/* Gamification, Leagues and Balance Section (Placed below enrollments/calendar) */}
+      {/* Gamification, Leagues and Balance Section (Collapsible Accordion) */}
       {!loading && (
-        <div style={{ marginTop: '32px' }}>
-          <div
+        <div style={{ marginTop: '36px' }}>
+          <button
+            type="button"
+            onClick={() => setGamificationExpanded((prev) => !prev)}
             style={{
+              width: '100%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginBottom: '16px',
+              padding: '14px 18px',
+              backgroundColor: 'var(--bg-surface)',
+              border: '1px solid var(--border-color)',
+              borderRadius: gamificationExpanded ? 'var(--radius-md) var(--radius-md) 0 0' : 'var(--radius-md)',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              textAlign: 'left',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}
           >
-            <h2
-              style={{
-                fontSize: '18px',
-                fontWeight: 700,
-                margin: 0,
-                color: 'var(--text-primary)',
-              }}
-            >
-              Достижения, рейтинг и баллы
-            </h2>
-          </div>
-
-          <GamificationBalanceCard
-            balance={balance}
-            loading={loadingGamification}
-            historyOpen={historyOpen}
-            onToggleHistory={() => setHistoryOpen((prev) => !prev)}
-          />
-
-          <LeagueWidget userId={user?.id} />
-
-          {historyOpen && (
-            <div style={{ marginBottom: '24px' }}>
-              <div
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h2
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: '12px',
+                  fontSize: '17px',
+                  fontWeight: 700,
+                  margin: 0,
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-heading)',
                 }}
               >
-                <h3
+                Достижения, рейтинг и баллы
+              </h2>
+              {balance && (
+                <span
                   style={{
-                    fontSize: '16px',
+                    fontSize: '12px',
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    color: 'var(--primary)',
                     fontWeight: 700,
-                    fontFamily: 'var(--font-heading)',
-                    margin: 0,
-                    color: 'var(--text-primary)',
                   }}
                 >
-                  История начислений баллов и монет
-                </h3>
-                <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-                  Всего операций: {pointsHistory.length}
+                  {balance.xp || 0} XP
                 </span>
-              </div>
-              <PointsHistorySection entries={pointsHistory} />
+              )}
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: 'var(--text-secondary)',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
+            >
+              <span>{gamificationExpanded ? 'Свернуть' : 'Развернуть'}</span>
+              <ChevronDown
+                size={18}
+                style={{
+                  transform: gamificationExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s ease',
+                }}
+              />
+            </div>
+          </button>
+
+          {gamificationExpanded && (
+            <div
+              style={{
+                padding: '20px',
+                backgroundColor: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderTop: 'none',
+                borderRadius: '0 0 var(--radius-md) var(--radius-md)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+            >
+              <GamificationBalanceCard
+                balance={balance}
+                loading={loadingGamification}
+                historyOpen={historyOpen}
+                onToggleHistory={() => setHistoryOpen((prev) => !prev)}
+              />
+
+              <LeagueWidget userId={user?.id} />
+
+              {historyOpen && (
+                <div style={{ marginBottom: '12px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: '12px',
+                    }}
+                  >
+                    <h3
+                      style={{
+                        fontSize: '16px',
+                        fontWeight: 700,
+                        fontFamily: 'var(--font-heading)',
+                        margin: 0,
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      История начислений баллов и монет
+                    </h3>
+                    <span style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
+                      Всего операций: {pointsHistory.length}
+                    </span>
+                  </div>
+                  <PointsHistorySection entries={pointsHistory} />
+                </div>
+              )}
             </div>
           )}
         </div>
