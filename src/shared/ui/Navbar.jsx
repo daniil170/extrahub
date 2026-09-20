@@ -264,7 +264,7 @@ export function Navbar({ currentUser, loading = false, onLogout }) {
                       </span>
                     </NavLink>
                     <NavLink to="/student/profile" style={navLinkStyle}>
-                      Профиль 🎨
+                      Профиль 
                     </NavLink>
                   </>
                 )}
